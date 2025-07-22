@@ -1,0 +1,61 @@
+body { font-family: monospace; padding: 20px; } .header, .section, .ttd, .row, .box { margin-bottom: 20px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 4px; text-align: left; }
+textarea {
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 4px;
+  box-sizing: border-box;
+}
+@media print {
+  body {
+    width: 210mm;
+    height: auto; /* gunakan ini, bukan min-height */
+    margin: 0;
+    padding: 5mm 5mm;
+    box-sizing: border-box;
+  }
+
+  .print-button {
+    display: none;
+  }
+
+  textarea {
+    border: none;
+    resize: none;
+    overflow: hidden;
+  }
+
+  table, tr, td, th {
+    page-break-inside: avoid;
+  }
+}
+@media print {
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('logoweb.png') center center no-repeat;
+    background-size: 300px; /* atur ukuran logo */
+    opacity: 0.5; /* tingkat transparansi */
+    z-index: -1;
+  }
+}
+#print-no-invoice {
+  display: none;
+}
+@media print {
+  #print-no-invoice {
+    display: block;
+  }
+}
+/* Sembunyikan class no-print saat print */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
