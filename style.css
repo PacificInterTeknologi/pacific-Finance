@@ -1,0 +1,176 @@
+/* NORMAL MODE */
+textarea {
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #000;
+}
+
+.print-text {
+  display: none;
+}
+
+input,
+select,
+button {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px;
+}
+
+/* PRINT MODE */
+@media print {
+  textarea,
+  input,
+  select,
+  button {
+    display: none !important;
+  }
+
+  .print-text {
+    display: inline !important;
+    white-space: pre-wrap;
+    font-weight: normal;
+  }
+
+  body {
+    width: 210mm;
+    margin: 0;
+    padding: 5mm;
+    box-sizing: border-box;
+  }
+
+  table, tr, td, th {
+    page-break-inside: avoid;
+  }
+
+  body::before {
+    content: \"\";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('logoweb.png') center center no-repeat;
+    background-size: 300px;
+    opacity: 0.1;
+    z-index: -1;
+  }
+}
+
+/* TABEL ITEM */
+#itemTable th:nth-child(1),
+#itemTable td:nth-child(1) {
+  width: 30px;
+  text-align: center;
+}
+
+#itemTable th:nth-child(2),
+#itemTable td:nth-child(2) {
+  width: 40%;
+}
+
+#itemTable th:nth-child(3),
+#itemTable td:nth-child(3) {
+  width: 30px;
+  text-align: center;
+}
+
+#itemTable th:nth-child(4),
+#itemTable td:nth-child(4),
+#itemTable th:nth-child(5),
+#itemTable td:nth-child(5) {
+  width: 120px;
+  text-align: right;
+}
+
+#itemTable td:nth-child(5) {
+  font-weight: bold;
+}
+
+#itemTable input,
+#itemTable textarea {
+  padding: 4px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* SUMMARY */
+.summary {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.summary td {
+  padding: 6px;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.summary td:first-child {
+  width: 100px;
+  font-weight: bold;
+}
+
+.summary input {
+  width: 100%;
+  padding: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+#grandtotal {
+  font-size: 15px;
+  text-align: right;
+  font-weight: bold;
+}
+body {
+  font-family: 'Courier New', Courier, monospace;
+  padding: 15px;
+  background: #fff;
+  color: #000;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+td, th {
+  border: 1px solid #ccc;
+  padding: 10px;
+  vertical-align: top;
+}
+
+textarea, input {
+  font-size: 11px;
+  padding: 6px;
+  border: 1px solid #999;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media print {
+  .print-button, .print-hidden {
+    display: none !important;
+  }
+
+  textarea, input, select {
+    border: none;
+    background: transparent;
+    color: black;
+  }
+
+  .print-text {
+    display: inline;
+  }
+}
