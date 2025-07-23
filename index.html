@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice - Pacific Inter Teknologi</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    @media print {
+      button,
+      .print-hidden {
+        display: none !important;
+      }
+      input,
+      textarea,
+      select {
+        border: none;
+        background: transparent;
+        -webkit-print-color-adjust: exact;
+        color: black;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+      }
+      .print-text {
+        display: inline;
+      }
+    }
+    .print-button {
+      margin: 20px 0;
+    }
+    .print-text {
+      display: none;
+    }
+  </style>
+</head>
+<body onload="isiTanggalOtomatis(); hitungTotal();">
+  <div id="login-screen" style="text-align: center; margin-top: 100px;">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username"><br><br>
+    <input type="password" id="password" placeholder="Password"><br><br>
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color: red;"></p>
+  </div>
+
+  <!-- KONTEN UTAMA -->
+  <div id="main-content" style="display: none;">
+    <div class="header">
+      <h1>PACIFIC INTER TEKNOLOGI</h1>
+      <p>Kirana Two Office Tower, Lt.10 Unit A</p>
+      <p>JL. Boulevard Timur No. 88 Rt./Rw 005/002</p>
+      <p>Pegangsaan Dua, Jakarta Utara 12450</p>
+      <p>Tlp : +62 877887279990 , +62 818 0828 3379</p>
+    </div>
+
+  <button class="print-button" onclick="window.print()">🖰 Cetak Invoice</button>
+<script>
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      const userBenar = "invoicing";
+      const passBenar = "al220466";
+
+      if (user === userBenar && pass === passBenar) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+      } else {
+        document.getElementById("login-error").textContent = "Username atau password salah!";
+      }
+    }
+  </script>
+  <script src="script.js"></script>
+<div class="row">
+  <div class="box">
+    <table>
+      <!-- Informasi Customer -->
+<tr>
+  <td>Invoice To:</td>
+  <td colspan="2">
+    <textarea id="customer" rows="2" placeholder="Nama Customer dan Alamat" style="width: 100%;"
+      oninput="document.getElementById('customer-print').textContent = this.value"></textarea>
+    <div class="print-text" id="customer-print"></div>
+  </td>
+</tr>
+<tr>
+  <td colspan="3">
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr>
+        <td style="width: 33%;">
+          <label for="no-invoice">No Invoice</label><br>
+          <input type="text" id="no-invoice" readonly style="width: 100%;" />
+          <span class="print-text" id="no-invoice-print"></span>
+        </td>
+        <td style="width: 33%;">
+          <label for="kodeLayanan">Kode</label><br>
+          <input type="text" id="kodeLayanan" value="INV" oninput="generateNoInvoice()" style="width: 100%;" />
+        </td>
+        <td style="width: 33%;">
+          <label for="nomorInvoice">No Urut</label><br>
+          <input type="number" id="nomorInvoice" value="1" oninput="generateNoInvoice()" style="width: 100%;" />
+        </td>
+      </tr>
+      <tr>
+        <td style="width: 33%;">
+          <label for="tanggal">Tanggal</label><br>
+          <input type="text" id="tanggal" readonly style="width: 100%;" />
+          <div class="print-text" id="tanggal-print"></div>
+        </td>
+        <td style="width: 33%;">
+          <label for="top">TOP</label><br>
+          <input type="text" id="top" placeholder="30 Hari"
+            oninput="document.getElementById('top-print').textContent = this.value" style="width: 100%;" />
+          <div class="print-text" id="top-print"></div>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+      </table>
+    </div>
+  </div>
+
+  <table id="itemTable">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Keterangan</th>
+        <th>Jumlah</th>
+        <th>Harga Satuan</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <textarea rows="2" oninput="this.nextElementSibling.textContent = this.value; hitungTotal();"></textarea>
+          <div class="print-text"></div>
+        </td>
+        <td>
+          <input class="jumlah" type="number" value="1" oninput="this.nextElementSibling.textContent = this.value; hitungTotal();">
+          <div class="print-text">1</div>
+        </td>
+        <td>
+          <input class="harga" type="number" value="0" oninput="this.nextElementSibling.textContent = this.value; hitungTotal();">
+          <div class="print-text">0</div>
+        </td>
+        <td class="subtotal"><span class="print-text">0</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <button onclick="tambahItem()">+ Tambah Item</button>
+
+  <div class="section right">
+  <table class="summary">
+    <tr>
+      <td>Diskon</td>
+      <td>
+        <input id="diskon" type="number" value="0" oninput="this.nextElementSibling.textContent = this.value; hitungTotal();">
+        <div class="print-text">0</div>
+      </td>
+    </tr>
+    <tr>
+      <td>PPN (%)</td>
+      <td>
+        <input id="ppn" type="number" value="0" oninput="this.nextElementSibling.textContent = this.value; hitungTotal();">
+        <div class="print-text">0</div>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Total</strong></td>
+      <td id="grandtotal"><strong>Rp 0</strong></td>
+    </tr>
+  </table>
+</div>
+
+  <div class="section">
+    <p><strong>Terbilang:</strong> <span id="terbilang"></span></p>
+    <p><strong>Transfer to:</strong><br/>
+      <select id="bank" onchange="isiBank()">
+        <option value="BCA">BCA</option>
+        <option value="Mandiri">Mandiri</option>
+      </select><br/>
+      A/N: <span id="pemilik">Alfianto</span><br/>
+      A/C: <span id="norek">161 036 6666</span>
+    </p>
+  </div>
+
+  <div class="ttd">
+    <p style="text-align: right; margin-right: 60px;">Hormat Kami,</p><br><br><br>
+    <p style="text-align: right; margin-right: 60px;"><strong>ALFIANTO</strong></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
