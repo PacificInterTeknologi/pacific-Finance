@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neraca - PACIFIC PRO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS Variables */
+    :root {
+      --primary-color: #0F1B3C;
+      --secondary-color: #8B0000;
+      --accent-color: #1E40AF;
+      --light-color: #f8f9fa;
+      --border-color: #e0e0e0;
+      --text-color: #333;
+      --success-color: #34a853;
+      --danger-color: #ea4335;
+      --warning-color: #fbbc05;
+      --sidebar-width: 250px;
+      --gold-color: #d4af37;
+      --dark-gold: #B8860B;
+      --platinum-color: #E5E4E2;
+      --light-blue: #E6F0FF;
+    }
+    
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+      color: var(--text-color);
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+    }
+    
+    /* Premium Background Pattern */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(15, 27, 60, 0.07) 0%, transparent 20%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #050a15 100%);
+      color: white;
+      padding: 18px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 76px;
+      border-bottom: 1px solid var(--gold-color);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .brand {
+      font-size: 32px;
+      font-weight: 900;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 1.5px;
+      position: relative;
+      padding-left: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .brand::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 36px;
+      width: 5px;
+      background: linear-gradient(to bottom, var(--gold-color), var(--dark-gold));
+      border-radius: 3px;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .user-name {
+      margin-right: 18px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    
+    .logout-btn {
+      background: linear-gradient(135deg, var(--danger-color) 0%, #c5221f 100%);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .logout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary-color) 0%, #050a15 100%);
+      height: calc(100vh - 76px);
+      position: fixed;
+      left: 0;
+      top: 76px;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+      overflow-y: auto;
+      z-index: 90;
+      transition: transform 0.3s;
+      border-right: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 25px 0;
+    }
+    
+    .sidebar-menu li {
+      margin-bottom: 8px;
+      position: relative;
+    }
+    
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      padding: 15px 25px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sidebar-menu a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+      transition: width 0.3s;
+      z-index: -1;
+    }
+    
+    .sidebar-menu a:hover::before {
+      width: 100%;
+    }
+    
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+      border-left: 3px solid var(--gold-color);
+    }
+    
+    .sidebar-menu i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+      font-size: 18px;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 110px 30px 30px;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-width));
+      background-color: transparent;
+    }
+    
+    .page-header {
+      margin-bottom: 40px;
+      position: relative;
+    }
+    
+    .page-title {
+      font-size: 36px;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      position: relative;
+      display: inline-block;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -8px;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--gold-color), var(--dark-gold));
+      border-radius: 2px;
+    }
+    
+    .page-subtitle {
+      color: #666;
+      font-size: 17px;
+      font-weight: 300;
+      margin-top: 12px;
+    }
+    
+    /* Controls Styles */
+    .controls {
+      background-color: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .controls:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+    }
+    
+    .controls-row {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .control-group label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .control-group input, .control-group select {
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background-color: #fafafa;
+    }
+    
+    .control-group input:focus, .control-group select:focus {
+      border-color: var(--accent-color);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+      background-color: white;
+    }
+    
+    /* Button Styles */
+    .btn {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #050a15 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #050a15 0%, #000000 100%);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, var(--success-color) 0%, #2d8e47 100%);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: linear-gradient(135deg, #2d8e47 0%, #1e5f30 100%);
+    }
+    
+    .btn-info {
+      background: linear-gradient(135deg, var(--accent-color) 0%, #2563a3 100%);
+      color: white;
+    }
+    
+    .btn-info:hover {
+      background: linear-gradient(135deg, #2563a3 0%, #1a4a7a 100%);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background: linear-gradient(135deg, #e0a800 0%, #b3551a 100%);
+    }
+    
+    /* Summary Cards Styles */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+    
+    .summary-card {
+      background-color: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary-color), var(--gold-color));
+    }
+    
+    .summary-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+    
+    .summary-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 15px 0;
+    }
+    
+    .summary-card .label {
+      color: #666;
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    
+    .summary-card .icon {
+      font-size: 36px;
+      color: var(--accent-color);
+      margin-bottom: 15px;
+    }
+    
+    /* Neraca Container Styles */
+    .neraca-container {
+      background-color: white;
+      border-radius: 16px;
+      padding: 35px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+      border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .neraca-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--gold-color), var(--dark-gold));
+    }
+    
+    .neraca-container:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+    }
+    
+    .neraca-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .neraca-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 1px;
+    }
+    
+    .neraca-period {
+      color: #666;
+      font-size: 17px;
+      font-weight: 500;
+    }
+    
+    /* Table Styles */
+    .neraca-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    
+    .neraca-table th {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #050a15 100%);
+      color: white;
+      padding: 18px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 0.8px;
+    }
+    
+    .neraca-table td {
+      padding: 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .neraca-table .section-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #050a15 100%);
+      color: white;
+      font-weight: 600;
+      padding: 15px 18px;
+      text-transform: uppercase;
+      font-size: 15px;
+      letter-spacing: 0.8px;
+    }
+    
+    .neraca-table .subsection-header {
+      background-color: #f0f0f0;
+      font-weight: 600;
+      padding: 12px 18px;
+      font-size: 15px;
+    }
+    
+    .neraca-table .account-name {
+      padding-left: 35px;
+    }
+    
+    .neraca-table .amount {
+      text-align: right;
+      font-weight: 500;
+      font-size: 16px;
+    }
+    
+    .neraca-table .total-row {
+      background-color: #f8f9fa;
+      font-weight: 700;
+      border-top: 2px solid var(--border-color);
+    }
+    
+    .neraca-table .total-row td {
+      padding: 18px;
+      font-size: 16px;
+    }
+    
+    .neraca-table .negative {
+      color: var(--danger-color);
+    }
+    
+    /* Menu Toggle */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      padding: 18px 28px;
+      background-color: var(--success-color);
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      z-index: 1000;
+      transform: translateY(-100px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      font-weight: 600;
+      font-size: 16px;
+      border-left: 5px solid white;
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .notification.error {
+      background-color: var(--danger-color);
+    }
+    
+    /* Sync Warning Styles */
+    .sync-warning {
+      background-color: #fff8e1;
+      border: 1px solid #ffecb3;
+      color: #856404;
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .sync-warning i {
+      color: #ffc107;
+      margin-right: 18px;
+      font-size: 28px;
+    }
+    
+    .sync-warning strong {
+      margin-right: 12px;
+    }
+    
+    .sync-btn {
+      background: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-left: auto;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    
+    .sync-btn:hover {
+      background: linear-gradient(135deg, #e0a800 0%, #b3551a 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    
+    /* Media Queries */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 110px 20px 20px;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .neraca-table {
+        font-size: 14px;
+      }
+      
+      .neraca-table th, .neraca-table td {
+        padding: 14px;
+      }
+      
+      .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      
+      .summary-card {
+        padding: 20px;
+      }
+      
+      .summary-card .value {
+        font-size: 26px;
+      }
+      
+      .summary-card .label {
+        font-size: 14px;
+      }
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .header, .sidebar, .controls, .btn, .summary-cards, .sync-warning {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 0;
+        width: 100%;
+      }
+      
+      .neraca-container {
+        box-shadow: none;
+        padding: 25px;
+        border: none;
+      }
+      
+      .neraca-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+      }
+      
+      .neraca-table th {
+        background-color: #f2f2f2 !important;
+        color: #333 !important;
+        padding: 8px !important;
+        border: 1px solid #ddd !important;
+      }
+      
+      .neraca-table td {
+        padding: 8px !important;
+        border: 1px solid #ddd !important;
+        background-color: white !important;
+      }
+      
+      .neraca-table .section-header {
+        background-color: #f2f2f2 !important;
+        color: #333 !important;
+        border: 1px solid #ddd !important;
+      }
+      
+      .neraca-table .subsection-header {
+        background-color: #f8f9fa !important;
+        border: 1px solid #ddd !important;
+      }
+      
+      .neraca-table .total-row {
+        background-color: #f8f9fa !important;
+        border: 1px solid #ddd !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="brand">PACIFIC PRO</div>
+    </div>
+    <div class="user-info">
+      <div class="user-name" id="userWelcome">Loading...</div>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div>
+  
+  <div class="sidebar" id="sidebar">
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a href="pelanggan.html"><i class="fas fa-users"></i> Data Pelanggan</a></li>
+      <li><a href="jenis-invoice.html"><i class="fas fa-file-alt"></i> Jenis Invoice</a></li>
+      <li><a href="invoice.html"><i class="fas fa-receipt"></i> Invoice</a></li>
+      <li><a href="laporan-penjualan.html"><i class="fas fa-chart-line"></i> Laporan Penjualan</a></li>
+      <li><a href="program_keuangan_akun.html"><i class="fas fa-coins"></i> Input Akun</a></li>
+      <li><a href="program_keuangan_jurnal.html"><i class="fas fa-book"></i> Jurnal</a></li>
+      <li><a href="program_keuangan_laporan.html"><i class="fas fa-chart-pie"></i> Laporan Keuangan</a></li>
+      <li><a href="laba_rugi.html"><i class="fas fa-chart-line"></i> Laba Rugi</a></li>
+      <li><a href="arus_kas.html"><i class="fas fa-money-bill-wave"></i> Arus Kas</a></li>
+      <li><a href="neraca.html" class="active"><i class="fas fa-balance-scale"></i> Neraca</a></li>
+      <li><a href="pengguna.html" id="linkPengguna" style="display: none;"><i class="fas fa-user-cog"></i> Manajemen Pengguna</a></li>
+    </ul>
+  </div>
+  
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Neraca Keuangan</h1>
+      <p class="page-subtitle">Laporan posisi keuangan perusahaan pada periode tertentu</p>
+    </div>
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="icon"><i class="fas fa-coins"></i></div>
+        <div class="value" id="totalAset">Rp 0</div>
+        <div class="label">Total Aset</div>
+      </div>
+      <div class="summary-card">
+        <div class="icon"><i class="fas fa-credit-card"></i></div>
+        <div class="value" id="totalKewajiban">Rp 0</div>
+        <div class="label">Total Kewajiban</div>
+      </div>
+      <div class="summary-card">
+        <div class="icon"><i class="fas fa-chart-line"></i></div>
+        <div class="value" id="totalEkuitas">Rp 0</div>
+        <div class="label">Total Ekuitas</div>
+      </div>
+      <div class="summary-card">
+        <div class="icon"><i class="fas fa-balance-scale"></i></div>
+        <div class="value" id="labaRugi">Rp 0</div>
+        <div class="label">Laba/Rugi Bersih</div>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <div class="controls-row">
+        <div class="control-group">
+          <label>Periode</label>
+          <select id="periodeSelect" onchange="handlePeriodeChange()">
+            <option value="bulan">Bulan Ini</option>
+            <option value="kuartal">Kuartal Ini</option>
+            <option value="tahun">Tahun Ini</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="control-group" id="customDateGroup" style="display: none;">
+          <label>Tanggal</label>
+          <input type="date" id="customDate">
+        </div>
+        <button class="btn btn-primary" onclick="loadNeraca()">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+        <button class="btn btn-warning" onclick="sinkronkanData()">
+          <i class="fas fa-sync-alt"></i> Sinkronkan Data
+        </button>
+        <button class="btn btn-success" onclick="exportToPDF()">
+          <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+        <button class="btn btn-info" onclick="exportToExcel()">
+          <i class="fas fa-file-excel"></i> Export Excel
+        </button>
+      </div>
+    </div>
+    
+    <div class="neraca-container">
+      <div class="neraca-header">
+        <div class="neraca-title">NERACA</div>
+        <div class="neraca-period" id="neracaPeriod">Periode: Desember 2023</div>
+      </div>
+      
+      <table class="neraca-table">
+        <thead>
+          <tr>
+            <th style="width: 60%;">AKUN</th>
+            <th style="width: 20%;">NOMOR</th>
+            <th style="width: 20%;">JUMLAH (Rp)</th>
+          </tr>
+        </thead>
+        <tbody id="neracaBody">
+          <!-- Aset Lancar -->
+          <tr class="section-header">
+            <td colspan="3">ASET LANCAR</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Kas dan Setara Kas</td>
+          </tr>
+          <tr>
+            <td class="account-name">Kas</td>
+            <td>1101</td>
+            <td class="amount" id="kas">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Bank</td>
+            <td>1102</td>
+            <td class="amount" id="bank">0</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Piutang Usaha</td>
+          </tr>
+          <tr>
+            <td class="account-name">Piutang Usaha</td>
+            <td>1201</td>
+            <td class="amount" id="piutangUsaha">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Cadangan Kerugian Piutang</td>
+            <td>1202</td>
+            <td class="amount" id="cadanganPiutang">0</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Persediaan</td>
+          </tr>
+          <tr>
+            <td class="account-name">Persediaan Barang</td>
+            <td>1301</td>
+            <td class="amount" id="persediaan">0</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Aset Lancar</td>
+            <td></td>
+            <td class="amount" id="totalAsetLancar">0</td>
+          </tr>
+          
+          <!-- Aset Tidak Lancar -->
+          <tr class="section-header">
+            <td colspan="3">ASET TIDAK LANCAR</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Peralatan</td>
+          </tr>
+          <tr>
+            <td class="account-name">Peralatan</td>
+            <td>1501</td>
+            <td class="amount" id="peralatan">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Akumulasi Penyusutan Peralatan</td>
+            <td>1502</td>
+            <td class="amount" id="akumulasiPeralatan">0</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Investasi</td>
+          </tr>
+          <tr>
+            <td class="account-name">Investasi Jangka Panjang</td>
+            <td>1601</td>
+            <td class="amount" id="investasi">0</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Aset Tidak Lancar</td>
+            <td></td>
+            <td class="amount" id="totalAsetTidakLancar">0</td>
+          </tr>
+          
+          <tr class="total-row">
+            <td><strong>TOTAL ASET</strong></td>
+            <td></td>
+            <td class="amount" id="totalAsetNeraca"><strong>0</strong></td>
+          </tr>
+          
+          <!-- Kewajiban Lancar -->
+          <tr class="section-header">
+            <td colspan="3">KEWAJIBAN LANCAR</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Utang Usaha</td>
+          </tr>
+          <tr>
+            <td class="account-name">Utang Usaha</td>
+            <td>2101</td>
+            <td class="amount" id="utangUsaha">0</td>
+          </tr>
+          <tr class="subsection-header">
+            <td colspan="3">Utang Pajak</td>
+          </tr>
+          <tr>
+            <td class="account-name">PPN Masukan</td>
+            <td>2201</td>
+            <td class="amount" id="ppnMasukan">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">PPh Pasal 23</td>
+            <td>2202</td>
+            <td class="amount" id="pph23">0</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Kewajiban Lancar</td>
+            <td></td>
+            <td class="amount" id="totalKewajibanLancar">0</td>
+          </tr>
+          
+          <!-- Kewajiban Jangka Panjang -->
+          <tr class="section-header">
+            <td colspan="3">KEWAJIBAN JANGKA PANJANG</td>
+          </tr>
+          <tr>
+            <td class="account-name">Utang Bank Jangka Panjang</td>
+            <td>2401</td>
+            <td class="amount" id="utangBank">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Utang Pajak Tangguhan</td>
+            <td>2402</td>
+            <td class="amount" id="utangPajak">0</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Kewajiban Jangka Panjang</td>
+            <td></td>
+            <td class="amount" id="totalKewajibanJangkaPanjang">0</td>
+          </tr>
+          
+          <tr class="total-row">
+            <td><strong>TOTAL KEWAJIBAN</strong></td>
+            <td></td>
+            <td class="amount" id="totalKewajibanNeraca"><strong>0</strong></td>
+          </tr>
+          
+          <!-- Ekuitas -->
+          <tr class="section-header">
+            <td colspan="3">EKUITAS</td>
+          </tr>
+          <tr>
+            <td class="account-name">Modal Saham</td>
+            <td>3101</td>
+            <td class="amount" id="modalSaham">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Tambahan Modal Disetor</td>
+            <td>3102</td>
+            <td class="amount" id="tambahanModal">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Laba Ditahan</td>
+            <td>3201</td>
+            <td class="amount" id="labaDitahan">0</td>
+          </tr>
+          <tr>
+            <td class="account-name">Saldo Laba Tahun Berjalan</td>
+            <td>3202</td>
+            <td class="amount" id="saldoLaba">0</td>
+          </tr>
+          <tr class="total-row">
+            <td><strong>TOTAL EKUITAS</strong></td>
+            <td></td>
+            <td class="amount" id="totalEkuitasNeraca"><strong>0</strong></td>
+          </tr>
+          
+          <tr class="total-row">
+            <td><strong>TOTAL KEWAJIBAN DAN EKUITAS</strong></td>
+            <td></td>
+            <td class="amount" id="totalKewajibanEkuitas"><strong>0</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div id="notification" class="notification"></div>
+  
+  <script>
+    // ============ GLOBAL VARIABLES ============
+    let neracaData = {};
+    
+    // ============ AUDIT TRAIL INTEGRATION ============
+    function logActivity(action, module, detail) {
+      if (window.auditTrail) {
+        window.auditTrail.log({
+          action: action,
+          module: module,
+          detail: detail,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+    
+    // Override existing functions to add audit logging
+    if (!window.originalShowNotification) {
+      window.originalShowNotification = window.showNotification;
+    }
+    
+    window.showNotification = function(message, type = 'success') {
+      if (window.originalShowNotification) {
+        window.originalShowNotification(message, type);
+      }
+      
+      // Log notification as audit activity
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      if (user) {
+        logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
+      }
+    };
+    
+    // ============ UI FUNCTIONS ============
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+    
+    function logout() {
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      if (user) {
+        logActivity('logout', 'Authentication', 'User logout');
+      }
+      
+      localStorage.removeItem("currentUser");
+      showNotification("Anda telah berhasil logout");
+      window.location.href = "index.html";
+    }
+    
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById("notification");
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add("show");
+      
+      setTimeout(() => {
+        notification.classList.remove("show");
+      }, 3000);
+    }
+    
+    function handlePeriodeChange() {
+      const customDateGroup = document.getElementById("customDateGroup");
+      const periodeSelect = document.getElementById("periodeSelect");
+      
+      if (periodeSelect.value === "custom") {
+        customDateGroup.style.display = "block";
+      } else {
+        customDateGroup.style.display = "none";
+      }
+    }
+    
+    // ============ USER AUTHORIZATION ============
+    function getCurrentUser() {
+      const user = localStorage.getItem("currentUser");
+      return user ? JSON.parse(user) : null;
+    }
+    
+    // ============ DATA FUNCTIONS ============
+    function loadNeraca() {
+      try {
+        // Get data from localStorage or calculate from jurnal
+        const jurnal = JSON.parse(localStorage.getItem("dataJurnal")) || [];
+        const laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+        
+        // Get laba bersih from laba rugi
+        const labaBersihData = JSON.parse(localStorage.getItem("labaBersih")) || {};
+        const labaBersih = parseFloat(labaBersihData.labaBersih) || 0;
+        
+        // Calculate account balances
+        const accounts = calculateAccountBalances(jurnal, laporanKeuangan, labaBersih);
+        
+        // Update neraca table
+        updateNeracaTable(accounts);
+        
+        // Update summary cards
+        updateSummaryCards(accounts);
+        
+        // Update period text
+        updatePeriodText();
+        
+        // Simpan data neraca ke localStorage untuk digunakan di halaman lain
+        localStorage.setItem('neraca', JSON.stringify(accounts));
+        
+        // Simpan data untuk dashboard
+        saveDataForDashboard(accounts);
+        
+        // Check for balance
+        checkBalance(accounts);
+        
+        showNotification("Data neraca berhasil dimuat");
+        
+        // Log activity
+        logActivity('load', 'Balance Sheet', 'Loaded balance sheet data');
+      } catch (error) {
+        console.error("Error loading balance sheet data:", error);
+        showNotification("Terjadi kesalahan saat memuat data neraca", "error");
+      }
+    }
+    
+    function calculateAccountBalances(jurnal, laporanKeuangan, labaBersih) {
+      const accounts = {
+        // Aset
+        kas: 0,
+        bank: 0,
+        piutangUsaha: 0,
+        cadanganPiutang: 0,
+        persediaan: 0,
+        peralatan: 0,
+        akumulasiPeralatan: 0,
+        investasi: 0,
+        
+        // Kewajiban
+        utangUsaha: 0,
+        ppnMasukan: 0,
+        pph23: 0,
+        utangBank: 0,
+        utangPajak: 0,
+        
+        // Ekuitas
+        modalSaham: 0,
+        tambahanModal: 0,
+        labaDitahan: 0,
+        saldoLaba: labaBersih // Menggunakan laba bersih dari laba rugi
+      };
+      
+      // Process jurnal entries
+      jurnal.forEach(entry => {
+        const debit = parseFloat(entry.debit) || 0;
+        const kredit = parseFloat(entry.kredit) || 0;
+        
+        // Update account balances based on account name
+        switch(entry.akun) {
+          case "Kas":
+            accounts.kas += debit - kredit;
+            break;
+          case "Bank":
+            accounts.bank += debit - kredit;
+            break;
+          case "Piutang Usaha":
+            accounts.piutangUsaha += debit - kredit;
+            break;
+          case "Persediaan":
+            accounts.persediaan += debit - kredit;
+            break;
+          case "Peralatan":
+            accounts.peralatan += debit - kredit;
+            break;
+          case "Utang Usaha":
+            accounts.utangUsaha += kredit - debit;
+            break;
+          case "PPN Masukan":
+            accounts.ppnMasukan += kredit - debit;
+            break;
+          case "PPh Pasal 23":
+            accounts.pph23 += kredit - debit;
+            break;
+          case "Utang Bank":
+            accounts.utangBank += kredit - debit;
+            break;
+          case "Utang Pajak Tangguhan":
+            accounts.utangPajak += kredit - debit;
+            break;
+          case "Modal Saham":
+            accounts.modalSaham += kredit - debit;
+            break;
+          case "Tambahan Modal Disetor":
+            accounts.tambahanModal += kredit - debit;
+            break;
+          case "Laba Ditahan":
+            accounts.labaDitahan += kredit - debit;
+            break;
+          case "Investasi":
+            accounts.investasi += debit - kredit;
+            break;
+          case "Beban Operasional":
+          case "Beban Gaji":
+          case "Beban Sewa":
+            // Expenses reduce equity
+            accounts.saldoLaba -= debit - kredit;
+            break;
+          case "Pendapatan Jasa":
+          case "Penjualan":
+            // Revenue increases equity
+            accounts.saldoLaba += kredit - debit;
+            break;
+        }
+      });
+      
+      // Process laporan keuangan data
+      laporanKeuangan.forEach(entry => {
+        // Update account balances based on laporan keuangan data
+        const nilai = parseFloat(entry.nilai) || 0;
+        const tipe = entry.tipe;
+        
+        // Apply value based on type (debit/kredit)
+        const adjustedValue = tipe === 'debit' ? nilai : -nilai;
+        
+        switch(entry.akun) {
+          case "Kas":
+            accounts.kas += adjustedValue;
+            break;
+          case "Bank":
+            accounts.bank += adjustedValue;
+            break;
+          case "Piutang Usaha":
+            accounts.piutangUsaha += adjustedValue;
+            break;
+          case "Persediaan":
+            accounts.persediaan += adjustedValue;
+            break;
+          case "Peralatan":
+            accounts.peralatan += adjustedValue;
+            break;
+          case "Utang Usaha":
+            accounts.utangUsaha -= adjustedValue;
+            break;
+          case "PPN Masukan":
+            accounts.ppnMasukan -= adjustedValue;
+            break;
+          case "PPh Pasal 23":
+            accounts.pph23 -= adjustedValue;
+            break;
+          case "Utang Bank":
+            accounts.utangBank -= adjustedValue;
+            break;
+          case "Utang Pajak Tangguhan":
+            accounts.utangPajak -= adjustedValue;
+            break;
+          case "Modal Saham":
+            accounts.modalSaham -= adjustedValue;
+            break;
+          case "Tambahan Modal Disetor":
+            accounts.tambahanModal -= adjustedValue;
+            break;
+          case "Laba Ditahan":
+            accounts.labaDitahan -= adjustedValue;
+            break;
+          case "Investasi":
+            accounts.investasi += adjustedValue;
+            break;
+        }
+      });
+      
+      // Calculate derived accounts
+      accounts.cadanganPiutang = accounts.piutangUsaha * 0.05; // 5% cadangan kerugian
+      accounts.akumulasiPeralatan = accounts.peralatan * 0.2; // 20% akumulasi penyusutan
+      
+      // Calculate totals
+      accounts.totalAsetLancar = accounts.kas + accounts.bank + accounts.piutangUsaha - accounts.cadanganPiutang + accounts.persediaan;
+      accounts.totalAsetTidakLancar = accounts.peralatan - accounts.akumulasiPeralatan + accounts.investasi;
+      accounts.totalAset = accounts.totalAsetLancar + accounts.totalAsetTidakLancar;
+      
+      accounts.totalKewajibanLancar = accounts.utangUsaha + accounts.ppnMasukan + accounts.pph23;
+      accounts.totalKewajibanJangkaPanjang = accounts.utangBank + accounts.utangPajak;
+      accounts.totalKewajiban = accounts.totalKewajibanLancar + accounts.totalKewajibanJangkaPanjang;
+      
+      accounts.totalEkuitas = accounts.modalSaham + accounts.tambahanModal + accounts.labaDitahan + accounts.saldoLaba;
+      accounts.totalKewajibanEkuitas = accounts.totalKewajiban + accounts.totalEkuitas;
+      
+      // Store globally for later use
+      neracaData = accounts;
+      
+      return accounts;
+    }
+    
+    function updateNeracaTable(accounts) {
+      try {
+        // Update individual accounts
+        document.getElementById("kas").textContent = formatRupiah(accounts.kas);
+        document.getElementById("bank").textContent = formatRupiah(accounts.bank);
+        document.getElementById("piutangUsaha").textContent = formatRupiah(accounts.piutangUsaha);
+        document.getElementById("cadanganPiutang").textContent = "(" + formatRupiah(accounts.cadanganPiutang) + ")";
+        document.getElementById("cadanganPiutang").classList.add("negative");
+        document.getElementById("persediaan").textContent = formatRupiah(accounts.persediaan);
+        document.getElementById("peralatan").textContent = formatRupiah(accounts.peralatan);
+        document.getElementById("akumulasiPeralatan").textContent = "(" + formatRupiah(accounts.akumulasiPeralatan) + ")";
+        document.getElementById("akumulasiPeralatan").classList.add("negative");
+        document.getElementById("investasi").textContent = formatRupiah(accounts.investasi);
+        
+        document.getElementById("utangUsaha").textContent = formatRupiah(accounts.utangUsaha);
+        document.getElementById("ppnMasukan").textContent = formatRupiah(accounts.ppnMasukan);
+        document.getElementById("pph23").textContent = formatRupiah(accounts.pph23);
+        document.getElementById("utangBank").textContent = formatRupiah(accounts.utangBank);
+        document.getElementById("utangPajak").textContent = formatRupiah(accounts.utangPajak);
+        
+        document.getElementById("modalSaham").textContent = formatRupiah(accounts.modalSaham);
+        document.getElementById("tambahanModal").textContent = formatRupiah(accounts.tambahanModal);
+        document.getElementById("labaDitahan").textContent = formatRupiah(accounts.labaDitahan);
+        
+        // Update saldo laba with color coding
+        const saldoLabaElement = document.getElementById("saldoLaba");
+        if (accounts.saldoLaba >= 0) {
+          saldoLabaElement.textContent = formatRupiah(accounts.saldoLaba);
+          saldoLabaElement.classList.remove("negative");
+        } else {
+          saldoLabaElement.textContent = "(" + formatRupiah(Math.abs(accounts.saldoLaba)) + ")";
+          saldoLabaElement.classList.add("negative");
+        }
+        
+        // Update totals
+        document.getElementById("totalAsetLancar").textContent = formatRupiah(accounts.totalAsetLancar);
+        document.getElementById("totalAsetTidakLancar").textContent = formatRupiah(accounts.totalAsetTidakLancar);
+        document.getElementById("totalAsetNeraca").innerHTML = "<strong>" + formatRupiah(accounts.totalAset) + "</strong>";
+        
+        document.getElementById("totalKewajibanLancar").textContent = formatRupiah(accounts.totalKewajibanLancar);
+        document.getElementById("totalKewajibanJangkaPanjang").textContent = formatRupiah(accounts.totalKewajibanJangkaPanjang);
+        document.getElementById("totalKewajibanNeraca").innerHTML = "<strong>" + formatRupiah(accounts.totalKewajiban) + "</strong>";
+        
+        document.getElementById("totalEkuitasNeraca").innerHTML = "<strong>" + formatRupiah(accounts.totalEkuitas) + "</strong>";
+        document.getElementById("totalKewajibanEkuitas").innerHTML = "<strong>" + formatRupiah(accounts.totalKewajibanEkuitas) + "</strong>";
+      } catch (error) {
+        console.error("Error updating balance sheet table:", error);
+      }
+    }
+    
+    function updateSummaryCards(accounts) {
+      try {
+        document.getElementById("totalAset").textContent = formatRupiah(accounts.totalAset);
+        document.getElementById("totalKewajiban").textContent = formatRupiah(accounts.totalKewajiban);
+        document.getElementById("totalEkuitas").textContent = formatRupiah(accounts.totalEkuitas);
+        
+        // Update laba/rugi with color coding
+        const labaRugiElement = document.getElementById("labaRugi");
+        if (accounts.saldoLaba >= 0) {
+          labaRugiElement.textContent = formatRupiah(accounts.saldoLaba);
+          labaRugiElement.style.color = "var(--success-color)";
+        } else {
+          labaRugiElement.textContent = "(" + formatRupiah(Math.abs(accounts.saldoLaba)) + ")";
+          labaRugiElement.style.color = "var(--danger-color)";
+        }
+      } catch (error) {
+        console.error("Error updating summary cards:", error);
+      }
+    }
+    
+    function updatePeriodText() {
+      try {
+        const periode = document.getElementById("periodeSelect").value;
+        const customDate = document.getElementById("customDate").value;
+        let periodText = "";
+        
+        switch(periode) {
+          case "bulan":
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const currentMonth = new Date().getMonth();
+            periodText = "Periode: " + months[currentMonth] + " " + new Date().getFullYear();
+            break;
+          case "kuartal":
+            const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
+            periodText = "Periode: Kuartal " + currentQuarter + " " + new Date().getFullYear();
+            break;
+          case "tahun":
+            periodText = "Periode: " + new Date().getFullYear();
+            break;
+          case "custom":
+            if (customDate) {
+              const date = new Date(customDate);
+              const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+              periodText = "Periode: " + months[date.getMonth()] + " " + date.getFullYear();
+            }
+            break;
+        }
+        
+        document.getElementById("neracaPeriod").textContent = periodText;
+      } catch (error) {
+        console.error("Error updating period text:", error);
+      }
+    }
+    
+    function saveDataForDashboard(accounts) {
+      try {
+        // Ambil data dashboard yang sudah ada
+        let dashboardData = JSON.parse(localStorage.getItem('dashboardData')) || {};
+        
+        // Update data neraca
+        dashboardData.neraca = {
+          totalAset: accounts.totalAset,
+          totalKewajiban: accounts.totalKewajiban,
+          totalEkuitas: accounts.totalEkuitas,
+          saldoLaba: accounts.saldoLaba,
+          lastUpdated: new Date().toISOString()
+        };
+        
+        // Simpan kembali ke localStorage
+        localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
+      } catch (error) {
+        console.error("Error saving data for dashboard:", error);
+      }
+    }
+    
+    function checkBalance(accounts) {
+      // Check if balance sheet is balanced (assets = liabilities + equity)
+      const difference = Math.abs(accounts.totalAset - accounts.totalKewajibanEkuitas);
+      
+      if (difference > 0.01) { // Allow for small rounding errors
+        showNotification(`Peringatan: Neraca tidak seimbang. Selisih: ${formatRupiah(difference)}`, "error");
+      }
+    }
+    
+    function formatRupiah(amount) {
+      try {
+        return "Rp " + Math.abs(amount).toLocaleString("id-ID");
+      } catch (error) {
+        console.error("Error formatting currency:", error);
+        return "Rp " + Math.abs(amount);
+      }
+    }
+    
+    // ============ SYNC FUNCTIONS ============
+    function sinkronkanData() {
+      try {
+        // Get data from jurnal
+        const jurnal = JSON.parse(localStorage.getItem("dataJurnal")) || [];
+        const laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+        
+        // Get laba bersih from laba rugi
+        const labaBersihData = JSON.parse(localStorage.getItem("labaBersih")) || {};
+        const labaBersih = parseFloat(labaBersihData.labaBersih) || 0;
+        
+        // Recalculate account balances
+        const accounts = calculateAccountBalances(jurnal, laporanKeuangan, labaBersih);
+        
+        // Update neraca table
+        updateNeracaTable(accounts);
+        
+        // Update summary cards
+        updateSummaryCards(accounts);
+        
+        // Save data
+        localStorage.setItem('neraca', JSON.stringify(accounts));
+        saveDataForDashboard(accounts);
+        
+        // Check for balance
+        checkBalance(accounts);
+        
+        showNotification("Data neraca berhasil disinkronkan");
+        
+        // Log activity
+        logActivity('sync', 'Balance Sheet', 'Synchronized balance sheet data');
+      } catch (error) {
+        console.error("Error synchronizing balance sheet data:", error);
+        showNotification("Terjadi kesalahan saat menyinkronkan data neraca", "error");
+      }
+    }
+    
+    // ============ EXPORT FUNCTIONS ============
+    function exportToPDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(18);
+        doc.text("NERACA KEUANGAN", 105, 20, { align: "center" });
+        
+        // Add period
+        doc.setFontSize(12);
+        const periodText = document.getElementById("neracaPeriod").textContent;
+        doc.text(periodText, 105, 30, { align: "center" });
+        
+        // Prepare table data
+        const tableData = [];
+        const rows = document.querySelectorAll("#neracaBody tr");
+        
+        rows.forEach(row => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length > 0) {
+            const rowData = [];
+            cells.forEach(cell => {
+              // Get clean text without HTML tags
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = cell.innerHTML;
+              rowData.push(tempDiv.textContent || tempDiv.innerText || "");
+            });
+            tableData.push(rowData);
+          }
+        });
+        
+        // Add table
+        doc.autoTable({
+          head: [["AKUN", "NOMOR", "JUMLAH (Rp)"]],
+          body: tableData,
+          startY: 40,
+          styles: {
+            fontSize: 10,
+            cellPadding: 3
+          },
+          headStyles: {
+            fillColor: [15, 27, 60],
+            textColor: 255
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 245]
+          }
+        });
+        
+        // Save the PDF
+        doc.save("neraca-keuangan.pdf");
+        
+        showNotification("Neraca berhasil diekspor ke PDF!");
+        
+        // Log activity
+        logActivity('export', 'Balance Sheet', 'Exported balance sheet to PDF');
+      } catch (error) {
+        console.error("Error exporting to PDF:", error);
+        showNotification("Terjadi kesalahan saat mengekspor ke PDF", "error");
+      }
+    }
+    
+    function exportToExcel() {
+      try {
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        
+        // Prepare data
+        const tableData = [];
+        const rows = document.querySelectorAll("#neracaBody tr");
+        
+        rows.forEach(row => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length > 0) {
+            const rowData = [];
+            cells.forEach(cell => {
+              // Get clean text without HTML tags
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = cell.innerHTML;
+              rowData.push(tempDiv.textContent || tempDiv.innerText || "");
+            });
+            tableData.push(rowData);
+          }
+        });
+        
+        // Create worksheet
+        const ws = XLSX.utils.aoa_to_sheet([
+          ["NERACA KEUANGAN"],
+          [document.getElementById("neracaPeriod").textContent],
+          [""],
+          ["AKUN", "NOMOR", "JUMLAH (Rp)"],
+          ...tableData
+        ]);
+        
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Neraca");
+        
+        // Save the file
+        XLSX.writeFile(wb, "neraca-keuangan.xlsx");
+        
+        showNotification("Neraca berhasil diekspor ke Excel!");
+        
+        // Log activity
+        logActivity('export', 'Balance Sheet', 'Exported balance sheet to Excel');
+      } catch (error) {
+        console.error("Error exporting to Excel:", error);
+        showNotification("Terjadi kesalahan saat mengekspor ke Excel", "error");
+      }
+    }
+    
+    // ============ INITIALIZATION ============
+    window.onload = function() {
+      try {
+        const user = getCurrentUser();
+        if (!user || !["admin", "staff"].includes(user.role)) {
+          showNotification("Akses ditolak. Halaman ini hanya untuk Admin & Staff.", "error");
+          window.location.href = "dashboard.html";
+          return;
+        }
+        
+        document.getElementById("userWelcome").textContent = `Login sebagai: ${user.username} (${user.role})`;
+        
+        if (user.role === "admin") {
+          document.getElementById("linkPengguna").style.display = "block";
+        }
+        
+        // Set default date
+        const today = new Date();
+        document.getElementById("customDate").value = today.toISOString().split('T')[0];
+        
+        // Load neraca data
+        loadNeraca();
+        
+        // Log activity
+        logActivity('view', 'Balance Sheet', 'User accessed balance sheet page');
+      } catch (error) {
+        console.error("Error initializing page:", error);
+        showNotification("Terjadi kesalahan saat memuat halaman", "error");
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Akuntansi - PACIFIC PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #8B0000;
+            --accent-color: #3182ce;
+            --light-color: #ebf8ff;
+            --border-color: #e2e8f0;
+            --text-color: #2d3748;
+            --text-light: #718096;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+            --warning-color: #dd6b20;
+            --gold-color: #d4af37;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a365d 40%, #8B0000 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* ===== LUXURY BACKGROUND ===== */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 30%);
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        /* ===== PARTICLE EFFECT ===== */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle-float 15s infinite linear;
+        }
+        
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.4;
+            }
+            90% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        /* ===== GOLD ACCENTS ===== */
+        .gold-accent {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+            filter: blur(20px);
+            z-index: 0;
+        }
+        
+        .gold-accent-1 {
+            top: -150px;
+            right: -100px;
+            animation: float-gold 20s infinite ease-in-out;
+        }
+        
+        .gold-accent-2 {
+            bottom: -150px;
+            left: -100px;
+            animation: float-gold 25s infinite ease-in-out reverse;
+        }
+        
+        @keyframes float-gold {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+        
+        /* ===== GEOMETRIC SHAPES ===== */
+        .geometric-shape {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .shape-1 {
+            top: 10%;
+            left: 5%;
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--gold-color);
+            transform: rotate(45deg);
+            animation: rotate 30s linear infinite;
+        }
+        
+        .shape-2 {
+            bottom: 15%;
+            right: 8%;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-color);
+            animation: rotate 40s linear infinite reverse;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* ===== LUXURY CONTAINER ===== */
+        .container {
+            max-width: 600px;
+            padding: 50px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ===== LUXURY DECORATIONS ===== */
+        .decoration {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold-color), transparent);
+            opacity: 0.7;
+        }
+        
+        .decoration-top {
+            top: 20px;
+            left: 0;
+        }
+        
+        .decoration-bottom {
+            bottom: 20px;
+            left: 0;
+        }
+        
+        .corner-decoration {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: var(--gold-color);
+            opacity: 0.7;
+        }
+        
+        .corner-tl {
+            top: 15px;
+            left: 15px;
+            border-top: 2px solid;
+            border-left: 2px solid;
+        }
+        
+        .corner-tr {
+            top: 15px;
+            right: 15px;
+            border-top: 2px solid;
+            border-right: 2px solid;
+        }
+        
+        .corner-bl {
+            bottom: 15px;
+            left: 15px;
+            border-bottom: 2px solid;
+            border-left: 2px solid;
+        }
+        
+        .corner-br {
+            bottom: 15px;
+            right: 15px;
+            border-bottom: 2px solid;
+            border-right: 2px solid;
+        }
+        
+        /* ===== LOGO SECTION ===== */
+        .logo-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .logo {
+            max-width: 220px;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3);
+            background-color: white;
+            padding: 25px;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            animation: pulse 3s infinite;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), 0 8px 32px rgba(0, 0, 0, 0.4); }
+            100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3); }
+        }
+        
+        .logo-fallback {
+            display: none;
+            font-size: 60px;
+            font-weight: 900;
+            font-family: 'Playfair Display', serif;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 5px;
+        }
+        
+        /* ===== CONTENT SECTION ===== */
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3), 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 3px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold-color), transparent);
+        }
+        
+        .subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            margin-bottom: 50px;
+            opacity: 0.9;
+            font-weight: 300;
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+        
+        /* ===== LUXURY BUTTON STYLES ===== */
+        .btn-container {
+            margin-top: 40px;
+            position: relative;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+            color: white;
+            padding: 18px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+            transition: left 0.7s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.2));
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.4);
+            border-color: rgba(212, 175, 55, 0.8);
+        }
+        
+        .btn:active {
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            margin-right: 12px;
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .btn:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* ===== NOTIFICATION STYLES ===== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, rgba(26, 54, 93, 0.9), rgba(49, 130, 206, 0.9));
+            color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-xl), 0 0 20px rgba(212, 175, 55, 0.3);
+            z-index: 1000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--gold-color);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.9), rgba(72, 187, 120, 0.9));
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, rgba(229, 62, 62, 0.9), rgba(245, 101, 101, 0.9));
+        }
+        
+        /* ===== LUXURY FOOTER ===== */
+        .developer-info {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            z-index: 1;
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 2s ease-out 0.5s both;
+            letter-spacing: 1px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .developer-info span {
+            color: var(--gold-color);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            text-decoration-color: var(--gold-color);
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 25px;
+                margin: 0 20px;
+            }
+            
+            .logo {
+                max-width: 170px;
+                padding: 20px;
+            }
+            
+            .logo-fallback {
+                font-size: 48px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .btn {
+                padding: 15px 40px;
+                font-size: 1.1rem;
+            }
+            
+            .developer-info {
+                font-size: 14px;
+                bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+            
+            .logo {
+                max-width: 140px;
+                padding: 15px;
+            }
+            
+            .logo-fallback {
+                font-size: 40px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+            
+            .decoration-top,
+            .decoration-bottom {
+                height: 1px;
+            }
+        }
+        
+        /* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* ===== FOCUS STYLES ===== */
+        a:focus,
+        button:focus {
+            outline: 3px solid var(--gold-color);
+            outline-offset: 2px;
+        }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only">Skip to main content</a>
+    
+    <!-- Particle effects -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Gold accent lights -->
+    <div class="gold-accent gold-accent-1"></div>
+    <div class="gold-accent gold-accent-2"></div>
+    
+    <!-- Geometric shapes -->
+    <div class="geometric-shape shape-1"></div>
+    <div class="geometric-shape shape-2"></div>
+    
+    <!-- Main container -->
+    <div class="container" id="main-content">
+        <!-- Decorative elements -->
+        <div class="decoration decoration-top"></div>
+        <div class="decoration decoration-bottom"></div>
+        <div class="corner-decoration corner-tl"></div>
+        <div class="corner-decoration corner-tr"></div>
+        <div class="corner-decoration corner-bl"></div>
+        <div class="corner-decoration corner-br"></div>
+        
+        <!-- Logo section -->
+        <div class="logo-container">
+            <img src="tegline.png" alt="PACIFIC PRO Logo" class="logo" 
+                 onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+            <div id="logoFallback" class="logo-fallback">PP</div>
+        </div>
+        
+        <!-- Content section -->
+        <main>
+            <h1>SISTEM AKUNTANSI</h1>
+            <p class="subtitle">Developed by Pacific Inter Teknologi</p>
+            
+            <!-- Button container -->
+            <div class="btn-container">
+                <a href="login.html" class="btn" aria-label="Masuk ke sistem PACIFIC PRO">
+                    <i class="fas fa-sign-in-alt"></i> Masuk ke Sistem
+                </a>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="developer-info">
+        Developed by <span>Pacific Inter Teknologi</span> © 2023
+    </footer>
+    
+    <!-- Notification element -->
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+    
+    <!-- JavaScript -->
+    <script>
+        // ===== PARTICLE EFFECT GENERATION =====
+        /**
+         * Creates floating particles for visual enhancement
+         */
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 5 + 1;
+                const posX = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 15;
+                
+                // Apply styles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // ===== AUDIT TRAIL INTEGRATION =====
+        // This function logs user activities for tracking purposes
+        function logActivity(action, module, detail) {
+            if (window.auditTrail) {
+                window.auditTrail.log({
+                    action: action,
+                    module: module,
+                    detail: detail
+                });
+            }
+        }
+        
+        // ===== NOTIFICATION SYSTEM =====
+        /**
+         * Shows a notification message to the user
+         * @param {string} message - The message to display
+         * @param {string} type - The type of notification (success, error, info)
+         */
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById("notification");
+            
+            // Set message and type
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            // Show notification
+            notification.classList.add("show");
+            
+            // Log the notification as an audit activity
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
+            }
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        }
+        
+        // ===== SESSION MANAGEMENT =====
+        /**
+         * Checks if user is already logged in and redirects to dashboard
+         */
+        function checkExistingSession() {
+            const currentUser = localStorage.getItem("currentUser");
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                showNotification(`Selamat datang kembali, ${user.fullName}! Mengarahkan ke dashboard...`, "success");
+                
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1500);
+            }
+        }
+        
+        // ===== INITIALIZATION =====
+        /**
+         * Initializes the page when DOM is fully loaded
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create particle effects
+            createParticles();
+            
+            // Check for existing user session
+            checkExistingSession();
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                // Enter key on the main button
+                if (e.key === 'Enter' && document.activeElement === document.querySelector('.btn')) {
+                    window.location.href = "login.html";
+                }
+            });
+            
+            // Log page access if audit trail is available
+            logActivity('view', 'Landing Page', 'User accessed landing page');
+        });
+        
+        // ===== ERROR HANDLING =====
+        /**
+         * Global error handler for uncaught errors
+         */
+        window.addEventListener('error', function(e) {
+            console.error('An error occurred:', e.error);
+            showNotification('Terjadi kesalahan. Silakan refresh halaman.', 'error');
+        });
+        
+        // ===== PERFORMANCE MONITORING =====
+        /**
+         * Logs page load performance metrics
+         */
+        window.addEventListener('load', function() {
+            if (window.performance) {
+                const perfData = window.performance.timing;
+                const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                console.log(`Page loaded in ${pageLoadTime}ms`);
+            }
+        });
+    </script>
+</body>
+</html>

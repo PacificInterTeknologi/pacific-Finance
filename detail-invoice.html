@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Invoice - Pacific Inter Teknologi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1B1F3B;
+      --secondary-color: #8B0000;
+      --accent-color: #4285f4;
+      --light-color: #f8f9fa;
+      --border-color: #e0e0e0;
+      --text-color: #333;
+      --success-color: #34a853;
+      --danger-color: #ea4335;
+      --warning-color: #fbbc05;
+    }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f7fa;
+      color: var(--text-color);
+    }
+    
+    .invoice-container { 
+      max-width: 900px; 
+      margin: 0 auto; 
+      padding: 30px; 
+      border: 1px solid var(--border-color);
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+    }
+    
+    .company-info {
+      flex: 1;
+    }
+    
+    .company-info h2 {
+      color: var(--primary-color);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .company-info p {
+      margin: 4px 0;
+      color: #555;
+      font-size: 14px;
+    }
+    
+    .invoice-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: right;
+      margin-left: auto;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background-color: #0d0e1f;
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+    }
+    
+    .btn-success:hover {
+      background-color: #2d8e47;
+    }
+    
+    /* Tambahkan style untuk fitur pencarian */
+    .search-container {
+      background-color: var(--light-color);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .search-container input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .search-container button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .search-container button:hover {
+      background-color: #3367d6;
+    }
+    
+    .search-error {
+      color: var(--danger-color);
+      margin-top: 10px;
+      display: none;
+    }
+    
+    .info-section {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .info-box {
+      flex: 1;
+      min-width: 250px;
+      background-color: var(--light-color);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    
+    .info-box h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-size: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 5px;
+    }
+    
+    .info-box p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    
+    .info-box strong {
+      display: inline-block;
+      width: 120px;
+      color: #555;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-belum-lunas {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-lunas {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+    
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    .total-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--light-color);
+      border-radius: 8px;
+      text-align: right;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+    
+    .total-label {
+      width: 200px;
+      font-weight: 600;
+    }
+    
+    .total-value {
+      width: 150px;
+      text-align: right;
+      font-weight: 700;
+    }
+    
+    .grand-total {
+      font-size: 18px;
+      color: var(--primary-color);
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    
+    .back-link {
+      margin-top: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    
+    .back-link:hover {
+      background-color: #0d0e1f;
+    }
+    
+    .not-found {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--danger-color);
+    }
+    
+    .not-found i {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .not-found h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    
+    /* CSS untuk tampilan cetak */
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      
+      .invoice-container {
+        box-shadow: none;
+        border: none;
+        padding: 15mm;
+      }
+      
+      .action-buttons, .back-link, .search-container {
+        display: none !important;
+      }
+      
+      .info-box {
+        background-color: transparent;
+        border: 1px solid #ccc;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .invoice-title {
+        text-align: center;
+        margin-left: 0;
+      }
+      
+      .info-section {
+        flex-direction: column;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .search-container {
+        flex-direction: column;
+      }
+      
+      .search-container input {
+        width: 100%;
+      }
+      
+      table {
+        font-size: 12px;
+      }
+      
+      th, td {
+        padding: 8px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <div class="header">
+      <div class="company-info">
+        <h2>PACIFIC INTER TEKNOLOGI</h2>
+        <p>Kirana Two Office Tower Lt.10 Unit A</p>
+        <p>Jl. Boulevard Timur No.88, Jakarta Utara</p>
+        <p>Telp: +62 81808283379</p>
+      </div>
+      <div class="invoice-title">INVOICE</div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn" onclick="window.print()">
+        <i class="fas fa-print"></i> Cetak Invoice
+      </button>
+      <a href="laporan-penjualan.html" class="btn">
+        <i class="fas fa-arrow-left"></i> Kembali ke Laporan
+      </a>
+    </div>
+    
+    <!-- Tambahkan fitur pencarian invoice -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Masukkan nomor invoice">
+      <button id="searchButton">
+        <i class="fas fa-search"></i> Cari Invoice
+      </button>
+    </div>
+    <div id="searchError" class="search-error">Invoice tidak ditemukan!</div>
+    
+    <div id="invoiceContent">
+      <div class="info-section">
+        <div class="info-box">
+          <h3>Informasi Invoice</h3>
+          <p><strong>No Invoice:</strong> <span id="noInvoice"></span></p>
+          <p><strong>Tanggal:</strong> <span id="tanggal"></span></p>
+          <p><strong>Status:</strong> <span id="status" class="status-badge"></span></p>
+        </div>
+        <div class="info-box">
+          <h3>Informasi Pelanggan</h3>
+          <p><strong>Nama:</strong> <span id="customer"></span></p>
+          <p><strong>Alamat:</strong> <span id="alamat"></span></p>
+          <p><strong>Telepon:</strong> <span id="telp"></span></p>
+        </div>
+        <div class="info-box">
+          <h3>Informasi Pembayaran</h3>
+          <p><strong>Term of Payment:</strong> <span id="termOfPayment"></span></p>
+          <p><strong>No Invoice DP:</strong> <span id="noInvoiceDP"></span></p>
+          <p><strong>Rekening Tujuan:</strong> <span id="rekeningTujuan"></span></p>
+        </div>
+      </div>
+      
+      <h2>Rincian Barang</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 5%;">No</th>
+            <th style="width: 45%;">Deskripsi</th>
+            <th style="width: 7%;">Qty</th>
+            <th style="width: 8%;">Unit</th>
+            <th style="width: 20%;">Harga</th>
+            <th style="width: 20%;">Total</th>
+          </tr>
+        </thead>
+        <tbody id="itemBody"></tbody>
+      </table>
+      
+      <div class="total-section">
+        <div class="total-row">
+          <div class="total-label">Sub Total:</div>
+          <div class="total-value" id="subTotal"></div>
+        </div>
+        <div class="total-row">
+          <div class="total-label">Diskon:</div>
+          <div class="total-value" id="diskon"></div>
+        </div>
+        <div class="total-row">
+          <div class="total-label">PPN 11%:</div>
+          <div class="total-value" id="ppn"></div>
+        </div>
+        <div class="total-row">
+          <div class="total-label">Down Payment:</div>
+          <div class="total-value" id="dp"></div>
+        </div>
+        <div class="total-row grand-total">
+          <div class="total-label">Total:</div>
+          <div class="total-value" id="totalHarga"></div>
+        </div>
+      </div>
+      
+      <div id="terbilangSection" style="margin-top: 20px; font-style: italic; color: #666;"></div>
+    </div>
+    
+    <div id="notFound" class="not-found" style="display: none;">
+      <i class="fas fa-file-invoice-dollar"></i>
+      <h2>Invoice tidak ditemukan</h2>
+      <p>Invoice yang Anda cari tidak tersedia dalam database.</p>
+      <a href="laporan-penjualan.html" class="back-link" style="margin-top: 20px;">
+        <i class="fas fa-arrow-left"></i> Kembali ke Laporan
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // Audit Trail Integration
+    function logActivity(action, module, detail) {
+      if (window.auditTrail) {
+        window.auditTrail.log({
+          action: action,
+          module: module,
+          detail: detail
+        });
+      }
+    }
+    
+    // Override existing functions to add audit logging
+    if (!window.originalShowNotification) {
+      window.originalShowNotification = window.showNotification;
+    }
+    
+    window.showNotification = function(message, type = 'success') {
+      if (window.originalShowNotification) {
+        window.originalShowNotification(message, type);
+      }
+      
+      // Log notification as audit activity
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      if (user) {
+        logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
+      }
+    };
+    
+    // Add audit logging to login function
+    if (!window.originalLoginUser) {
+      window.originalLoginUser = window.loginUser;
+    }
+    
+    window.loginUser = function(username, password) {
+      const result = window.originalLoginUser ? window.originalLoginUser(username, password) : null;
+      
+      if (result) {
+        logActivity('login', 'Authentication', 'Login berhasil');
+      } else {
+        logActivity('login', 'Authentication', 'Login gagal');
+      }
+      
+      return result;
+    };
+    
+    // Add audit logging to logout function
+    if (!window.originalLogout) {
+      window.originalLogout = window.logout;
+    }
+    
+    window.logout = function() {
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      if (user) {
+        logActivity('logout', 'Authentication', 'User logout');
+      }
+      
+      if (window.originalLogout) {
+        window.originalLogout();
+      } else {
+        localStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+      }
+    };
+    
+    function getParameterByName(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+    
+    function formatCurrency(amount) {
+      return "Rp " + amount.toLocaleString("id-ID");
+    }
+    
+    function terbilang(nilai) {
+      const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"];
+      const satuan = ["", "Ribu", "Juta", "Miliar", "Triliun"];
+      
+      if (nilai === 0) return "Nol";
+      
+      let hasil = "", i = 0;
+      while (nilai > 0) {
+        let temp = nilai % 1000, str = "", r = Math.floor(temp/100), p = Math.floor((temp%100)/10), s = temp%10;
+        
+        if (r > 0) str += (r === 1 ? "Seratus " : angka[r] + " Ratus ");
+        if (p === 1) str += s === 0 ? "Sepuluh " : s === 1 ? "Sebelas " : angka[s] + " Belas ";
+        else {
+          if (p > 0) str += angka[p] + " Puluh ";
+          if (s > 0) str += angka[s] + " ";
+        }
+        
+        hasil = str + satuan[i] + " " + hasil;
+        nilai = Math.floor(nilai / 1000); 
+        i++;
+      }
+      
+      return hasil.trim();
+    }
+    
+    // Fungsi untuk mendapatkan semua data invoice dari berbagai sumber
+    function getAllInvoices() {
+      let allInvoices = [];
+      
+      // Coba dapatkan data dari berbagai key localStorage yang mungkin digunakan
+      const keys = [
+        "dataPenjualan",       // untuk invoice.html
+        "dataInvoiceDP",       // untuk invoice-dp.html
+        "dataInvoicePelunasan", // untuk invoice-pelunasan.html
+        "invoices"             // key alternatif
+      ];
+      
+      keys.forEach(key => {
+        try {
+          const data = JSON.parse(localStorage.getItem(key)) || [];
+          if (Array.isArray(data)) {
+            allInvoices = allInvoices.concat(data);
+          }
+        } catch (e) {
+          console.error(`Error parsing localStorage key ${key}:`, e);
+        }
+      });
+      
+      // Hapus duplikat berdasarkan nomor invoice
+      const uniqueInvoices = [];
+      const invoiceNumbers = new Set();
+      
+      allInvoices.forEach(invoice => {
+        if (invoice && invoice.noInvoice && !invoiceNumbers.has(invoice.noInvoice)) {
+          invoiceNumbers.add(invoice.noInvoice);
+          uniqueInvoices.push(invoice);
+        }
+      });
+      
+      return uniqueInvoices;
+    }
+    
+    // Fungsi untuk menampilkan invoice
+    function displayInvoice(invoice) {
+      // Tampilkan konten invoice
+      document.getElementById("invoiceContent").style.display = "block";
+      document.getElementById("notFound").style.display = "none";
+      
+      // Isi informasi invoice
+      document.getElementById("noInvoice").textContent = invoice.noInvoice;
+      document.getElementById("tanggal").textContent = invoice.tanggal;
+      document.getElementById("customer").textContent = invoice.customer;
+      document.getElementById("alamat").textContent = invoice.alamat || "-";
+      document.getElementById("telp").textContent = invoice.telp || "-";
+      document.getElementById("termOfPayment").textContent = invoice.termOfPayment || "-";
+      document.getElementById("noInvoiceDP").textContent = invoice.noInvoiceDP || "-";
+      document.getElementById("rekeningTujuan").textContent = invoice.rekeningTujuan || "-";
+      
+      // Atur status badge
+      const statusElement = document.getElementById("status");
+      statusElement.textContent = invoice.status || "Belum Lunas";
+      if (invoice.status === "Lunas") {
+        statusElement.className = "status-badge status-lunas";
+      } else {
+        statusElement.className = "status-badge status-belum-lunas";
+      }
+      
+      // Hitung subtotal
+      let subtotal = 0;
+      const items = invoice.items || invoice.item || [];
+      
+      // Isi tabel item
+      const tbody = document.getElementById("itemBody");
+      tbody.innerHTML = ""; // Kosongkan tabel terlebih dahulu
+      items.forEach((item, i) => {
+        const nama = item.nama || item.deskripsi || "";
+        const qty = item.qty || item.jumlah || 0;
+        const unit = item.unit || "pcs";
+        const harga = item.harga || 0;
+        const total = qty * harga;
+        subtotal += total;
+        
+        const row = `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${nama}</td>
+            <td>${qty}</td>
+            <td>${unit}</td>
+            <td>${formatCurrency(harga)}</td>
+            <td>${formatCurrency(total)}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+      
+      // Hitung komponen pembayaran
+      const diskon = invoice.diskon || 0;
+      const ppnValue = invoice.ppn ? (subtotal - diskon) * 0.11 : 0;
+      const dpValue = invoice.gunakanDP ? 1000000 : 0; // Nilai DP default 1 juta
+      const totalAkhir = subtotal - diskon + ppnValue - dpValue;
+      
+      // Tampilkan total
+      document.getElementById("subTotal").textContent = formatCurrency(subtotal);
+      document.getElementById("diskon").textContent = formatCurrency(diskon);
+      document.getElementById("ppn").textContent = formatCurrency(ppnValue);
+      document.getElementById("dp").textContent = formatCurrency(dpValue);
+      document.getElementById("totalHarga").textContent = formatCurrency(totalAkhir);
+      
+      // Tampilkan terbilang
+      const terbilangSection = document.getElementById("terbilangSection");
+      terbilangSection.innerHTML = `<p><strong>Terbilang:</strong> ${terbilang(totalAkhir)} Rupiah</p>`;
+    }
+    
+    // Fungsi untuk mencari invoice berdasarkan nomor
+    function searchInvoice() {
+      const searchValue = document.getElementById("searchInput").value.trim();
+      const errorDiv = document.getElementById("searchError");
+      
+      // Reset error message
+      errorDiv.style.display = "none";
+      
+      if (!searchValue) {
+        errorDiv.textContent = "Masukkan nomor invoice!";
+        errorDiv.style.display = "block";
+        return;
+      }
+      
+      // Cari invoice di semua sumber data
+      const allInvoices = getAllInvoices();
+      const invoice = allInvoices.find(d => d.noInvoice.toLowerCase() === searchValue.toLowerCase());
+      
+      if (invoice) {
+        // Tampilkan invoice yang ditemukan
+        displayInvoice(invoice);
+        
+        // Log activity
+        logActivity('view', 'Invoice', `Mencari invoice: ${searchValue}`);
+      } else {
+        // Tampilkan pesan error
+        errorDiv.textContent = "Invoice tidak ditemukan!";
+        errorDiv.style.display = "block";
+        
+        // Sembunyikan konten invoice
+        document.getElementById("invoiceContent").style.display = "none";
+        document.getElementById("notFound").style.display = "block";
+      }
+    }
+    
+    // Tambahkan event listener untuk tombol cari
+    document.getElementById("searchButton").addEventListener("click", searchInvoice);
+    
+    // Tambahkan event listener untuk Enter key di input pencarian
+    document.getElementById("searchInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        searchInvoice();
+      }
+    });
+    
+    // Cek apakah ada parameter URL
+    const noInvoice = getParameterByName("no") || getParameterByName("id");
+    if (noInvoice) {
+      // Jika ada parameter URL, cari invoice berdasarkan parameter
+      const allInvoices = getAllInvoices();
+      const invoice = allInvoices.find(d => d.noInvoice === noInvoice);
+      
+      if (invoice) {
+        displayInvoice(invoice);
+      } else {
+        // Tampilkan pesan not found
+        document.getElementById("invoiceContent").style.display = "none";
+        document.getElementById("notFound").style.display = "block";
+      }
+    } else {
+      // Jika tidak ada parameter URL, sembunyikan konten invoice
+      document.getElementById("invoiceContent").style.display = "none";
+    }
+  </script>
+</body>
+</html>

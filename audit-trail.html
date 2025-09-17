@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Trail - PACIFIC PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables untuk konsistensi warna */
+        :root {
+            --primary-color: #1B1F3B;
+            --secondary-color: #8B0000;
+            --accent-color: #4285f4;
+            --light-color: #f8f9fa;
+            --border-color: #e0e0e0;
+            --text-color: #333;
+            --success-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc05;
+        }
+        
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        /* Header Styles */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-name {
+            margin-right: 15px;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c5221f;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            height: calc(100vh - 70px);
+            position: fixed;
+            left: 0;
+            top: 70px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            z-index: 90;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .page-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Audit Container Styles */
+        .audit-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        /* Filter Styles */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .filter-group input, .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0d0e1f;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #2d8e47;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c5221f;
+        }
+        
+        /* Table Styles */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .audit-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .audit-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .audit-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .audit-table tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* Action Badge Styles */
+        .action-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .action-create {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+        
+        .action-update {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        
+        .action-delete {
+            background-color: #ffebee;
+            color: #b71c1c;
+        }
+        
+        .action-login {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .action-logout {
+            background-color: #fce4ec;
+            color: #c2185b;
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        /* Stats Cards Styles */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* No Data Styles */
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        /* Export Controls Styles */
+        .export-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <div class="logo-container">
+            <div class="brand">PACIFIC PRO</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userWelcome">Loading...</div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="pelanggan.html"><i class="fas fa-users"></i> Data Pelanggan</a></li>
+            <li><a href="jenis-invoice.html"><i class="fas fa-file-alt"></i> Jenis Invoice</a></li>
+            <li><a href="invoice.html"><i class="fas fa-receipt"></i> Invoice</a></li>
+            <li><a href="laporan-penjualan.html"><i class="fas fa-chart-line"></i> Laporan Penjualan</a></li>
+            <li><a href="program_keuangan_akun.html"><i class="fas fa-coins"></i> Input Akun</a></li>
+            <li><a href="program_keuangan_jurnal.html"><i class="fas fa-book"></i> Jurnal</a></li>
+            <li><a href="program_keuangan_laporan.html"><i class="fas fa-chart-pie"></i> Laporan Keuangan</a></li>
+            <li><a href="neraca.html"><i class="fas fa-balance-scale"></i> Neraca</a></li>
+            <li><a href="laba_rugi.html"><i class="fas fa-chart-line"></i> Laba Rugi</a></li>
+            <li><a href="arus_kas.html"><i class="fas fa-money-bill-wave"></i> Arus Kas</a></li>
+            <li><a href="audit-trail.html" class="active"><i class="fas fa-history"></i> Audit Trail</a></li>
+            <li><a href="pengguna.html" id="linkPengguna" style="display: none;"><i class="fas fa-user-cog"></i> Manajemen Pengguna</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Audit Trail</h1>
+            <p class="page-subtitle">Catat semua aktivitas pengguna dalam sistem</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="value" id="totalActivities">0</div>
+                <div class="label">Total Aktivitas</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="todayActivities">0</div>
+                <div class="label">Aktivitas Hari Ini</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="activeUsers">0</div>
+                <div class="label">Pengguna Aktif</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="failedLogins">0</div>
+                <div class="label">Login Gagal</div>
+            </div>
+        </div>
+        
+        <!-- Audit Container -->
+        <div class="audit-container">
+            <!-- Filters Section -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Tanggal Mulai</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="filter-group">
+                    <label>Tanggal Selesai</label>
+                    <input type="date" id="endDate">
+                </div>
+                <div class="filter-group">
+                    <label>Pengguna</label>
+                    <select id="userFilter">
+                        <option value="">Semua Pengguna</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Aksi</label>
+                    <select id="actionFilter">
+                        <option value="">Semua Aksi</option>
+                        <option value="login">Login</option>
+                        <option value="logout">Logout</option>
+                        <option value="create">Create</option>
+                        <option value="update">Update</option>
+                        <option value="delete">Delete</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="filterAuditTrail()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-success" onclick="exportAuditTrail()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Audit Table -->
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Waktu</th>
+                        <th>Pengguna</th>
+                        <th>Role</th>
+                        <th>Aksi</th>
+                        <th>Modul</th>
+                        <th>Detail</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-spinner fa-spin"></i> Memuat data audit trail...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Export Controls -->
+            <div class="export-controls">
+                <button class="btn btn-danger" onclick="clearAuditTrail()">
+                    <i class="fas fa-trash"></i> Hapus Semua Data
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Element -->
+    <div id="notification" class="notification"></div>
+    
+    <!-- External Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        // ======================
+        // AUDIT TRAIL INTEGRATION
+        // ======================
+        
+        // Function to log activity
+        function logActivity(action, module, detail) {
+            if (window.auditTrail) {
+                window.auditTrail.log({
+                    action: action,
+                    module: module,
+                    detail: detail
+                });
+            }
+        }
+        
+        // Override existing functions to add audit logging
+        if (!window.originalShowNotification) {
+            window.originalShowNotification = window.showNotification;
+        }
+        
+        window.showNotification = function(message, type = 'success') {
+            if (window.originalShowNotification) {
+                window.originalShowNotification(message, type);
+            }
+            
+            // Log notification as audit activity
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
+            }
+        };
+        
+        // Add audit logging to login function
+        if (!window.originalLoginUser) {
+            window.originalLoginUser = window.loginUser;
+        }
+        
+        window.loginUser = function(username, password) {
+            const result = window.originalLoginUser ? window.originalLoginUser(username, password) : null;
+            
+            if (result) {
+                logActivity('login', 'Authentication', 'Login berhasil');
+            } else {
+                logActivity('login', 'Authentication', 'Login gagal');
+            }
+            
+            return result;
+        };
+        
+        // Add audit logging to logout function
+        if (!window.originalLogout) {
+            window.originalLogout = window.logout;
+        }
+        
+        window.logout = function() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                logActivity('logout', 'Authentication', 'User logout');
+            }
+            
+            if (window.originalLogout) {
+                window.originalLogout();
+            } else {
+                localStorage.removeItem("currentUser");
+                window.location.href = "index.html";
+            }
+        };
+        
+        // ======================
+        // AUDIT TRAIL SYSTEM
+        // ======================
+        
+        class AuditTrail {
+            constructor() {
+                this.activities = JSON.parse(localStorage.getItem('auditTrail')) || [];
+                this.init();
+            }
+            
+            init() {
+                this.loadAuditTrail();
+                this.updateStats();
+                this.setupFilters();
+                this.loadUserFilter();
+                
+                // Auto cleanup old audit logs (keep last 90 days)
+                this.cleanupOldLogs();
+            }
+            
+            log(activity) {
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                if (!user) return;
+                
+                const auditLog = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    username: user.username,
+                    fullName: user.fullName,
+                    role: user.role,
+                    action: activity.action,
+                    module: activity.module,
+                    detail: activity.detail,
+                    ipAddress: this.getClientIP(),
+                    userAgent: navigator.userAgent,
+                    sessionId: this.getSessionId()
+                };
+                
+                this.activities.unshift(auditLog);
+                
+                // Keep only last 1000 activities
+                if (this.activities.length > 1000) {
+                    this.activities = this.activities.slice(0, 1000);
+                }
+                
+                localStorage.setItem('auditTrail', JSON.stringify(this.activities));
+                
+                // Update stats in real-time
+                this.updateStats();
+            }
+            
+            loadAuditTrail() {
+                const tbody = document.getElementById('auditTableBody');
+                const filtered = this.getFilteredActivities();
+                
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="no-data">
+                                <i class="fas fa-inbox"></i> Tidak ada data audit trail
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = filtered.map((activity, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${this.formatDateTime(activity.timestamp)}</td>
+                        <td>${activity.fullName}</td>
+                        <td>${activity.role}</td>
+                        <td>${this.getActionBadge(activity.action)}</td>
+                        <td>${activity.module}</td>
+                        <td>${activity.detail}</td>
+                        <td>${activity.ipAddress}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            getFilteredActivities() {
+                let filtered = [...this.activities];
+                
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const userFilter = document.getElementById('userFilter').value;
+                const actionFilter = document.getElementById('actionFilter').value;
+                
+                if (startDate) {
+                    filtered = filtered.filter(a => 
+                        new Date(a.timestamp) >= new Date(startDate)
+                    );
+                }
+                
+                if (endDate) {
+                    const endDateTime = new Date(endDate);
+                    endDateTime.setHours(23, 59, 59, 999);
+                    filtered = filtered.filter(a => 
+                        new Date(a.timestamp) <= endDateTime
+                    );
+                }
+                
+                if (userFilter) {
+                    filtered = filtered.filter(a => a.username === userFilter);
+                }
+                
+                if (actionFilter) {
+                    filtered = filtered.filter(a => a.action === actionFilter);
+                }
+                
+                return filtered;
+            }
+            
+            updateStats() {
+                const now = new Date();
+                const today = now.toDateString();
+                
+                const totalActivities = this.activities.length;
+                const todayActivities = this.activities.filter(a => 
+                    new Date(a.timestamp).toDateString() === today
+                ).length;
+                
+                const uniqueUsers = new Set(this.activities.map(a => a.username)).size;
+                const failedLogins = this.activities.filter(a => 
+                    a.action === 'login' && a.detail.includes('gagal')
+                ).length;
+                
+                document.getElementById('totalActivities').textContent = totalActivities;
+                document.getElementById('todayActivities').textContent = todayActivities;
+                document.getElementById('activeUsers').textContent = uniqueUsers;
+                document.getElementById('failedLogins').textContent = failedLogins;
+            }
+            
+            setupFilters() {
+                // Set default date range (last 30 days)
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(endDate.getDate() - 30);
+                
+                document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+                document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+            }
+            
+            loadUserFilter() {
+                const userFilter = document.getElementById('userFilter');
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                
+                userFilter.innerHTML = '<option value="">Semua Pengguna</option>';
+                users.forEach(user => {
+                    userFilter.innerHTML += `<option value="${user.username}">${user.fullName}</option>`;
+                });
+            }
+            
+            getActionBadge(action) {
+                const badges = {
+                    login: '<span class="action-badge action-login">Login</span>',
+                    logout: '<span class="action-badge action-logout">Logout</span>',
+                    create: '<span class="action-badge action-create">Create</span>',
+                    update: '<span class="action-badge action-update">Update</span>',
+                    delete: '<span class="action-badge action-delete">Delete</span>'
+                };
+                
+                return badges[action] || `<span class="action-badge">${action}</span>`;
+            }
+            
+            formatDateTime(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+            
+            getClientIP() {
+                // Simulate IP address (in real app, this would come from server)
+                return '192.168.1.' + Math.floor(Math.random() * 255);
+            }
+            
+            getSessionId() {
+                let sessionId = sessionStorage.getItem('sessionId');
+                if (!sessionId) {
+                    sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
+                    sessionStorage.setItem('sessionId', sessionId);
+                }
+                return sessionId;
+            }
+            
+            cleanupOldLogs() {
+                const ninetyDaysAgo = new Date();
+                ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+                
+                this.activities = this.activities.filter(a => 
+                    new Date(a.timestamp) >= ninetyDaysAgo
+                );
+                
+                localStorage.setItem('auditTrail', JSON.stringify(this.activities));
+            }
+            
+            exportToExcel() {
+                const filtered = this.getFilteredActivities();
+                
+                const data = filtered.map(activity => ({
+                    'Waktu': this.formatDateTime(activity.timestamp),
+                    'Pengguna': activity.fullName,
+                    'Role': activity.role,
+                    'Aksi': activity.action,
+                    'Modul': activity.module,
+                    'Detail': activity.detail,
+                    'IP Address': activity.ipAddress
+                }));
+                
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Audit Trail");
+                XLSX.writeFile(wb, `audit_trail_${new Date().toISOString().split('T')[0]}.xlsx`);
+            }
+            
+            clear() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data audit trail?')) {
+                    this.activities = [];
+                    localStorage.setItem('auditTrail', JSON.stringify(this.activities));
+                    this.loadAuditTrail();
+                    this.updateStats();
+                }
+            }
+        }
+        
+        // ======================
+        // GLOBAL FUNCTIONS
+        // ======================
+        
+        // Initialize audit trail
+        const auditTrail = new AuditTrail();
+        
+        function filterAuditTrail() {
+            auditTrail.loadAuditTrail();
+        }
+        
+        function exportAuditTrail() {
+            auditTrail.exportToExcel();
+        }
+        
+        function clearAuditTrail() {
+            auditTrail.clear();
+        }
+        
+        // Override existing functions to add audit logging
+        const originalShowNotification = window.showNotification;
+        window.showNotification = function(message, type = 'success') {
+            originalShowNotification(message, type);
+            
+            // Log notification as audit activity
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                auditTrail.log({
+                    action: type === 'error' ? 'error' : 'info',
+                    module: 'System',
+                    detail: `Notification: ${message}`
+                });
+            }
+        };
+        
+        // Add audit logging to login function
+        const originalLogin = window.loginUser;
+        window.loginUser = function(username, password) {
+            const result = originalLogin(username, password);
+            
+            if (result) {
+                auditTrail.log({
+                    action: 'login',
+                    module: 'Authentication',
+                    detail: 'Login berhasil'
+                });
+            } else {
+                auditTrail.log({
+                    action: 'login',
+                    module: 'Authentication',
+                    detail: 'Login gagal'
+                });
+            }
+            
+            return result;
+        };
+        
+        // Add audit logging to logout function
+        const originalLogout = window.logout;
+        window.logout = function() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                auditTrail.log({
+                    action: 'logout',
+                    module: 'Authentication',
+                    detail: 'User logout'
+                });
+            }
+            
+            originalLogout();
+        };
+        
+        // Add audit logging to CRUD operations
+        function logCRUD(action, module, detail) {
+            auditTrail.log({
+                action: action,
+                module: module,
+                detail: detail
+            });
+        }
+        
+        // ======================
+        // PAGE INITIALIZATION
+        // ======================
+        
+        // Check login and load page
+        window.onload = function() {
+            const currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                window.location.href = "index.html";
+                return;
+            }
+            
+            const user = JSON.parse(currentUser);
+            document.getElementById("userWelcome").textContent = user.fullName + " (" + user.role + ")";
+            
+            if (user.role === "admin") {
+                document.getElementById("linkPengguna").style.display = "block";
+            }
+            
+            // Log page access
+            auditTrail.log({
+                action: 'view',
+                module: 'Audit Trail',
+                detail: 'Mengakses halaman audit trail'
+            });
+        };
+        
+        // Make logCRUD available globally
+        window.logCRUD = logCRUD;
+    </script>
+</body>
+</html>

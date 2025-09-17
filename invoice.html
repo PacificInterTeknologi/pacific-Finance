@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <title>Invoice - Pacific Inter Teknologi</title>
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* =====================
+           CSS VARIABLES
+           ===================== */
+        :root {
+            /* Color Variables */
+            --primary: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            /* Font Variables */
+            --font-company-header: 20px;
+            --font-invoice-title: 20px;
+            --font-info-detail: 11.5px;
+            --font-table-header: 11.5px;
+            --font-total: 15px;
+            --font-signature: 11.5px;
+            --font-body: 11.5px;
+            
+            /* Print Variables */
+            --font-size-print: 11.5pt;
+            --font-size-small-print: 10pt;
+            --font-size-large-print: 12pt;
+            --font-size-xlarge-print: 14pt;
+            --font-size-title-print: 18pt;
+            --font-size-subtitle-print: 16pt;
+            --font-size-header-print: 9pt;
+        }
+        
+        /* =====================
+           RESET & BASE STYLES
+           ===================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+            background-color: transparent;
+            color: var(--gray-800);
+            line-height: 1.4;
+            padding: 20px;
+            min-height: 100vh;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: var(--font-body);
+            letter-spacing: 0.5px;
+        }
+        
+        /* =====================
+           LAYOUT STYLES
+           ===================== */
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: transparent;
+            border-radius: 8px;
+            border: none;
+            overflow: hidden;
+        }
+        
+        /* =====================
+           HEADER STYLES
+           ===================== */
+        .invoice-header {
+            padding: 20px;
+            border-bottom: 1px dashed var(--gray-300);
+        }
+        
+        .invoice-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .company-info h1 {
+            font-size: var(--font-company-header);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .company-info p {
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 700;
+            margin: 2px 0;
+            line-height: 1.3;
+        }
+        
+        .invoice-title {
+            font-size: var(--font-invoice-title);
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* =====================
+           INFO STYLES
+           ===================== */
+        .invoice-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-group {
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px dashed var(--gray-300);
+        }
+        
+        .info-group h3 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .info-group p {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-700);
+            margin: 4px 0;
+            line-height: 1.3;
+        }
+        
+        .info-group p strong {
+            color: var(--gray-900);
+            font-weight: 700;
+        }
+        
+        /* =====================
+           TABLE STYLES
+           ===================== */
+        .invoice-details {
+            padding: 20px;
+        }
+        
+        .table-wrapper {
+            margin: 15px 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: transparent;
+        }
+        
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px dashed var(--gray-300);
+        }
+        
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px dashed var(--gray-300);
+            font-size: 12px;
+            font-weight: 700;
+            vertical-align: top;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* =====================
+           FORM ELEMENTS STYLES
+           ===================== */
+        td input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-800);
+            padding: 4px 0;
+        }
+        
+        /* Div Contenteditable Styling - Fix untuk teks yang terpotong */
+        .item-description {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-800);
+            padding: 4px 0;
+            min-height: 24px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+            overflow: visible;
+            outline: none;
+        }
+        
+        /* Placeholder untuk contenteditable div */
+        .item-description:empty:before {
+            content: attr(data-placeholder);
+            color: var(--gray-400);
+            font-style: italic;
+        }
+        
+        /* Focus state untuk contenteditable div */
+        .item-description:focus {
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            padding-bottom: 3px;
+        }
+        
+        /* Kolom deskripsi yang lebih lebar */
+        td:first-child {
+            width: 55% !important;
+            max-width: 55% !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
+            white-space: pre-wrap !important;
+            overflow: visible !important;
+            height: auto !important;
+        }
+        
+        td input[type="number"], td input[type="text"] {
+            text-align: center;
+        }
+        
+        td input:focus {
+            outline: none;
+        }
+        
+        td input[type="number"]:focus, td input[type="text"]:focus {
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            padding-bottom: 3px;
+        }
+        
+        .line-total {
+            text-align: right;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        
+        /* =====================
+           SUMMARY STYLES
+           ===================== */
+        .summary {
+            margin-top: 15px;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .summary-row:not(:last-child) {
+            border-bottom: none;
+        }
+        
+        .summary-row.total {
+            border-top: 1px dashed var(--gray-300);
+            margin-top: 8px;
+            padding-top: 12px;
+            background-color: transparent;
+            margin: 8px 0 0;
+            padding: 12px 0 0;
+            border-radius: 0;
+        }
+        
+        .summary-row#diskonRow {
+            display: flex;
+            color: var(--gray-600);
+            font-style: italic;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--gray-200);
+        }
+        
+        .summary-row#diskonRow .summary-label {
+            font-weight: 600;
+        }
+        
+        .summary-row#diskonRow .summary-value {
+            font-weight: 500;
+        }
+        
+        #diskonInput {
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-800);
+            background: transparent;
+            width: 120px;
+            text-align: right;
+            padding: 4px;
+            border: 1px dashed var(--gray-300);
+            border-radius: 4px;
+        }
+        
+        #diskonInput:focus {
+            outline: none;
+            border-color: var(--accent) !important;
+        }
+        
+        .summary-label {
+            font-weight: 700;
+            color: var(--gray-700);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .summary-value {
+            font-weight: 700;
+            color: var(--gray-900);
+            font-size: 12px;
+        }
+        
+        .summary-row.total .summary-label {
+            font-size: 14px;
+            color: var(--primary);
+        }
+        
+        .summary-row.total .summary-value {
+            font-size: var(--font-total);
+            color: var(--primary);
+        }
+        
+        /* =====================
+           ADDITIONAL ELEMENTS STYLES
+           ===================== */
+        .terbilang {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px dashed var(--gray-300);
+            font-style: italic;
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .payment-info {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .payment-box {
+            border-radius: 4px;
+            padding: 10px;
+            border: none;
+        }
+        
+        .payment-box label {
+            display: block;
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        
+        .payment-box input {
+            width: 100%;
+            padding: 6px;
+            border: 1px dashed var(--gray-300);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+        }
+        
+        .payment-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+        
+        .status-badge.paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-badge.unpaid {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .signature-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .signature-box {
+            text-align: center;
+            width: 200px;
+            border: none;
+            padding: 0;
+        }
+        
+        .signature-box p {
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 30px;
+            font-size: 12px;
+        }
+        
+        .signature-space {
+            position: relative;
+        }
+        
+        .signature-line {
+            width: 100%;
+            height: 1px;
+            border-bottom: 1px solid var(--gray-400);
+            margin-bottom: 6px;
+        }
+        
+        .signature-info {
+            margin-top: 5px;
+        }
+        
+        .signature-info h4 {
+            font-weight: 700;
+            color: var(--gray-900);
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        .signature-title {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-style: normal;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        /* =====================
+           DROPDOWN MENU STYLES
+           ===================== */
+        .dropdown-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .dropdown-toggle {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px dashed var(--gray-300);
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: var(--font-info-detail);
+            font-weight: 700;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .dropdown-toggle:hover {
+            border-color: var(--primary);
+        }
+        
+        .dropdown-menu-items {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: transparent;
+            min-width: 180px;
+            border-radius: 6px;
+            z-index: 1001;
+            margin-top: 5px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px dashed var(--gray-300);
+        }
+        
+        .dropdown-menu-items.show {
+            display: flex;
+        }
+        
+        .dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--font-info-detail);
+            color: var(--gray-700);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .dropdown-item:hover {
+            border: 1px dashed var(--gray-300);
+        }
+        
+        .dropdown-item.danger {
+            color: #ef4444;
+        }
+        
+        .dropdown-item.success {
+            color: #10b981;
+        }
+        
+        .dropdown-item.info {
+            color: #3b82f6;
+        }
+        
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* =====================
+           MODAL STYLES
+           ===================== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: transparent;
+            margin: 5% auto;
+            padding: 20px;
+            border: none;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--gray-300);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .close {
+            color: var(--gray-500);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: var(--gray-700);
+        }
+        
+        .invoice-list {
+            background-color: transparent;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .invoice-item {
+            padding: 12px;
+            border-bottom: 1px dashed var(--gray-300);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .invoice-item:hover {
+            background-color: var(--gray-50);
+        }
+        
+        .invoice-item:last-child {
+            border-bottom: none;
+        }
+        
+        .invoice-number {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .invoice-date {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+        
+        .invoice-customer {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--gray-700);
+        }
+        
+        .invoice-amount {
+            text-align: right;
+            font-weight: 700;
+        }
+        
+        .search-box {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px dashed var(--gray-300);
+            border-radius: 6px;
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+        
+        /* =====================
+           NOTIFICATION STYLES
+           ===================== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: transparent;
+            color: var(--gray-800);
+            border-radius: 6px;
+            border: 1px dashed var(--gray-300);
+            z-index: 1000;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            max-width: 300px;
+            font-size: var(--font-info-detail);
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.error {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        /* =====================
+           LOADING SPINNER STYLES
+           ===================== */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .loading-spinner.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 15px;
+            font-size: 16px;
+            color: var(--gray-700);
+        }
+        
+        /* =====================
+           DEBUG BUTTON STYLES
+           ===================== */
+        .debug-button {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 9999;
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* =====================
+           PRINT STYLES
+           ===================== */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                border-color: black !important;
+            }
+            
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: var(--font-size-print);
+                line-height: 1.4;
+                letter-spacing: normal !important;
+            }
+            
+            .invoice-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                border: none !important;
+            }
+            
+            .dropdown-menu, .notification, .debug-button, .modal, .loading-spinner {
+                display: none !important;
+            }
+            
+            .invoice-container, .invoice-container * {
+                visibility: visible !important;
+                color: black !important;
+            }
+            
+            .invoice-container {
+                position: static !important;
+                left: auto !important;
+                top: auto !important;
+            }
+            
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+            
+            .invoice-header {
+                border-bottom: 1px dashed black !important;
+                padding: 15mm 8mm 8mm !important;
+            }
+            
+            .invoice-details {
+                padding: 8mm !important;
+            }
+            
+            .info-group {
+                box-shadow: none !important;
+                border: 1px dashed black !important;
+                page-break-inside: avoid;
+            }
+            
+            .table-wrapper, .summary, .payment-box {
+                box-shadow: none !important;
+                border: none !important;
+                page-break-inside: avoid;
+            }
+            
+            .signature-box {
+                border: none !important;
+            }
+            
+            .signature-line {
+                border-bottom: 1px solid black !important;
+            }
+            
+            /* Tampilkan diskon saat print */
+            #diskonRow {
+                display: flex !important;
+                border-bottom: 1px dashed black !important;
+            }
+            
+            #diskonInput {
+                border: none !important;
+                background: transparent !important;
+                color: black !important;
+                font-size: var(--font-size-small-print) !important;
+                font-weight: 700 !important;
+                width: auto !important;
+                padding: 0 !important;
+            }
+            
+            input {
+                border: none !important;
+                background: transparent !important;
+                color: black !important;
+                -webkit-appearance: none;
+                font-family: 'Courier Prime', 'Roboto Mono', monospace !important;
+                font-size: var(--font-size-header-print) !important;
+                font-weight: 700 !important;
+            }
+            
+            /* Div contenteditable styling khusus untuk print - fix untuk teks yang terpotong */
+            .item-description {
+                border: none !important;
+                background: transparent !important;
+                color: black !important;
+                font-family: 'Courier Prime', 'Roboto Mono', monospace !important;
+                font-size: var(--font-size-header-print) !important;
+                font-weight: 700 !important;
+                min-height: auto !important;
+                line-height: 1.4 !important;
+                word-wrap: break-word !important;
+                word-break: break-word !important;
+                white-space: pre-wrap !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                outline: none !important;
+            }
+            
+            /* Hilangkan placeholder saat print */
+            .item-description:empty:before {
+                content: none !important;
+            }
+            
+            .company-info p {
+                font-size: 10pt !important;
+            }
+            
+            .invoice-title {
+                font-size: var(--font-size-title-print) !important;
+            }
+            
+            th, td {
+                font-size: var(--font-size-header-print) !important;
+                padding: 5pt !important;
+                vertical-align: top !important;
+            }
+            
+            /* Pastikan baris tabel tidak terpotong saat mencetak */
+            tr {
+                page-break-inside: avoid !important;
+            }
+            
+            /* Pastikan sel deskripsi item dapat memperluas sesuai kebutuhan */
+            td:first-child {
+                width: 55% !important;
+                max-width: 55% !important;
+            }
+            
+            thead {
+                display: table-header-group;
+            }
+            
+            .table-wrapper {
+                page-break-inside: auto;
+            }
+            
+            /* Adjust summary styles for print */
+            .summary-label, .summary-value {
+                font-size: var(--font-size-header-print) !important;
+            }
+            
+            .summary-row.total .summary-label {
+                font-size: var(--font-size-large-print) !important;
+            }
+            
+            .summary-row.total .summary-value {
+                font-size: var(--font-size-xlarge-print) !important;
+            }
+            
+            .terbilang {
+                font-size: var(--font-size-header-print) !important;
+            }
+            
+            .payment-box label, .payment-box input {
+                font-size: var(--font-size-header-print) !important;
+            }
+            
+            .signature-box p, .signature-info h4, .signature-title {
+                font-size: var(--font-size-header-print) !important;
+            }
+            
+            .status-badge {
+                background: none !important;
+                border: 1px solid black !important;
+                color: black !important;
+                font-size: 8pt !important;
+            }
+            
+            /* Prevent page breaks inside important elements */
+            .invoice-info, .summary, .payment-info {
+                page-break-inside: avoid;
+            }
+            
+            /* Force page breaks if needed */
+            .table-wrapper {
+                page-break-inside: auto;
+            }
+            
+            .signature-section {
+                margin-top: 15mm !important;
+            }
+        }
+        
+        /* =====================
+           RESPONSIVE STYLES
+           ===================== */
+        @media (max-width: 768px) {
+            .invoice-header {
+                padding: 15px;
+            }
+            
+            .invoice-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .invoice-info {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .invoice-details {
+                padding: 15px;
+            }
+            
+            .payment-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .signature-section {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .invoice-header {
+                padding: 12px;
+            }
+            
+            .invoice-top h1 {
+                font-size: 18px;
+            }
+            
+            .invoice-title {
+                font-size: 18px;
+            }
+            
+            .invoice-details {
+                padding: 12px;
+            }
+            
+            table {
+                font-size: 11px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .summary-row.total .summary-value {
+                font-size: 14px;
+            }
+            
+            .signature-box {
+                width: 180px;
+            }
+        }
+    </style>
+</head>
+<body onload="loadInvoice()">
+    <!-- Check Login -->
+    <script>
+        // Check if user is logged in
+        const currentUser = localStorage.getItem("currentUser");
+        if (!currentUser) {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <div class="loading-text">Membuat PDF...</div>
+    </div>
+
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu">
+        <button class="dropdown-toggle" onclick="toggleDropdown()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
+        <div class="dropdown-menu-items" id="dropdownMenuItems">
+            <button class="dropdown-item" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <button class="dropdown-item" onclick="addItem()">
+                <i class="fas fa-plus"></i> Tambah Item
+            </button>
+            <button class="dropdown-item danger" onclick="removeLastItem()">
+                <i class="fas fa-trash"></i> Hapus Item
+            </button>
+            <button class="dropdown-item success" onclick="saveInvoice()">
+                <i class="fas fa-save"></i> Simpan
+            </button>
+            <button class="dropdown-item info" onclick="createPaymentInvoice()" id="createPaymentBtn" style="display:none;">
+                <i class="fas fa-file-invoice-dollar"></i> Invoice Pelunasan
+            </button>
+            <button class="dropdown-item" onclick="prepareForPrint()">
+                <i class="fas fa-print"></i> Cetak
+            </button>
+            <button class="dropdown-item" onclick="exportToPDF()">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <button class="dropdown-item" onclick="openPrintInvoiceModal()">
+                <i class="fas fa-file-invoice"></i> Cetak Invoice Lama
+            </button>
+        </div>
+    </div>
+
+    <!-- Invoice Container -->
+    <div class="invoice-container" id="invoiceContent">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="invoice-top">
+                <div class="company-info">
+                    <h1>PACIFIC INTER TEKNOLOGI</h1>
+                    <p>Kirana Two Office Tower Lt.10 Unit A</p>
+                    <p>Jl. Boulevard Timur No.88, Jakarta Utara</p>
+                    <p>Telp: +62 81808283379</p>
+                </div>
+                <div class="invoice-title">Invoice</div>
+            </div>
+            <div class="invoice-info">
+                <div class="info-group">
+                    <h3>Bill To</h3>
+                    <p><strong id="namaPelanggan">-</strong></p>
+                    <p id="alamatPelanggan">-</p>
+                    <p id="telpPelanggan">-</p>
+                </div>
+                <div class="info-group">
+                    <h3>Invoice Details</h3>
+                    <p><strong>No:</strong> <span id="noInvoice">-</span></p>
+                    <p><strong>Date:</strong> <span id="tanggalInvoice">-</span></p>
+                    <p><strong>Payment Terms:</strong> <span id="termOfPayment">-</span></p>
+                    <div id="statusContainer" style="display: none;">
+                        <strong>Status:</strong> <span id="statusBadge" class="status-badge unpaid">Belum Lunas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="invoice-details">
+            <!-- Item Table -->
+            <div class="table-wrapper">
+                <table id="itemTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 45%;">Item Description</th>
+                            <th style="width: 10%;">Qty</th>
+                            <th style="width: 10%;">Unit</th>
+                            <th style="width: 15%;">Unit Price</th>
+                            <th style="width: 20%;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="item-description" contenteditable="true" data-placeholder="Deskripsi item..." oninput="updateTotal();"></div></td>
+                            <td><input type="number" value="1" min="1" oninput="updateTotal()"></td>
+                            <td><input type="text" value="pcs" oninput="updateTotal()"></td>
+                            <td><input type="number" value="0" min="0" oninput="updateTotal()"></td>
+                            <td class="line-total">Rp 0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary">
+                <div class="summary-row">
+                    <div class="summary-label">Subtotal</div>
+                    <div class="summary-value" id="subtotalValue">Rp 0</div>
+                </div>
+                <div class="summary-row" id="diskonRow">
+                    <div class="summary-label">Diskon</div>
+                    <div class="summary-value">
+                        <div style="display: flex; align-items: center;">
+                            <span style="margin-right: 4px;">Rp</span>
+                            <input type="number" id="diskonInput" min="0" value="0" oninput="updateTotal()">
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-row total">
+                    <div class="summary-label">Total</div>
+                    <div class="summary-value" id="grandTotal">Rp 0</div>
+                </div>
+            </div>
+
+            <!-- Terbilang Section -->
+            <div class="terbilang" id="terbilangText">Terbilang: Nol Rupiah</div>
+
+            <!-- Payment Info -->
+            <div class="payment-info">
+                <div class="payment-box">
+                    <label>Payment Account</label>
+                    <input type="text" id="rekeningTujuan" />
+                </div>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-section">
+                <div class="signature-box">
+                    <p>Hormat Kami,</p>
+                    <div class="signature-space">
+                        <div class="signature-line"></div>
+                        <div class="signature-info">
+                            <h4>ALFIANTO</h4>
+                            <p class="signature-title">Direktur</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Print Invoice Modal -->
+    <div id="printInvoiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Pilih Invoice untuk Dicetak</h2>
+                <span class="close" onclick="closePrintInvoiceModal()">&times;</span>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInvoice" placeholder="Cari berdasarkan nomor invoice atau nama pelanggan..." oninput="filterInvoices()">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="invoice-list" id="invoiceList">
+                <!-- Daftar invoice akan diisi oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Button -->
+    <button class="debug-button" onclick="debugLocalStorageData()">
+        <i class="fas fa-bug"></i> Debug Data
+    </button>
+
+    <script>
+        // =====================
+        // UTILITY FUNCTIONS
+        // =====================
+        
+        /**
+         * Format tanggal ke format Indonesia
+         * @param {string|Date} dateString - Tanggal yang akan diformat
+         * @returns {string} Hasil format tanggal Indonesia
+         */
+        function formatDateToID(dateString) {
+            // Cek apakah formatnya YYYY-MM-DD
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                // Tambahkan waktu untuk menghindari timezone issue
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    timeZone: 'Asia/Jakarta'
+                });
+            }
+            // Jika format sudah benar, kembalikan apa adanya
+            return dateString;
+        }
+        
+        /**
+         * Mendapatkan tanggal hari ini dalam format YYYY-MM-DD
+         * @returns {string} Tanggal hari ini
+         */
+        function getTodayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        /**
+         * Menampilkan notifikasi
+         * @param {string} message - Pesan notifikasi
+         * @param {string} type - Tipe notifikasi (success, error, warning, info)
+         */
+        function showNotification(message, type = 'success') {
+            try {
+                const notification = document.getElementById("notification");
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add("show");
+                setTimeout(() => {
+                    notification.classList.remove("show");
+                }, 3000);
+            } catch (error) {
+                console.error("Error showing notification:", error);
+            }
+        }
+        
+        /**
+         * Debug function to check localStorage data
+         */
+        function debugLocalStorageData() {
+            console.log("=== DEBUG LOCAL STORAGE DATA ===");
+            
+            // Check selectedInvoice
+            try {
+                const selectedInvoice = localStorage.getItem("selectedInvoice");
+                console.log("selectedInvoice:", selectedInvoice ? JSON.parse(selectedInvoice) : "null");
+            } catch (e) {
+                console.error("Error parsing selectedInvoice:", e);
+            }
+            
+            // Check selectedPelanggan
+            try {
+                const selectedPelanggan = localStorage.getItem("selectedPelanggan");
+                console.log("selectedPelanggan:", selectedPelanggan ? JSON.parse(selectedPelanggan) : "null");
+            } catch (e) {
+                console.error("Error parsing selectedPelanggan:", e);
+            }
+            
+            // Check selectedPelangganId
+            const selectedPelangganId = localStorage.getItem("selectedPelangganId");
+            console.log("selectedPelangganId:", selectedPelangganId);
+            
+            // Check jenisInvoiceTerpilih
+            try {
+                const jenisInvoiceTerpilih = localStorage.getItem("jenisInvoiceTerpilih");
+                console.log("jenisInvoiceTerpilih:", jenisInvoiceTerpilih ? JSON.parse(jenisInvoiceTerpilih) : "null");
+            } catch (e) {
+                console.error("Error parsing jenisInvoiceTerpilih:", e);
+            }
+            
+            // Check dataPelanggan
+            try {
+                const dataPelanggan = localStorage.getItem("dataPelanggan");
+                console.log("dataPelanggan (first 3 items):", dataPelanggan ? JSON.parse(dataPelanggan).slice(0, 3) : "null");
+            } catch (e) {
+                console.error("Error parsing dataPelanggan:", e);
+            }
+            
+            // Check dataPenjualan
+            try {
+                const dataPenjualan = localStorage.getItem("dataPenjualan");
+                console.log("dataPenjualan (first 3 items):", dataPenjualan ? JSON.parse(dataPenjualan).slice(0, 3) : "null");
+            } catch (e) {
+                console.error("Error parsing dataPenjualan:", e);
+            }
+            
+            console.log("=== END DEBUG ===");
+        }
+        
+        // =====================
+        // MODAL FUNCTIONS
+        // =====================
+        
+        /**
+         * Membuka modal print invoice
+         */
+        function openPrintInvoiceModal() {
+            try {
+                console.log("Membuka modal print invoice...");
+                const modal = document.getElementById("printInvoiceModal");
+                modal.style.display = "block";
+                loadInvoiceList();
+            } catch (error) {
+                console.error("Error opening print invoice modal:", error);
+                showNotification("Terjadi kesalahan saat membuka daftar invoice", "error");
+            }
+        }
+        
+        /**
+         * Menutup modal print invoice
+         */
+        function closePrintInvoiceModal() {
+            try {
+                console.log("Menutup modal print invoice...");
+                const modal = document.getElementById("printInvoiceModal");
+                modal.style.display = "none";
+            } catch (error) {
+                console.error("Error closing print invoice modal:", error);
+            }
+        }
+        
+        /**
+         * Memuat daftar invoice
+         */
+        function loadInvoiceList() {
+            try {
+                console.log("Memuat daftar invoice...");
+                const invoiceList = document.getElementById("invoiceList");
+                invoiceList.innerHTML = "";
+                
+                // Ambil data invoice dari localStorage
+                const dataPenjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                if (dataPenjualan.length === 0) {
+                    invoiceList.innerHTML = "<div class='invoice-item'><p>Tidak ada invoice yang tersedia</p></div>";
+                    return;
+                }
+                
+                // Urutkan invoice berdasarkan tanggal (terbaru dulu)
+                const sortedInvoices = [...dataPenjualan].sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+                
+                // Tampilkan invoice
+                sortedInvoices.forEach(invoice => {
+                    const invoiceItem = document.createElement("div");
+                    invoiceItem.className = "invoice-item";
+                    invoiceItem.onclick = () => printExistingInvoice(invoice.id);
+                    invoiceItem.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div class="invoice-number">${invoice.noInvoice}</div>
+                                <div class="invoice-date">${formatDateToID(invoice.tanggal)}</div>
+                                <div class="invoice-customer">${invoice.customer}</div>
+                            </div>
+                            <div class="invoice-amount">Rp ${invoice.total.toLocaleString("id-ID")}</div>
+                        </div>
+                    `;
+                    invoiceList.appendChild(invoiceItem);
+                });
+                
+                console.log("Daftar invoice berhasil dimuat");
+            } catch (error) {
+                console.error("Error loading invoice list:", error);
+                showNotification("Terjadi kesalahan saat memuat daftar invoice", "error");
+            }
+        }
+        
+        /**
+         * Filter invoice berdasarkan pencarian
+         */
+        function filterInvoices() {
+            try {
+                const searchTerm = document.getElementById("searchInvoice").value.toLowerCase();
+                const invoiceItems = document.querySelectorAll(".invoice-item");
+                
+                invoiceItems.forEach(item => {
+                    const invoiceNumber = item.querySelector(".invoice-number").textContent.toLowerCase();
+                    const customerName = item.querySelector(".invoice-customer").textContent.toLowerCase();
+                    
+                    if (invoiceNumber.includes(searchTerm) || customerName.includes(searchTerm)) {
+                        item.style.display = "block";
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+            } catch (error) {
+                console.error("Error filtering invoices:", error);
+            }
+        }
+        
+        /**
+         * Mencetak invoice yang sudah ada
+         * @param {string} invoiceId - ID invoice yang akan dicetak
+         */
+        function printExistingInvoice(invoiceId) {
+            try {
+                console.log("Mencetak invoice dengan ID:", invoiceId);
+                
+                // Ambil data invoice dari localStorage
+                const dataPenjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                const invoice = dataPenjualan.find(inv => inv.id === invoiceId);
+                
+                if (!invoice) {
+                    showNotification("Invoice tidak ditemukan", "error");
+                    return;
+                }
+                
+                // Simpan invoice yang akan dicetak ke localStorage
+                localStorage.setItem("selectedInvoice", JSON.stringify(invoice));
+                
+                // Tutup modal
+                closePrintInvoiceModal();
+                
+                // Reload halaman untuk menampilkan invoice yang dipilih
+                loadInvoice();
+                
+                // Siapkan untuk cetak
+                setTimeout(() => {
+                    prepareForPrint();
+                }, 500);
+            } catch (error) {
+                console.error("Error printing existing invoice:", error);
+                showNotification("Terjadi kesalahan saat mencetak invoice", "error");
+            }
+        }
+        
+        // =====================
+        // EXPORT FUNCTIONS
+        // =====================
+        
+        /**
+         * Export ke PDF
+         */
+        function exportToPDF() {
+            try {
+                console.log("Export ke PDF...");
+                
+                // Show loading spinner
+                const loadingSpinner = document.getElementById("loadingSpinner");
+                loadingSpinner.classList.add("show");
+                
+                // Hide dropdown menu
+                const dropdownMenu = document.getElementById("dropdownMenuItems");
+                dropdownMenu.classList.remove("show");
+                
+                // Get invoice number for filename
+                const invoiceNumber = document.getElementById("noInvoice").textContent;
+                const customerName = document.getElementById("namaPelanggan").textContent;
+                
+                // Small delay to ensure DOM updates
+                setTimeout(() => {
+                    // Get the invoice content element
+                    const element = document.getElementById('invoiceContent');
+                    
+                    // Create canvas from HTML element
+                    html2canvas(element, {
+                        scale: 2, // Higher resolution
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    }).then(canvas => {
+                        // Calculate PDF dimensions
+                        const imgWidth = 210; // A4 width in mm
+                        const pageHeight = 295; // A4 height in mm
+                        const imgHeight = canvas.height * imgWidth / canvas.width;
+                        let heightLeft = imgHeight;
+                        
+                        // Create PDF
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        let position = 0;
+                        
+                        // Add image to PDF
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                        
+                        // Add new page if content exceeds one page
+                        while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+                        
+                        // Save PDF
+                        const fileName = `Invoice_${invoiceNumber}_${customerName.replace(/\s+/g, '_')}.pdf`;
+                        pdf.save(fileName);
+                        
+                        // Hide loading spinner
+                        loadingSpinner.classList.remove("show");
+                        
+                        // Show success notification
+                        showNotification(`PDF invoice berhasil dibuat: ${fileName}`);
+                        
+                        console.log("PDF export completed");
+                    }).catch(error => {
+                        console.error("Error generating PDF:", error);
+                        loadingSpinner.classList.remove("show");
+                        showNotification("Terjadi kesalahan saat membuat PDF", "error");
+                    });
+                }, 500);
+            } catch (error) {
+                console.error("Error exporting to PDF:", error);
+                const loadingSpinner = document.getElementById("loadingSpinner");
+                loadingSpinner.classList.remove("show");
+                showNotification("Terjadi kesalahan saat export PDF", "error");
+            }
+        }
+        
+        // =====================
+        // INVOICE FUNCTIONS
+        // =====================
+        
+        /**
+         * Inisialisasi halaman invoice
+         */
+        function loadInvoice() {
+            try {
+                console.log("Memulai loadInvoice...");
+                
+                // Check if user is logged in
+                const currentUser = localStorage.getItem("currentUser");
+                if (!currentUser) {
+                    console.log("User tidak login, redirect ke index.html");
+                    window.location.href = "index.html";
+                    return;
+                }
+                
+                console.log("User terdeteksi:", currentUser);
+                
+                // Debug: Tampilkan semua kunci localStorage yang relevan
+                console.log("Debug - localStorage keys:");
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.includes("pelanggan") || key.includes("invoice") || key.includes("selected")) {
+                        console.log(`- ${key}:`, localStorage.getItem(key));
+                    }
+                }
+                
+                // Get data from localStorage dengan urutan prioritas
+                let pelanggan = {};
+                let jenis = {};
+                let invoiceData = {};
+                
+                // Prioritas 1: Coba ambil dari selectedInvoice
+                try {
+                    const selectedInvoice = localStorage.getItem("selectedInvoice");
+                    if (selectedInvoice) {
+                        invoiceData = JSON.parse(selectedInvoice);
+                        console.log("Data invoice dari selectedInvoice:", invoiceData);
+                        pelanggan = {
+                            nama: invoiceData.customer || invoiceData.nama || "",
+                            alamat: invoiceData.alamat || "",
+                            telp: invoiceData.telp || "",
+                            id: invoiceData.pelangganId || ""
+                        };
+                    }
+                } catch (e) {
+                    console.error("Error parsing selectedInvoice:", e);
+                }
+                
+                // Prioritas 2: Jika tidak ada data di selectedInvoice, coba dari selectedPelanggan
+                if (!pelanggan.nama) {
+                    try {
+                        const selectedPelanggan = localStorage.getItem("selectedPelanggan");
+                        if (selectedPelanggan) {
+                            pelanggan = JSON.parse(selectedPelanggan);
+                            console.log("Data pelanggan dari selectedPelanggan:", pelanggan);
+                        }
+                    } catch (e) {
+                        console.error("Error parsing selectedPelanggan:", e);
+                    }
+                }
+                
+                // Prioritas 3: Jika masih kosong, coba cari di dataPelanggan menggunakan ID
+                if (!pelanggan.nama) {
+                    try {
+                        const selectedId = localStorage.getItem("selectedPelangganId");
+                        const dataPelanggan = localStorage.getItem("dataPelanggan");
+                        if (selectedId && dataPelanggan) {
+                            const pelangganArray = JSON.parse(dataPelanggan);
+                            const foundPelanggan = pelangganArray.find(p => p.id === selectedId);
+                            if (foundPelanggan) {
+                                pelanggan = foundPelanggan;
+                                console.log("Data pelanggan ditemukan dari dataPelanggan:", pelanggan);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error mencari data pelanggan:", e);
+                    }
+                }
+                
+                // Prioritas 4: Coba dari jenisInvoiceTerpilih
+                if (!pelanggan.nama) {
+                    try {
+                        const jenisInvoiceData = localStorage.getItem("jenisInvoiceTerpilih");
+                        if (jenisInvoiceData) {
+                            const jenisData = JSON.parse(jenisInvoiceData);
+                            if (jenisData.nama || jenisData.customer) {
+                                pelanggan = {
+                                    nama: jenisData.nama || jenisData.customer,
+                                    alamat: jenisData.alamat || "",
+                                    telp: jenisData.telp || "",
+                                    id: jenisData.pelangganId || ""
+                                };
+                                console.log("Data pelanggan dari jenisInvoiceTerpilih:", pelanggan);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error parsing jenisInvoiceTerpilih:", e);
+                    }
+                }
+                
+                // Coba ambil data jenis invoice
+                try {
+                    jenis = JSON.parse(localStorage.getItem("jenisInvoiceTerpilih")) || {};
+                    console.log("Data jenis invoice:", jenis);
+                } catch (e) {
+                    console.error("Error parsing jenisInvoiceTerpilih:", e);
+                }
+                
+                // Update UI with customer data
+                document.getElementById("namaPelanggan").textContent = pelanggan.nama || pelanggan.customer || "-";
+                document.getElementById("alamatPelanggan").textContent = pelanggan.alamat || "-";
+                document.getElementById("telpPelanggan").textContent = pelanggan.telp || "-";
+                
+                // Update UI with invoice data
+                document.getElementById("noInvoice").textContent = invoiceData.noInvoice || jenis.noInvoice || "-";
+                document.getElementById("termOfPayment").textContent = invoiceData.termOfPayment || jenis.top || "-";
+                document.getElementById("rekeningTujuan").value = invoiceData.rekeningTujuan || jenis.rekening || "";
+                
+                // Format and set date
+                const tanggal = invoiceData.tanggal || jenis.tanggal || getTodayDate();
+                const formattedDate = formatDateToID(tanggal);
+                document.getElementById("tanggalInvoice").textContent = formattedDate;
+                
+                // Tampilkan status invoice jika ada
+                if (invoiceData.status) {
+                    const statusContainer = document.getElementById("statusContainer");
+                    const statusBadge = document.getElementById("statusBadge");
+                    statusContainer.style.display = "block";
+                    statusBadge.textContent = invoiceData.status;
+                    statusBadge.className = invoiceData.status === "Lunas" ? "status-badge paid" : "status-badge unpaid";
+                }
+                
+                // Tampilkan tombol invoice pelunasan jika invoice belum lunas
+                if (invoiceData.status && invoiceData.status !== "Lunas") {
+                    document.getElementById("createPaymentBtn").style.display = "flex";
+                }
+                
+                // Load diskon dari invoice data jika ada (dalam rupiah)
+                if (invoiceData.diskon && invoiceData.diskon > 0) {
+                    document.getElementById("diskonInput").value = invoiceData.diskon;
+                } else {
+                    document.getElementById("diskonInput").value = 0;
+                }
+                
+                // Baris diskon selalu ditampilkan
+                document.getElementById("diskonRow").style.display = "flex";
+                
+                // Load items if they exist
+                if (invoiceData.items && invoiceData.items.length > 0) {
+                    const tbody = document.querySelector("#itemTable tbody");
+                    tbody.innerHTML = ""; // Clear existing rows
+                    
+                    invoiceData.items.forEach(item => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><div class="item-description" contenteditable="true" data-placeholder="Deskripsi item..." oninput="updateTotal();">${item.deskripsi}</div></td>
+                            <td><input type="number" value="${item.qty}" min="1" oninput="updateTotal()"></td>
+                            <td><input type="text" value="${item.unit}" oninput="updateTotal()"></td>
+                            <td><input type="number" value="${item.harga}" min="0" oninput="updateTotal()"></td>
+                            <td class="line-total">Rp ${item.total.toLocaleString("id-ID")}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    // Add initial item if table is empty
+                    const tbody = document.querySelector("#itemTable tbody");
+                    if (tbody.children.length === 0) {
+                        console.log("Menambahkan item awal...");
+                        addItem();
+                    }
+                }
+                
+                // Update total after loading items
+                updateTotal();
+                
+                console.log("loadInvoice selesai");
+            } catch (error) {
+                console.error("Error loading invoice data:", error);
+                showNotification("Terjadi kesalahan saat memuat data invoice", "error");
+            }
+        }
+        
+        /**
+         * Menambah item baru ke tabel
+         */
+        function addItem() {
+            try {
+                console.log("Menambah item baru...");
+                
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><div class="item-description" contenteditable="true" data-placeholder="Deskripsi item..." oninput="updateTotal();"></div></td>
+                    <td><input type="number" value="1" min="1" oninput="updateTotal()"></td>
+                    <td><input type="text" value="pcs" oninput="updateTotal()"></td>
+                    <td><input type="number" value="0" min="0" oninput="updateTotal()"></td>
+                    <td class="line-total">Rp 0</td>
+                `;
+                
+                document.querySelector("#itemTable tbody").appendChild(row);
+                updateTotal();
+                
+                console.log("Item berhasil ditambahkan");
+            } catch (error) {
+                console.error("Error adding item:", error);
+                showNotification("Terjadi kesalahan saat menambah item", "error");
+            }
+        }
+        
+        /**
+         * Menghapus item terakhir dari tabel
+         */
+        function removeLastItem() {
+            try {
+                console.log("Menghapus item terakhir...");
+                
+                const tbody = document.querySelector("#itemTable tbody");
+                if (tbody.children.length > 1) {
+                    tbody.removeChild(tbody.lastChild);
+                    updateTotal();
+                    console.log("Item berhasil dihapus");
+                } else {
+                    showNotification("Minimal harus ada satu item", "error");
+                }
+            } catch (error) {
+                console.error("Error removing last item:", error);
+                showNotification("Terjadi kesalahan saat menghapus item", "error");
+            }
+        }
+        
+        /**
+         * Update total invoice
+         */
+        function updateTotal() {
+            try {
+                console.log("Update total...");
+                
+                let subtotal = 0;
+                const rows = document.querySelectorAll("#itemTable tbody tr");
+                
+                // Hitung subtotal dari semua item
+                rows.forEach((row) => {
+                    const deskripsi = row.cells[0].querySelector(".item-description").textContent.trim();
+                    const qty = parseFloat(row.cells[1].querySelector("input").value) || 0;
+                    const harga = parseFloat(row.cells[3].querySelector("input").value) || 0;
+                    const sub = qty * harga;
+                    
+                    row.cells[4].textContent = "Rp " + sub.toLocaleString("id-ID");
+                    subtotal += sub;
+                });
+                
+                // Update tampilan subtotal
+                const subtotalElement = document.getElementById("subtotalValue");
+                subtotalElement.textContent = "Rp " + subtotal.toLocaleString("id-ID");
+                
+                // Ambil nilai diskon dari input manual (dalam rupiah)
+                const diskonInput = document.getElementById("diskonInput");
+                const diskonAmount = parseFloat(diskonInput.value) || 0;
+                
+                let total = subtotal;
+                
+                // Hitung total setelah diskon
+                if (diskonAmount > 0) {
+                    total = subtotal - diskonAmount;
+                    
+                    // Pastikan diskon tidak melebihi subtotal
+                    if (total < 0) {
+                        total = 0;
+                        diskonInput.value = subtotal;
+                        showNotification("Diskon tidak boleh melebihi subtotal", "error");
+                    }
+                }
+                
+                // Update total akhir
+                const grandTotalElement = document.getElementById("grandTotal");
+                grandTotalElement.textContent = "Rp " + total.toLocaleString("id-ID");
+                
+                // Update terbilang
+                const terbilangText = document.getElementById("terbilangText");
+                terbilangText.textContent = "Terbilang: " + terbilang(total) + " Rupiah";
+                
+                console.log("Update total selesai - Subtotal: " + subtotal + 
+                           ", Diskon: Rp " + diskonAmount + ", Total: " + total);
+            } catch (error) {
+                console.error("Error updating total:", error);
+            }
+        }
+        
+        /**
+         * Konversi angka ke terbilang
+         * @param {number} nilai - Angka yang akan dikonversi
+         * @returns {string} Hasil konversi terbilang
+         */
+        function terbilang(nilai) {
+            try {
+                const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"];
+                const satuan = ["", "Ribu", "Juta", "Miliar", "Triliun"];
+                
+                if (nilai === 0) return "Nol";
+                
+                let hasil = "", i = 0;
+                while (nilai > 0) {
+                    let temp = nilai % 1000, str = "", r = Math.floor(temp/100), p = Math.floor((temp%100)/10), s = temp%10;
+                    
+                    if (r > 0) str += (r === 1 ? "Seratus " : angka[r] + " Ratus ");
+                    if (p === 1) str += s === 0 ? "Sepuluh " : s === 1 ? "Sebelas " : angka[s] + " Belas ";
+                    else {
+                        if (p > 0) str += angka[p] + " Puluh ";
+                        if (s > 0) str += angka[s] + " ";
+                    }
+                    
+                    hasil = str + satuan[i] + " " + hasil;
+                    nilai = Math.floor(nilai / 1000);
+                    i++;
+                }
+                
+                return hasil.trim();
+            } catch (error) {
+                console.error("Error converting to words:", error);
+                return "Nol";
+            }
+        }
+        
+        /**
+         * Validasi item invoice
+         * @returns {boolean} True jika valid
+         */
+        function validateInvoiceItems() {
+            const rows = document.querySelectorAll("#itemTable tbody tr");
+            
+            for (let i = 0; i < rows.length; i++) {
+                const deskripsi = rows[i].cells[0].querySelector(".item-description").textContent.trim();
+                const qty = parseFloat(rows[i].cells[1].querySelector("input").value) || 0;
+                const harga = parseFloat(rows[i].cells[3].querySelector("input").value) || 0;
+                
+                if (!deskripsi) {
+                    showNotification(`Deskripsi item ${i + 1} wajib diisi`, "error");
+                    return false;
+                }
+                
+                if (qty <= 0) {
+                    showNotification(`Quantity item ${i + 1} harus lebih dari 0`, "error");
+                    return false;
+                }
+                
+                if (harga <= 0) {
+                    showNotification(`Harga item ${i + 1} harus lebih dari 0`, "error");
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        /**
+         * Validasi diskon
+         * @returns {boolean} True jika valid
+         */
+        function validateDiskon() {
+            const diskonAmount = parseFloat(document.getElementById("diskonInput").value) || 0;
+            const subtotalText = document.getElementById("subtotalValue").textContent;
+            const subtotal = parseInt(subtotalText.replace(/[^\d]/g, '')) || 0;
+            
+            if (diskonAmount < 0) {
+                showNotification("Diskon tidak boleh negatif", "error");
+                return false;
+            }
+            
+            if (diskonAmount > subtotal) {
+                showNotification("Diskon tidak boleh melebihi subtotal", "error");
+                return false;
+            }
+            
+            return true;
+        }
+        
+        /**
+         * Menyimpan invoice
+         */
+        function saveInvoice() {
+            try {
+                console.log("Menyimpan invoice...");
+                
+                if (!validateInvoiceItems()) {
+                    showNotification("Mohon lengkapi semua field yang diperlukan", "error");
+                    return;
+                }
+                
+                if (!validateDiskon()) {
+                    return;
+                }
+                
+                updateTotal();
+                
+                const rows = document.querySelectorAll("#itemTable tbody tr");
+                let items = [];
+                
+                rows.forEach((row, index) => {
+                    const deskripsi = row.cells[0].querySelector(".item-description").textContent.trim();
+                    const qty = parseFloat(row.cells[1].querySelector("input").value) || 0;
+                    const unit = row.cells[2].querySelector("input").value.trim();
+                    const harga = parseFloat(row.cells[3].querySelector("input").value) || 0;
+                    
+                    if (deskripsi && qty > 0 && harga > 0) {
+                        items.push({
+                            deskripsi,
+                            qty,
+                            unit,
+                            harga,
+                            total: qty * harga
+                        });
+                    }
+                });
+                
+                if (items.length === 0) {
+                    showNotification("Harap isi minimal satu item", "error");
+                    return;
+                }
+                
+                const totalText = document.getElementById("grandTotal").textContent;
+                const total = parseInt(totalText.replace(/[^\d]/g, '')) || 0;
+                
+                // Ambil jenis invoice dari localStorage
+                const jenis = JSON.parse(localStorage.getItem("jenisInvoiceTerpilih")) || {};
+                const jenisInvoice = jenis.jenisInvoice || "regular";
+                
+                // Ambil data pelanggan dari berbagai sumber
+                let pelanggan = {};
+                
+                // Coba dari selectedInvoice dulu
+                try {
+                    pelanggan = JSON.parse(localStorage.getItem("selectedInvoice")) || {};
+                } catch (e) {
+                    console.error("Error parsing selectedInvoice:", e);
+                }
+                
+                // Jika tidak ada, coba dari selectedPelanggan
+                if (!pelanggan.nama) {
+                    try {
+                        pelanggan = JSON.parse(localStorage.getItem("selectedPelanggan")) || {};
+                    } catch (e) {
+                        console.error("Error parsing selectedPelanggan:", e);
+                    }
+                }
+                
+                // Jika masih tidak ada, coba dari jenisInvoiceTerpilih
+                if (!pelanggan.nama) {
+                    pelanggan = {
+                        nama: jenis.nama || jenis.customer || "",
+                        alamat: jenis.alamat || "",
+                        telp: jenis.telp || "",
+                        id: jenis.pelangganId || ""
+                    };
+                }
+                
+                // Cek apakah ini invoice baru atau update invoice yang sudah ada
+                let invoiceId = "";
+                let isNewInvoice = true;
+                
+                try {
+                    const selectedInvoice = localStorage.getItem("selectedInvoice");
+                    if (selectedInvoice) {
+                        const invoiceData = JSON.parse(selectedInvoice);
+                        if (invoiceData.id) {
+                            invoiceId = invoiceData.id;
+                            isNewInvoice = false;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error checking existing invoice:", e);
+                }
+                
+                // Ambil nilai diskon dari input manual (dalam rupiah)
+                const diskonAmount = parseFloat(document.getElementById("diskonInput").value) || 0;
+                
+                // Ambil tanggal dari data pelanggan atau hari ini
+                let tanggalSimpan;
+                if (pelanggan.tanggal) {
+                    // Gunakan tanggal dari data pelanggan
+                    tanggalSimpan = pelanggan.tanggal;
+                } else {
+                    // Gunakan tanggal hari ini
+                    tanggalSimpan = getTodayDate();
+                }
+                
+                const data = {
+                    id: isNewInvoice ? Date.now().toString() : invoiceId,
+                    tanggal: tanggalSimpan, // Simpan dalam format YYYY-MM-DD
+                    noInvoice: document.getElementById("noInvoice").textContent,
+                    customer: document.getElementById("namaPelanggan").textContent,
+                    alamat: document.getElementById("alamatPelanggan").textContent,
+                    telp: document.getElementById("telpPelanggan").textContent,
+                    pelangganId: pelanggan.id || "",
+                    termOfPayment: document.getElementById("termOfPayment").textContent,
+                    items: items,
+                    jenisInvoice: jenisInvoice,
+                    rekeningTujuan: document.getElementById("rekeningTujuan").value,
+                    total: total,
+                    diskon: diskonAmount,
+                    status: "Belum Lunas",
+                    tanggalPelunasan: "",
+                    metodePembayaran: document.getElementById("termOfPayment").textContent === "Cash" ? "Tunai" : "Kredit",
+                    createdAt: isNewInvoice ? new Date().toISOString() : (pelanggan.createdAt || new Date().toISOString())
+                };
+                
+                console.log("Data invoice yang akan disimpan:", data);
+                
+                // Simpan ke dataPenjualan
+                const penjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                
+                if (isNewInvoice) {
+                    penjualan.push(data);
+                } else {
+                    // Update existing invoice
+                    const index = penjualan.findIndex(p => p.id === invoiceId);
+                    if (index !== -1) {
+                        penjualan[index] = data;
+                    }
+                }
+                
+                localStorage.setItem("dataPenjualan", JSON.stringify(penjualan));
+                
+                // Update laporan keuangan
+                if (isNewInvoice) {
+                    const laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+                    
+                    laporanKeuangan.push({
+                        id: Date.now().toString(),
+                        tanggal: data.tanggal,
+                        akun: "Pendapatan Jasa",
+                        nilai: data.total,
+                        keterangan: `Penjualan - ${data.customer}`,
+                        tipe: "kredit",
+                        noInvoice: data.noInvoice,
+                        invoiceId: data.id,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    laporanKeuangan.push({
+                        id: Date.now().toString() + 1,
+                        tanggal: data.tanggal,
+                        akun: data.termOfPayment === "Cash" ? "Kas" : "Piutang Usaha",
+                        nilai: data.total,
+                        keterangan: `Penjualan - ${data.customer}`,
+                        tipe: "debit",
+                        noInvoice: data.noInvoice,
+                        invoiceId: data.id,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem("laporanKeuangan", JSON.stringify(laporanKeuangan));
+                }
+                
+                // Update dashboard data
+                const dashboardData = JSON.parse(localStorage.getItem("dashboardData")) || {};
+                dashboardData.penjualan = {
+                    total: (dashboardData.penjualan?.total || 0) + (isNewInvoice ? data.total : 0),
+                    lastUpdated: new Date().toISOString(),
+                    invoiceCount: penjualan.length
+                };
+                
+                localStorage.setItem("dashboardData", JSON.stringify(dashboardData));
+                
+                // Update data pelanggan dengan riwayat pembelian
+                if (pelanggan.id) {
+                    const dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+                    const pelangganIndex = dataPelanggan.findIndex(p => p.id === pelanggan.id);
+                    
+                    if (pelangganIndex !== -1) {
+                        if (!dataPelanggan[pelangganIndex].riwayatPembelian) {
+                            dataPelanggan[pelangganIndex].riwayatPembelian = [];
+                        }
+                        
+                        // Hapus riwayat pembelian lama jika ini adalah update
+                        if (!isNewInvoice) {
+                            dataPelanggan[pelangganIndex].riwayatPembelian = dataPelanggan[pelangganIndex].riwayatPembelian.filter(
+                                r => r.invoiceId !== invoiceId
+                            );
+                        }
+                        
+                        dataPelanggan[pelangganIndex].riwayatPembelian.push({
+                            invoiceId: data.id,
+                            noInvoice: data.noInvoice,
+                            tanggal: data.tanggal,
+                            total: data.total,
+                            status: data.status
+                        });
+                        
+                        localStorage.setItem("dataPelanggan", JSON.stringify(dataPelanggan));
+                    }
+                }
+                
+                showNotification(isNewInvoice ? "✅ Invoice berhasil disimpan ke laporan penjualan." : "✅ Invoice berhasil diperbarui.");
+                console.log("Invoice berhasil disimpan");
+            } catch (error) {
+                console.error("Error saving invoice:", error);
+                showNotification("Terjadi kesalahan saat menyimpan invoice", "error");
+            }
+        }
+        
+        /**
+         * Membuat invoice pelunasan
+         */
+        function createPaymentInvoice() {
+            try {
+                console.log("Membuat invoice pelunasan...");
+                
+                // Get current invoice data
+                const selectedInvoice = localStorage.getItem("selectedInvoice");
+                if (!selectedInvoice) {
+                    showNotification("Tidak ada invoice yang dipilih", "error");
+                    return;
+                }
+                
+                const invoiceData = JSON.parse(selectedInvoice);
+                if (invoiceData.status === "Lunas") {
+                    showNotification("Invoice ini sudah lunas", "error");
+                    return;
+                }
+                
+                // Tambahkan tanggal ke data yang akan disimpan
+                const invoiceToSave = {
+                    ...invoiceData,
+                    tanggalPelunasan: getTodayDate() // Tambahkan tanggal pelunasan
+                };
+                
+                // Simpan invoice yang akan dilunasi di localStorage
+                localStorage.setItem("invoiceToBePaid", JSON.stringify(invoiceToSave));
+                
+                // Redirect ke halaman invoice pelunasan
+                window.location.href = "invoice-pelunasan.html";
+            } catch (error) {
+                console.error("Error creating payment invoice:", error);
+                showNotification("Terjadi kesalahan saat membuat invoice pelunasan", "error");
+            }
+        }
+        
+        /**
+         * Kembali ke halaman sebelumnya
+         */
+        function goBack() {
+            try {
+                console.log("Kembali ke halaman sebelumnya...");
+                
+                // Check if user came from jenis-invoice.html
+                const jenisInvoice = JSON.parse(localStorage.getItem("jenisInvoiceTerpilih")) || {};
+                if (jenisInvoice.jenisInvoice) {
+                    window.location.href = "jenis-invoice.html";
+                } else {
+                    window.location.href = "dashboard.html";
+                }
+            } catch (error) {
+                console.error("Error navigating back:", error);
+                showNotification("Terjadi kesalahan saat navigasi", "error");
+            }
+        }
+        
+        // =====================
+        // UI FUNCTIONS
+        // =====================
+        
+        /**
+         * Toggle dropdown menu
+         */
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById("dropdownMenuItems");
+            dropdownMenu.classList.toggle("show");
+        }
+        
+        /**
+         * Menyiapkan untuk cetak
+         */
+        function prepareForPrint() {
+            try {
+                console.log("Menyiapkan untuk cetak...");
+                
+                // Sembunyikan elemen yang tidak perlu dicetak
+                const elementsToHide = document.querySelectorAll('.dropdown-menu, .notification, .debug-button, .modal, .loading-spinner');
+                elementsToHide.forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                // Berikan jeda singkat untuk memastikan perubahan diterapkan
+                setTimeout(() => {
+                    window.print();
+                    
+                    // Kembalikan tampilan setelah print
+                    setTimeout(() => {
+                        elementsToHide.forEach(el => {
+                            el.style.display = '';
+                        });
+                        loadInvoice();
+                    }, 1000);
+                }, 500);
+            } catch (error) {
+                console.error("Error preparing for print:", error);
+                showNotification("Terjadi kesalahan saat menyiapkan cetakan", "error");
+            }
+        }
+        
+        // =====================
+        // EVENT LISTENERS
+        // =====================
+        
+        // Menutup modal jika pengguna mengklik di luar modal
+        window.onclick = function(event) {
+            const modal = document.getElementById("printInvoiceModal");
+            if (event.target === modal) {
+                closePrintInvoiceModal();
+            }
+        };
+        
+        // Menutup dropdown jika pengguna mengklik di luar dropdown
+        document.addEventListener('click', function(event) {
+            const dropdownMenu = document.getElementById("dropdownMenuItems");
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            
+            if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.remove("show");
+            }
+        });
+        
+        // =====================
+        // AUTO LOGOUT FUNCTIONALITY
+        // =====================
+        
+        // Auto logout setelah 3 menit (180000 milidetik)
+        const idleTime = 180000; 
+        let idleTimer;
+        
+        /**
+         * Fungsi untuk logout
+         */
+        function autoLogout() {
+            // Hapus session storage
+            sessionStorage.clear();
+            localStorage.removeItem("currentUser");
+            
+            // Hapus cookies
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            // Tampilkan notifikasi logout
+            showNotification("Sesi Anda telah berakhir. Silakan login kembali.", "error");
+            
+            // Redirect ke halaman login setelah 2 detik
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        }
+        
+        /**
+         * Reset timer aktivitas
+         */
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(autoLogout, idleTime);
+        }
+        
+        /**
+         * Tambahkan notifikasi sebelum logout
+         */
+        function showLogoutWarning() {
+            const notification = document.createElement("div");
+            notification.className = "notification warning";
+            notification.style.position = "fixed";
+            notification.style.bottom = "20px";
+            notification.style.right = "20px";
+            notification.style.zIndex = "9999";
+            notification.style.maxWidth = "350px";
+            notification.innerHTML = `
+                <strong>Peringatan!</strong> 
+                Sesi Anda akan berakhir dalam <span id="countdown">60</span> detik karena tidak ada aktivitas.
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Countdown timer
+            let countdown = 60;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById("countdown").textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    notification.remove();
+                }
+            }, 1000);
+        }
+        
+        /**
+         * Reset timer dengan warning
+         */
+        function resetIdleTimerWithWarning() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                showLogoutWarning();
+                setTimeout(autoLogout, 60000); // Logout setelah 60 detik warning
+            }, idleTime - 60000); // Tampilkan warning 60 detik sebelum logout
+        }
+        
+        // Deteksi aktivitas pengguna
+        document.addEventListener('mousemove', resetIdleTimerWithWarning);
+        document.addEventListener('keypress', resetIdleTimerWithWarning);
+        document.addEventListener('click', resetIdleTimerWithWarning);
+        document.addEventListener('scroll', resetIdleTimerWithWarning);
+        document.addEventListener('touchstart', resetIdleTimerWithWarning); // Untuk mobile
+        
+        // Mulai timer saat halaman dimuat
+        window.addEventListener('load', resetIdleTimerWithWarning);
+        
+        // Tambahkan CSS untuk notifikasi warning
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification.warning {
+                background-color: #fbbf24;
+                color: #000;
+                padding: 15px 20px;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-size: 12px;
+                max-width: 350px;
+                animation: slideIn 0.3s ease-out;
+            }
+            
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

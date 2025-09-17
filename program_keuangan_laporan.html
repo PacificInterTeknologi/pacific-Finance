@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buku Besar - PACIFIC PRO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* CSS Variables */
+    :root {
+      --primary-color: #1a365d;
+      --secondary-color: #8B0000;
+      --accent-color: #3182ce;
+      --light-color: #ebf8ff;
+      --border-color: #e2e8f0;
+      --text-color: #2d3748;
+      --text-light: #718096;
+      --success-color: #38a169;
+      --danger-color: #e53e3e;
+      --warning-color: #dd6b20;
+      --sidebar-width: 260px;
+    }
+    
+    /* Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    /* Header Styles */
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 70px;
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .brand {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-name {
+      margin-right: 15px;
+      font-size: 14px;
+    }
+    
+    .logout-btn {
+      background: var(--danger-color);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .logout-btn:hover {
+      background: #c5221f;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--primary-color);
+      color: white;
+      position: fixed;
+      height: calc(100vh - 70px);
+      left: 0;
+      top: 70px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      overflow-y: auto;
+      z-index: 90;
+      transition: transform 0.3s;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 20px 0;
+    }
+    
+    .sidebar-menu li {
+      margin-bottom: 5px;
+    }
+    
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+    
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+      border-left: 3px solid var(--accent-color);
+    }
+    
+    .sidebar-menu i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 100px 20px 20px;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-width));
+    }
+    
+    .page-header {
+      margin-bottom: 30px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+    
+    .page-subtitle {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    /* Card Styles */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    /* Filter Styles */
+    .filter-container {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .filter-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #555;
+    }
+    
+    .filter-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    /* Button Styles */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0d0e1f;
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: #2d8e47;
+    }
+    
+    .btn-info {
+      background-color: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-info:hover {
+      background-color: #3367d6;
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background-color: #e0a800;
+    }
+    
+    /* Table Styles */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .data-table th {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+    
+    .data-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .data-table tbody tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    
+    .data-table tbody tr:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    /* Responsive Menu Toggle */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      background-color: var(--success-color);
+      color: white;
+      border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      transform: translateY(-100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .notification.error {
+      background-color: var(--danger-color);
+    }
+    
+    .notification.warning {
+      background-color: var(--warning-color);
+    }
+    
+    /* Pagination Styles */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 5px;
+    }
+    
+    .pagination button {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    
+    .pagination button:hover {
+      background: var(--light-color);
+    }
+    
+    .pagination button.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+    
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Sync Warning Styles */
+    .sync-warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .sync-warning i {
+      color: #ffc107;
+      margin-right: 10px;
+      font-size: 20px;
+    }
+    
+    .sync-warning strong {
+      margin-right: 10px;
+    }
+    
+    .sync-btn {
+      background-color: var(--warning-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: auto;
+      transition: background 0.3s;
+    }
+    
+    .sync-btn:hover {
+      background-color: #e0a800;
+    }
+    
+    /* Badge Styles */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .badge-debit {
+      background-color: #e3f2fd;
+      color: #0d47a1;
+    }
+    
+    .badge-kredit {
+      background-color: #ffebee;
+      color: #b71c1c;
+    }
+    
+    .badge-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .badge-info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .badge-warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .badge-primary {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+    
+    /* Account Header Styles */
+    .account-header {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+      font-weight: bold;
+    }
+    
+    /* Table Cell Alignment */
+    .data-table td:nth-child(5), .data-table td:nth-child(6), .data-table td:nth-child(7) {
+      text-align: right;
+    }
+    
+    /* Modal Styles */
+    .modal {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .modal-content {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: modalopen 0.4s;
+    }
+    
+    @keyframes modalopen {
+      from {opacity: 0}
+      to {opacity: 1}
+    }
+    
+    /* Session Timer Styles */
+    .session-timer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .session-timer.warning {
+      background-color: var(--warning-color);
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
+    /* Media Queries */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .filter-row {
+        flex-direction: column;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .sync-warning {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .sync-btn {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+      
+      .data-table {
+        font-size: 12px;
+      }
+      
+      .data-table th, .data-table td {
+        padding: 8px 5px;
+      }
+      
+      .account-header {
+        font-size: 14px;
+        padding: 5px !important;
+      }
+      
+      .session-timer {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .header, .sidebar, .action-buttons, .filter-container, .pagination, .sync-warning, .page-header, .notification, .session-timer {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .card {
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .table-container {
+        margin: 0;
+        padding: 0;
+      }
+      
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+      }
+      
+      .data-table th {
+        background-color: #f2f2f2 !important;
+        color: #333 !important;
+        padding: 8px !important;
+        border: 1px solid #ddd !important;
+      }
+      
+      .data-table td {
+        padding: 8px !important;
+        border: 1px solid #ddd !important;
+        background-color: white !important;
+      }
+      
+      .data-table tbody tr:nth-child(even) {
+        background-color: white !important;
+      }
+    }
+    
+    /* Print-specific styles */
+    .print-only {
+      display: none;
+    }
+    
+    @media print {
+      .print-only {
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      
+      .print-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
+      .print-date {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <div class="header">
+    <div class="logo-container">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="brand">PACIFIC PRO</div>
+    </div>
+    <div class="user-info">
+      <div class="user-name" id="userWelcome">Loading...</div>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div>
+  
+  <!-- Sidebar Section -->
+  <div class="sidebar" id="sidebar">
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a href="pelanggan.html"><i class="fas fa-users"></i> Data Pelanggan</a></li>
+      <li><a href="jenis-invoice.html"><i class="fas fa-file-alt"></i> Jenis Invoice</a></li>
+      <li><a href="invoice.html"><i class="fas fa-receipt"></i> Invoice</a></li>
+      <li><a href="laporan-penjualan.html"><i class="fas fa-chart-line"></i> Laporan Penjualan</a></li>
+      <li><a href="program_keuangan_akun.html"><i class="fas fa-coins"></i> Input Akun</a></li>
+      <li><a href="program_keuangan_jurnal.html"><i class="fas fa-book"></i> Jurnal</a></li>
+      <li><a href="program_keuangan_laporan.html" class="active"><i class="fas fa-chart-pie"></i> Buku Besar</a></li>
+      <li><a href="laba_rugi.html"><i class="fas fa-chart-line"></i> Laba Rugi</a></li>
+      <li><a href="arus_kas.html"><i class="fas fa-money-bill-wave"></i> Arus Kas</a></li>
+      <li><a href="neraca.html"><i class="fas fa-balance-scale"></i> Neraca</a></li>
+      <li><a href="pengguna.html" id="linkPengguna" style="display: none;"><i class="fas fa-user-cog"></i> Manajemen Pengguna</a></li>
+    </ul>
+  </div>
+  
+  <!-- Main Content Section -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Buku Besar</h1>
+      <p class="page-subtitle">Catatan transaksi keuangan per akun</p>
+    </div>
+    
+    <!-- Main Card -->
+    <div class="card">
+      <!-- Sync Warning -->
+      <div class="sync-warning" id="syncWarning" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <strong>Peringatan:</strong> Data buku besar tidak sinkron dengan jurnal. 
+          Silakan sinkronkan data untuk memastikan konsistensi.
+        </div>
+        <button class="sync-btn" onclick="sinkronkanData()">
+          <i class="fas fa-sync-alt"></i> Sinkronkan Data
+        </button>
+      </div>
+      
+      <!-- Filter Section -->
+      <div class="filter-container">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="filterTanggalMulai">Tanggal Mulai</label>
+            <input type="date" id="filterTanggalMulai" class="filter-control">
+          </div>
+          <div class="filter-group">
+            <label for="filterTanggalSelesai">Tanggal Selesai</label>
+            <input type="date" id="filterTanggalSelesai" class="filter-control">
+          </div>
+          <div class="filter-group">
+            <label for="filterAkun">Akun</label>
+            <select id="filterAkun" class="filter-control">
+              <option value="">Semua Akun</option>
+              <option value="Kas">Kas</option>
+              <option value="Bank">Bank</option>
+              <option value="Piutang Usaha">Piutang Usaha</option>
+              <option value="Persediaan">Persediaan</option>
+              <option value="Peralatan">Peralatan</option>
+              <option value="Utang Usaha">Utang Usaha</option>
+              <option value="Modal Saham">Modal Saham</option>
+              <option value="Pendapatan Jasa">Pendapatan Jasa</option>
+              <option value="Biaya Operasional">Biaya Operasional</option>
+              <option value="Beban Gaji">Beban Gaji</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterTipe">Tipe</label>
+            <select id="filterTipe" class="filter-control">
+              <option value="">Semua Tipe</option>
+              <option value="debit">Debit</option>
+              <option value="kredit">Kredit</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <button class="btn btn-primary" onclick="applyFilters()">
+            <i class="fas fa-filter"></i> Terapkan Filter
+          </button>
+          <button class="btn btn-info" onclick="resetFilters()">
+            <i class="fas fa-redo"></i> Reset Filter
+          </button>
+          <button class="btn btn-warning" onclick="sinkronkanData()">
+            <i class="fas fa-sync-alt"></i> Sinkronkan Data
+          </button>
+          <button class="btn btn-success" onclick="exportExcel()">
+            <i class="fas fa-file-excel"></i> Export Laporan
+          </button>
+          <button class="btn btn-success" onclick="exportBukuBesarExcel()">
+            <i class="fas fa-file-excel"></i> Export Buku Besar
+          </button>
+          <button class="btn btn-info" onclick="exportPDF()">
+            <i class="fas fa-file-pdf"></i> Export PDF
+          </button>
+          <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print"></i> Cetak
+          </button>
+        </div>
+      </div>
+      
+      <!-- Table Section -->
+      <div class="table-container">
+        <!-- Print Header -->
+        <div class="print-only">
+          <div class="print-title">BUKU BESAR</div>
+          <div class="print-date" id="printDate"></div>
+          <div id="printFilterInfo"></div>
+        </div>
+        
+        <!-- Data Table -->
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Akun</th>
+              <th>Keterangan</th>
+              <th>Jenis Transaksi</th>
+              <th>Tipe</th>
+              <th>Jumlah (Rp)</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tabelLaporan">
+            <!-- Data laporan akan ditampilkan di sini -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination" id="laporanPagination">
+        <!-- Pagination akan ditampilkan di sini -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Notification Element -->
+  <div id="notification" class="notification"></div>
+  
+  <!-- Session Timer Element -->
+  <div id="sessionTimer" class="session-timer">
+    <i class="fas fa-clock"></i>
+    <span id="timerText">Sesi: 15:00</span>
+  </div>
+  
+  <script>
+    // ============ GLOBAL VARIABLES ============
+    let laporanCurrentPage = 1;
+    const laporanItemsPerPage = 15;
+    let laporanFilteredData = [];
+    
+    // ============ AUTO LOGOUT VARIABLES ============
+    const idleTime = 15 * 60 * 1000; // 15 menit dalam milidetik
+    const warningTime = 2 * 60 * 1000; // 2 menit sebelum logout
+    let idleTimer;
+    let warningTimer;
+    let timeLeft = idleTime;
+    
+    // ============ AUDIT TRAIL INTEGRATION ============
+    function logActivity(action, module, detail) {
+      if (window.auditTrail) {
+        window.auditTrail.log({
+          action: action,
+          module: module,
+          detail: detail,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+    
+    // Override showNotification to add audit logging
+    if (!window.originalShowNotification) {
+      window.originalShowNotification = window.showNotification;
+    }
+    
+    window.showNotification = function(message, type = 'success') {
+      if (window.originalShowNotification) {
+        window.originalShowNotification(message, type);
+      }
+      
+      // Log notification as audit activity
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      if (user) {
+        logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
+      }
+    };
+    
+    // ============ AUTO LOGOUT FUNCTIONS ============
+    function startIdleTimer() {
+      // Hapus timer yang ada jika ada
+      if (idleTimer) clearTimeout(idleTimer);
+      if (warningTimer) clearTimeout(warningTimer);
+      
+      // Set timer untuk warning
+      warningTimer = setTimeout(() => {
+        showNotification("Sesi Anda akan berakhir dalam 2 menit karena tidak ada aktivitas", "warning");
+        document.getElementById("sessionTimer").classList.add("warning");
+      }, idleTime - warningTime);
+      
+      // Set timer untuk logout
+      idleTimer = setTimeout(() => {
+        autoLogout();
+      }, idleTime);
+      
+      // Update timer display
+      updateTimerDisplay();
+    }
+    
+    function resetIdleTimer() {
+      timeLeft = idleTime;
+      document.getElementById("sessionTimer").classList.remove("warning");
+      startIdleTimer();
+    }
+    
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60000);
+      const seconds = Math.floor((timeLeft % 60000) / 1000);
+      document.getElementById("timerText").textContent = `Sesi: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      
+      // Update setiap detik
+      if (timeLeft > 0) {
+        timeLeft -= 1000;
+        setTimeout(updateTimerDisplay, 1000);
+      }
+    }
+    
+    function autoLogout() {
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      if (user) {
+        logActivity('auto_logout', 'Authentication', 'Auto logout due to inactivity');
+      }
+      
+      localStorage.removeItem("currentUser");
+      showNotification("Sesi Anda telah berakhir karena tidak ada aktivitas", "warning");
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2000);
+    }
+    
+    // ============ DUPLICATE CHECKING FUNCTIONS ============
+    function isTransactionExist(transaction, existingData) {
+      return existingData.some(item => {
+        // Create unique keys based on transaction type
+        if (transaction.noInvoice && transaction.jenisTransaksi) {
+          // For sales and payment transactions
+          return item.noInvoice === transaction.noInvoice && 
+                 item.jenisTransaksi === transaction.jenisTransaksi && 
+                 item.akun === transaction.akun;
+        } else if (transaction.fromJurnal) {
+          // For manual journal entries
+          return item.tanggal === transaction.tanggal && 
+                 item.akun === transaction.akun && 
+                 item.nilai === transaction.nilai && 
+                 item.tipe === transaction.tipe &&
+                 item.keterangan === transaction.keterangan;
+        }
+        return false;
+      });
+    }
+    
+    function cleanDuplicateLaporanEntries() {
+      const laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+      
+      // Create a map to track unique transactions
+      const uniqueTransactions = new Map();
+      
+      // Process each transaction
+      laporanKeuangan.forEach(item => {
+        let key;
+        
+        // Create unique key based on transaction type
+        if (item.noInvoice && item.jenisTransaksi) {
+          // For sales and payment transactions
+          key = `${item.noInvoice}-${item.jenisTransaksi}-${item.akun}`;
+        } else {
+          // For manual journal entries
+          key = `${item.tanggal}-${item.akun}-${item.nilai}-${item.tipe}-${item.keterangan}`;
+        }
+        
+        // Only add if not already exists
+        if (!uniqueTransactions.has(key)) {
+          uniqueTransactions.set(key, item);
+        }
+      });
+      
+      // Convert back to array
+      const cleanedData = Array.from(uniqueTransactions.values());
+      
+      // Save if duplicates were removed
+      if (cleanedData.length !== laporanKeuangan.length) {
+        localStorage.setItem("laporanKeuangan", JSON.stringify(cleanedData));
+        console.log(`Dihapus ${laporanKeuangan.length - cleanedData.length} entri duplikat dari laporan keuangan`);
+      }
+      
+      return cleanedData;
+    }
+    
+    // ============ VALIDASI TANGGAL ============
+    function isValidDate(dateString) {
+      if (!dateString) return false;
+      
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+      
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    }
+    
+    // ============ UI FUNCTIONS ============
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+      resetIdleTimer();
+    }
+    
+    function logout() {
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      if (user) {
+        logActivity('logout', 'Authentication', 'User logout');
+      }
+      
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    }
+    
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById("notification");
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add("show");
+      
+      setTimeout(() => {
+        notification.classList.remove("show");
+      }, 3000);
+    }
+    
+    // ============ USER AUTHORIZATION ============
+    function getCurrentUser() {
+      const user = localStorage.getItem("currentUser");
+      return user ? JSON.parse(user) : null;
+    }
+    
+    function isAuthorized(roles = []) {
+      const user = getCurrentUser();
+      return user && roles.includes(user.role);
+    }
+    
+    // ============ DATA FUNCTIONS ============
+    function loadLaporan() {
+      // Get data from three sources
+      let laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+      const dataPenjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+      const dataJurnal = JSON.parse(localStorage.getItem("dataJurnal")) || [];
+      
+      // Clean duplicates from financial report data
+      laporanKeuangan = cleanDuplicateLaporanEntries();
+      
+      // Combine all data with better deduplication
+      let allData = [];
+      const transactionKeys = new Set();
+      
+      // Add data from sales with proper key generation
+      dataPenjualan.forEach(penjualan => {
+        // Sales transaction - revenue
+        const revenueKey = `${penjualan.noInvoice}-penjualan-Pendapatan Jasa`;
+        if (!transactionKeys.has(revenueKey)) {
+          allData.push({
+            tanggal: penjualan.tanggal,
+            akun: "Pendapatan Jasa",
+            nilai: penjualan.total,
+            keterangan: `Penjualan - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+            tipe: "kredit",
+            noInvoice: penjualan.noInvoice,
+            jenisTransaksi: "penjualan"
+          });
+          transactionKeys.add(revenueKey);
+        }
+        
+        // Sales transaction - cash/receivable
+        const assetKey = `${penjualan.noInvoice}-penjualan-${penjualan.metodePembayaran === "Tunai" ? "Kas" : "Piutang Usaha"}`;
+        if (!transactionKeys.has(assetKey)) {
+          allData.push({
+            tanggal: penjualan.tanggal,
+            akun: penjualan.metodePembayaran === "Tunai" ? "Kas" : "Piutang Usaha",
+            nilai: penjualan.total,
+            keterangan: `Penjualan - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+            tipe: "debit",
+            noInvoice: penjualan.noInvoice,
+            jenisTransaksi: "penjualan"
+          });
+          transactionKeys.add(assetKey);
+        }
+        
+        // Payment transaction
+        if (penjualan.status === "Lunas" && penjualan.tanggalPelunasan) {
+          const paymentKeyKas = `${penjualan.noInvoice}-pelunasan-Kas`;
+          if (!transactionKeys.has(paymentKeyKas)) {
+            allData.push({
+              tanggal: penjualan.tanggalPelunasan,
+              akun: "Kas",
+              nilai: penjualan.total,
+              keterangan: `Pelunasan Invoice ${penjualan.noInvoice} - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+              tipe: "debit",
+              noInvoice: penjualan.noInvoice,
+              jenisTransaksi: "pelunasan"
+            });
+            transactionKeys.add(paymentKeyKas);
+          }
+          
+          const paymentKeyPiutang = `${penjualan.noInvoice}-pelunasan-Piutang Usaha`;
+          if (!transactionKeys.has(paymentKeyPiutang)) {
+            allData.push({
+              tanggal: penjualan.tanggalPelunasan,
+              akun: "Piutang Usaha",
+              nilai: penjualan.total,
+              keterangan: `Pelunasan Invoice ${penjualan.noInvoice} - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+              tipe: "kredit",
+              noInvoice: penjualan.noInvoice,
+              jenisTransaksi: "pelunasan"
+            });
+            transactionKeys.add(paymentKeyPiutang);
+          }
+        }
+      });
+      
+      // Add data from manual journal with better key generation
+      dataJurnal.forEach(jurnal => {
+        // Skip journal entries from sales
+        if (jurnal.fromPenjualan) return;
+        
+        const journalKey = `manual-${jurnal.tanggal}-${jurnal.akun}-${jurnal.debit || jurnal.kredit}-${jurnal.keterangan}`;
+        if (!transactionKeys.has(journalKey)) {
+          allData.push({
+            tanggal: jurnal.tanggal,
+            akun: jurnal.akun,
+            nilai: jurnal.debit || jurnal.kredit,
+            keterangan: jurnal.keterangan,
+            tipe: jurnal.debit ? "debit" : "kredit",
+            fromJurnal: true
+          });
+          transactionKeys.add(journalKey);
+        }
+      });
+      
+      // Add existing financial report data with deduplication
+      laporanKeuangan.forEach(item => {
+        let itemKey;
+        
+        if (item.noInvoice && item.jenisTransaksi) {
+          itemKey = `${item.noInvoice}-${item.jenisTransaksi}-${item.akun}`;
+        } else {
+          itemKey = `existing-${item.tanggal}-${item.akun}-${item.nilai}-${item.tipe}-${item.keterangan}`;
+        }
+        
+        if (!transactionKeys.has(itemKey)) {
+          allData.push(item);
+          transactionKeys.add(itemKey);
+        }
+      });
+      
+      // Apply filters
+      const tanggalMulai = document.getElementById("filterTanggalMulai").value;
+      const tanggalSelesai = document.getElementById("filterTanggalSelesai").value;
+      const filterAkun = document.getElementById("filterAkun").value;
+      const filterTipe = document.getElementById("filterTipe").value;
+      
+      laporanFilteredData = allData.filter(item => {
+        const matchesTanggalMulai = !tanggalMulai || item.tanggal >= tanggalMulai;
+        const matchesTanggalSelesai = !tanggalSelesai || item.tanggal <= tanggalSelesai;
+        const matchesAkun = !filterAkun || item.akun === filterAkun;
+        const matchesTipe = !filterTipe || item.tipe === filterTipe;
+        
+        return matchesTanggalMulai && matchesTanggalSelesai && matchesAkun && matchesTipe;
+      });
+      
+      // Sort data by date
+      laporanFilteredData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+      
+      // Reset to first page
+      laporanCurrentPage = 1;
+      
+      // Update display
+      renderLaporanTable();
+      setupLaporanPaginationControls();
+      
+      // Update filter info for printing
+      updatePrintFilterInfo();
+      
+      // Check synchronization with journal
+      cekSinkronisasi();
+    }
+    
+    function renderLaporanTable() {
+      const tbody = document.getElementById("tabelLaporan");
+      tbody.innerHTML = "";
+      
+      if (laporanFilteredData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 20px;">
+              Tidak ada data buku besar
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // Kelompokkan data berdasarkan akun
+      const groupedData = {};
+      laporanFilteredData.forEach(item => {
+        if (!groupedData[item.akun]) {
+          groupedData[item.akun] = [];
+        }
+        groupedData[item.akun].push(item);
+      });
+      
+      // Urutkan akun berdasarkan kategori (Aset, Liabilitas, Ekuitas, Pendapatan, Beban)
+      const sortedAccounts = Object.keys(groupedData).sort((a, b) => {
+        const accountOrder = {
+          'Kas': 1, 'Bank': 2, 'Piutang Usaha': 3, 'Persediaan': 4, 'Peralatan': 5,
+          'Utang Usaha': 6, 'Modal Saham': 7, 'Pendapatan Jasa': 8, 
+          'Biaya Operasional': 9, 'Beban Gaji': 10
+        };
+        return (accountOrder[a] || 99) - (accountOrder[b] || 99);
+      });
+      
+      let no = 1;
+      
+      // Tampilkan data per akun
+      sortedAccounts.forEach(akun => {
+        const transactions = groupedData[akun];
+        
+        // Header untuk setiap akun
+        const accountType = getAccountType(akun);
+        const accountRow = document.createElement("tr");
+        accountRow.className = "account-header";
+        accountRow.innerHTML = `
+          <td colspan="8" style="background-color: var(--primary-color); color: white; font-weight: bold; padding: 8px;">
+            ${akun} (${accountType})
+          </td>
+        `;
+        tbody.appendChild(accountRow);
+        
+        // Header kolom untuk akun
+        const headerRow = document.createElement("tr");
+        headerRow.style.backgroundColor = "#f0f0f0";
+        headerRow.innerHTML = `
+          <th>No</th>
+          <th>Tanggal</th>
+          <th>Keterangan</th>
+          <th>Ref</th>
+          <th>Debit (Rp)</th>
+          <th>Kredit (Rp)</th>
+          <th>Saldo (Rp)</th>
+          <th>Aksi</th>
+        `;
+        tbody.appendChild(headerRow);
+        
+        // Hitung saldo awal
+        let saldo = 0;
+        const isDebitNormal = isDebitNormalAccount(akun);
+        
+        // Tampilkan transaksi untuk akun ini
+        transactions.forEach(item => {
+          const jumlah = parseFloat(item.nilai);
+          const debit = item.tipe === "debit" ? jumlah : 0;
+          const kredit = item.tipe === "kredit" ? jumlah : 0;
+          
+          // Update saldo
+          if (isDebitNormal) {
+            saldo = saldo + debit - kredit;
+          } else {
+            saldo = saldo - debit + kredit;
+          }
+          
+          // Format tampilan
+          const debitText = debit > 0 ? "Rp " + debit.toLocaleString("id-ID") : "";
+          const kreditText = kredit > 0 ? "Rp " + kredit.toLocaleString("id-ID") : "";
+          const saldoText = "Rp " + saldo.toLocaleString("id-ID");
+          
+          // Tampilkan informasi tambahan
+          let additionalInfo = "";
+          if (item.noInvoice) {
+            additionalInfo = `<br><small>No. Invoice: ${item.noInvoice}</small>`;
+          }
+          
+          // Tipe transaksi badge
+          let jenisTransaksiBadge = "";
+          if (item.jenisTransaksi === "penjualan") {
+            jenisTransaksiBadge = '<span class="badge badge-success">Penjualan</span>';
+          } else if (item.jenisTransaksi === "pelunasan") {
+            jenisTransaksiBadge = '<span class="badge badge-warning">Pelunasan</span>';
+          } else if (item.fromJurnal) {
+            jenisTransaksiBadge = '<span class="badge badge-primary">Manual</span>';
+          }
+          
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${no++}</td>
+            <td>${item.tanggal}</td>
+            <td>${item.keterangan}${additionalInfo}</td>
+            <td>${jenisTransaksiBadge}</td>
+            <td style="text-align: right;">${debitText}</td>
+            <td style="text-align: right;">${kreditText}</td>
+            <td style="text-align: right; font-weight: bold;">${saldoText}</td>
+            <td>
+              <button class="btn btn-sm btn-info" onclick="viewTransactionDetail('${encodeURIComponent(JSON.stringify(item))}')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+        
+        // Total untuk akun ini
+        const totalRow = document.createElement("tr");
+        totalRow.style.backgroundColor = "#f0f0f0";
+        totalRow.style.fontWeight = "bold";
+        
+        const totalDebit = transactions
+          .filter(item => item.tipe === "debit")
+          .reduce((sum, item) => sum + parseFloat(item.nilai), 0);
+          
+        const totalKredit = transactions
+          .filter(item => item.tipe === "kredit")
+          .reduce((sum, item) => sum + parseFloat(item.nilai), 0);
+        
+        totalRow.innerHTML = `
+          <td colspan="4" style="text-align: right;">TOTAL ${akun}:</td>
+          <td style="text-align: right;">Rp ${totalDebit.toLocaleString("id-ID")}</td>
+          <td style="text-align: right;">Rp ${totalKredit.toLocaleString("id-ID")}</td>
+          <td style="text-align: right;">Rp ${saldo.toLocaleString("id-ID")}</td>
+          <td></td>
+        `;
+        tbody.appendChild(totalRow);
+        
+        // Baris kosong untuk pemisah antar akun
+        const spacerRow = document.createElement("tr");
+        spacerRow.innerHTML = `<td colspan="8" style="height: 15px;"></td>`;
+        tbody.appendChild(spacerRow);
+      });
+    }
+    
+    // Fungsi untuk menentukan jenis akun
+    function getAccountType(accountName) {
+      const assetAccounts = ['Kas', 'Bank', 'Piutang Usaha', 'Persediaan', 'Peralatan'];
+      const liabilityAccounts = ['Utang Usaha'];
+      const equityAccounts = ['Modal Saham'];
+      const revenueAccounts = ['Pendapatan Jasa'];
+      const expenseAccounts = ['Biaya Operasional', 'Beban Gaji'];
+      
+      if (assetAccounts.includes(accountName)) return "Aset";
+      if (liabilityAccounts.includes(accountName)) return "Liabilitas";
+      if (equityAccounts.includes(accountName)) return "Ekuitas";
+      if (revenueAccounts.includes(accountName)) return "Pendapatan";
+      if (expenseAccounts.includes(accountName)) return "Beban";
+      
+      return "Lainnya";
+    }
+    
+    // Fungsi untuk menentukan apakah akun memiliki saldo normal debit
+    function isDebitNormalAccount(accountName) {
+      const assetAccounts = ['Kas', 'Bank', 'Piutang Usaha', 'Persediaan', 'Peralatan'];
+      const expenseAccounts = ['Biaya Operasional', 'Beban Gaji'];
+      
+      return assetAccounts.includes(accountName) || expenseAccounts.includes(accountName);
+    }
+    
+    // Fungsi untuk melihat detail transaksi
+    function viewTransactionDetail(encodedItem) {
+      const item = JSON.parse(decodeURIComponent(encodedItem));
+      
+      // Buat modal untuk menampilkan detail
+      const modal = document.createElement("div");
+      modal.className = "modal";
+      modal.style.display = "block";
+      modal.style.position = "fixed";
+      modal.style.zIndex = "1000";
+      modal.style.left = "0";
+      modal.style.top = "0";
+      modal.style.width = "100%";
+      modal.style.height = "100%";
+      modal.style.overflow = "auto";
+      modal.style.backgroundColor = "rgba(0,0,0,0.4)";
+      
+      const modalContent = document.createElement("div");
+      modalContent.className = "modal-content";
+      modalContent.style.backgroundColor = "#fefefe";
+      modalContent.style.margin = "15% auto";
+      modalContent.style.padding = "20px";
+      modalContent.style.border = "1px solid #888";
+      modalContent.style.width = "80%";
+      modalContent.style.maxWidth = "600px";
+      modalContent.style.borderRadius = "8px";
+      
+      modalContent.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3>Detail Transaksi</h3>
+          <span class="close" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="width: 30%; padding: 8px; font-weight: bold;">Tanggal</td>
+            <td style="padding: 8px;">${item.tanggal}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">Akun</td>
+            <td style="padding: 8px;">${item.akun}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">Keterangan</td>
+            <td style="padding: 8px;">${item.keterangan}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">Tipe</td>
+            <td style="padding: 8px;">
+              <span class="badge ${item.tipe === 'debit' ? 'badge-debit' : 'badge-kredit'}">
+                ${item.tipe.toUpperCase()}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">Jumlah</td>
+            <td style="padding: 8px;">Rp ${parseFloat(item.nilai).toLocaleString("id-ID")}</td>
+          </tr>
+          ${item.noInvoice ? `
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">No. Invoice</td>
+            <td style="padding: 8px;">${item.noInvoice}</td>
+          </tr>
+          ` : ""}
+          ${item.jenisTransaksi ? `
+          <tr>
+            <td style="padding: 8px; font-weight: bold;">Jenis Transaksi</td>
+            <td style="padding: 8px;">${item.jenisTransaksi}</td>
+          </tr>
+          ` : ""}
+        </table>
+        <div style="text-align: right; margin-top: 20px;">
+          <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Tutup</button>
+        </div>
+      `;
+      
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+      
+      // Tambahkan event listener untuk menutup modal
+      const closeBtn = modal.querySelector(".close");
+      closeBtn.onclick = function() {
+        modal.remove();
+      };
+      
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.remove();
+        }
+      };
+      
+      resetIdleTimer();
+    }
+    
+    function setupLaporanPaginationControls() {
+      const pagination = document.getElementById("laporanPagination");
+      pagination.innerHTML = "";
+      
+      const totalPages = Math.ceil(laporanFilteredData.length / laporanItemsPerPage);
+      
+      if (totalPages <= 1) return;
+      
+      // Previous button
+      const prevBtn = document.createElement("button");
+      prevBtn.innerHTML = "<i class='fas fa-chevron-left'></i>";
+      prevBtn.disabled = laporanCurrentPage === 1;
+      prevBtn.onclick = () => {
+        if (laporanCurrentPage > 1) {
+          laporanCurrentPage--;
+          renderLaporanTable();
+          setupLaporanPaginationControls();
+        }
+        resetIdleTimer();
+      };
+      pagination.appendChild(prevBtn);
+      
+      // Page number buttons
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= laporanCurrentPage - 2 && i <= laporanCurrentPage + 2)) {
+          const pageBtn = document.createElement("button");
+          pageBtn.textContent = i;
+          pageBtn.className = i === laporanCurrentPage ? "active" : "";
+          pageBtn.onclick = () => {
+            laporanCurrentPage = i;
+            renderLaporanTable();
+            setupLaporanPaginationControls();
+            resetIdleTimer();
+          };
+          pagination.appendChild(pageBtn);
+        } else if (i === laporanCurrentPage - 3 || i === laporanCurrentPage + 3) {
+          const span = document.createElement("span");
+          span.textContent = "...";
+          pagination.appendChild(span);
+        }
+      }
+      
+      // Next button
+      const nextBtn = document.createElement("button");
+      nextBtn.innerHTML = "<i class='fas fa-chevron-right'></i>";
+      nextBtn.disabled = laporanCurrentPage === totalPages;
+      nextBtn.onclick = () => {
+        if (laporanCurrentPage < totalPages) {
+          laporanCurrentPage++;
+          renderLaporanTable();
+          setupLaporanPaginationControls();
+        }
+        resetIdleTimer();
+      };
+      pagination.appendChild(nextBtn);
+      
+      // Items per page selector
+      const itemsPerPageContainer = document.createElement("div");
+      itemsPerPageContainer.style.marginLeft = "10px";
+      
+      const label = document.createElement("span");
+      label.textContent = "Items per page: ";
+      itemsPerPageContainer.appendChild(label);
+      
+      const select = document.createElement("select");
+      select.className = "filter-control";
+      
+      [10, 15, 25, 50, 100].forEach(num => {
+        const option = document.createElement("option");
+        option.value = num;
+        option.textContent = num;
+        if (num === laporanItemsPerPage) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+      
+      select.onchange = () => {
+        laporanItemsPerPage = parseInt(select.value);
+        laporanCurrentPage = 1;
+        renderLaporanTable();
+        setupLaporanPaginationControls();
+        resetIdleTimer();
+      };
+      
+      itemsPerPageContainer.appendChild(select);
+      pagination.appendChild(itemsPerPageContainer);
+    }
+    
+    function updatePrintFilterInfo() {
+      const tanggalMulai = document.getElementById("filterTanggalMulai").value;
+      const tanggalSelesai = document.getElementById("filterTanggalSelesai").value;
+      const filterAkun = document.getElementById("filterAkun").value;
+      const filterTipe = document.getElementById("filterTipe").value;
+      
+      let filterInfo = "Periode: ";
+      if (tanggalMulai && tanggalSelesai) {
+        filterInfo += `${tanggalMulai} s/d ${tanggalSelesai}`;
+      } else if (tanggalMulai) {
+        filterInfo += `${tanggalMulai} s/d Sekarang`;
+      } else if (tanggalSelesai) {
+        filterInfo += `Awal s/d ${tanggalSelesai}`;
+      } else {
+        filterInfo += "Semua Periode";
+      }
+      
+      if (filterAkun) {
+        filterInfo += ` | Akun: ${filterAkun}`;
+      }
+      
+      if (filterTipe) {
+        filterInfo += ` | Tipe: ${filterTipe}`;
+      }
+      
+      document.getElementById("printFilterInfo").textContent = filterInfo;
+      
+      // Update print date
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      document.getElementById("printDate").textContent = `Dicetak pada: ${dateStr}`;
+    }
+    
+    // ============ FILTER FUNCTIONS ============
+    function applyFilters() {
+      loadLaporan();
+      showNotification("Filter berhasil diterapkan");
+      resetIdleTimer();
+    }
+    
+    function resetFilters() {
+      document.getElementById("filterTanggalMulai").value = "";
+      document.getElementById("filterTanggalSelesai").value = "";
+      document.getElementById("filterAkun").value = "";
+      document.getElementById("filterTipe").value = "";
+      
+      loadLaporan();
+      showNotification("Filter berhasil direset");
+      resetIdleTimer();
+    }
+    
+    // ============ EXPORT FUNCTIONS ============
+    function exportExcel() {
+      const table = document.querySelector(".data-table");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Buku Besar" });
+      XLSX.writeFile(wb, "buku_besar.xlsx");
+      
+      // Log activity
+      logActivity('export', 'General Ledger', 'Exported general ledger to Excel');
+      
+      showNotification("Buku besar berhasil diekspor ke Excel");
+      resetIdleTimer();
+    }
+    
+    function exportBukuBesarExcel() {
+      // Create a temporary table for export
+      const exportTable = document.createElement("table");
+      
+      // Add header
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Akun</th>
+          <th>Tanggal</th>
+          <th>Keterangan</th>
+          <th>Ref</th>
+          <th>Debit (Rp)</th>
+          <th>Kredit (Rp)</th>
+          <th>Saldo (Rp)</th>
+        </tr>
+      `;
+      exportTable.appendChild(thead);
+      
+      // Add body
+      const tbody = document.createElement("tbody");
+      
+      // Kelompokkan data berdasarkan akun
+      const groupedData = {};
+      laporanFilteredData.forEach(item => {
+        if (!groupedData[item.akun]) {
+          groupedData[item.akun] = [];
+        }
+        groupedData[item.akun].push(item);
+      });
+      
+      // Urutkan akun
+      const sortedAccounts = Object.keys(groupedData).sort((a, b) => {
+        const accountOrder = {
+          'Kas': 1, 'Bank': 2, 'Piutang Usaha': 3, 'Persediaan': 4, 'Peralatan': 5,
+          'Utang Usaha': 6, 'Modal Saham': 7, 'Pendapatan Jasa': 8, 
+          'Biaya Operasional': 9, 'Beban Gaji': 10
+        };
+        return (accountOrder[a] || 99) - (accountOrder[b] || 99);
+      });
+      
+      // Tampilkan data per akun
+      sortedAccounts.forEach(akun => {
+        const transactions = groupedData[akun];
+        
+        // Header untuk setiap akun
+        const accountRow = document.createElement("tr");
+        accountRow.innerHTML = `
+          <td colspan="7" style="background-color: #1a365d; color: white; font-weight: bold;">${akun}</td>
+        `;
+        tbody.appendChild(accountRow);
+        
+        // Hitung saldo awal
+        let saldo = 0;
+        const isDebitNormal = isDebitNormalAccount(akun);
+        
+        // Tampilkan transaksi untuk akun ini
+        transactions.forEach(item => {
+          const jumlah = parseFloat(item.nilai);
+          const debit = item.tipe === "debit" ? jumlah : 0;
+          const kredit = item.tipe === "kredit" ? jumlah : 0;
+          
+          // Update saldo
+          if (isDebitNormal) {
+            saldo = saldo + debit - kredit;
+          } else {
+            saldo = saldo - debit + kredit;
+          }
+          
+          // Format tampilan
+          const debitText = debit > 0 ? debit : "";
+          const kreditText = kredit > 0 ? kredit : "";
+          
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td></td>
+            <td>${item.tanggal}</td>
+            <td>${item.keterangan}</td>
+            <td>${item.jenisTransaksi || ""}</td>
+            <td style="text-align: right;">${debitText}</td>
+            <td style="text-align: right;">${kreditText}</td>
+            <td style="text-align: right;">${saldo}</td>
+          `;
+          tbody.appendChild(row);
+        });
+        
+        // Total untuk akun ini
+        const totalRow = document.createElement("tr");
+        totalRow.style.backgroundColor = "#f0f0f0";
+        totalRow.style.fontWeight = "bold";
+        
+        const totalDebit = transactions
+          .filter(item => item.tipe === "debit")
+          .reduce((sum, item) => sum + parseFloat(item.nilai), 0);
+          
+        const totalKredit = transactions
+          .filter(item => item.tipe === "kredit")
+          .reduce((sum, item) => sum + parseFloat(item.nilai), 0);
+        
+        totalRow.innerHTML = `
+          <td colspan="4" style="text-align: right;">TOTAL ${akun}:</td>
+          <td style="text-align: right;">${totalDebit}</td>
+          <td style="text-align: right;">${totalKredit}</td>
+          <td style="text-align: right;">${saldo}</td>
+        `;
+        tbody.appendChild(totalRow);
+        
+        // Baris kosong untuk pemisah antar akun
+        const spacerRow = document.createElement("tr");
+        spacerRow.innerHTML = `<td colspan="7" style="height: 15px;"></td>`;
+        tbody.appendChild(spacerRow);
+      });
+      
+      exportTable.appendChild(tbody);
+      
+      // Export to Excel
+      const wb = XLSX.utils.table_to_book(exportTable, { sheet: "Buku Besar" });
+      XLSX.writeFile(wb, "buku_besar.xlsx");
+      
+      // Log activity
+      logActivity('export', 'General Ledger', 'Exported general ledger to Excel');
+      
+      showNotification("Buku besar berhasil diekspor ke Excel");
+      resetIdleTimer();
+    }
+    
+    function exportPDF() {
+      // Create temporary element for PDF
+      const element = document.createElement('div');
+      
+      // Add header
+      const header = document.createElement('div');
+      header.style.textAlign = 'center';
+      header.style.marginBottom = '20px';
+      
+      const title = document.createElement('h2');
+      title.textContent = 'BUKU BESAR';
+      title.style.marginBottom = '5px';
+      header.appendChild(title);
+      
+      const date = new Date();
+      const dateStr = date.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      const dateElement = document.createElement('p');
+      dateElement.textContent = `Dicetak pada: ${dateStr}`;
+      dateElement.style.marginBottom = '10px';
+      header.appendChild(dateElement);
+      
+      const filterInfo = document.createElement('p');
+      filterInfo.textContent = document.getElementById("printFilterInfo").textContent;
+      filterInfo.style.fontSize = '12px';
+      header.appendChild(filterInfo);
+      
+      element.appendChild(header);
+      
+      // Copy table
+      const tableClone = document.querySelector(".data-table").cloneNode(true);
+      element.appendChild(tableClone);
+      
+      const opt = {
+        margin: 10,
+        filename: 'buku_besar.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
+      
+      // Log activity
+      logActivity('export', 'General Ledger', 'Exported general ledger to PDF');
+      
+      showNotification("Buku besar berhasil diekspor ke PDF");
+      resetIdleTimer();
+    }
+    
+    // ============ SYNC FUNCTIONS ============
+    function cekSinkronisasi() {
+      const jurnalData = JSON.parse(localStorage.getItem("dataJurnal")) || [];
+      const laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+      const dataPenjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+      
+      // Create a map to track unique transactions in journal
+      const journalTransactions = new Map();
+      
+      // Add from manual journal
+      jurnalData.forEach(entry => {
+        // Skip journal entries from sales
+        if (entry.fromPenjualan) return;
+        
+        const journalKey = `manual-${entry.tanggal}-${entry.akun}-${entry.debit || entry.kredit}-${entry.keterangan}`;
+        if (!journalTransactions.has(journalKey)) {
+          journalTransactions.set(journalKey, entry);
+        }
+      });
+      
+      // Add from sales data
+      dataPenjualan.forEach(penjualan => {
+        // Sales transaction - revenue
+        const revenueKey = `${penjualan.noInvoice}-penjualan-Pendapatan Jasa`;
+        journalTransactions.set(revenueKey, {
+          tanggal: penjualan.tanggal,
+          akun: "Pendapatan Jasa",
+          nilai: penjualan.total,
+          keterangan: `Penjualan - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+          tipe: "kredit",
+          noInvoice: penjualan.noInvoice,
+          jenisTransaksi: "penjualan"
+        });
+        
+        // Sales transaction - cash/receivable
+        const assetKey = `${penjualan.noInvoice}-penjualan-${penjualan.metodePembayaran === "Tunai" ? "Kas" : "Piutang Usaha"}`;
+        journalTransactions.set(assetKey, {
+          tanggal: penjualan.tanggal,
+          akun: penjualan.metodePembayaran === "Tunai" ? "Kas" : "Piutang Usaha",
+          nilai: penjualan.total,
+          keterangan: `Penjualan - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+          tipe: "debit",
+          noInvoice: penjualan.noInvoice,
+          jenisTransaksi: "penjualan"
+        });
+        
+        // Payment transaction
+        if (penjualan.status === "Lunas" && penjualan.tanggalPelunasan) {
+          const paymentKeyKas = `${penjualan.noInvoice}-pelunasan-Kas`;
+          journalTransactions.set(paymentKeyKas, {
+            tanggal: penjualan.tanggalPelunasan,
+            akun: "Kas",
+            nilai: penjualan.total,
+            keterangan: `Pelunasan Invoice ${penjualan.noInvoice} - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+            tipe: "debit",
+            noInvoice: penjualan.noInvoice,
+            jenisTransaksi: "pelunasan"
+          });
+          
+          const paymentKeyPiutang = `${penjualan.noInvoice}-pelunasan-Piutang Usaha`;
+          journalTransactions.set(paymentKeyPiutang, {
+            tanggal: penjualan.tanggalPelunasan,
+            akun: "Piutang Usaha",
+            nilai: penjualan.total,
+            keterangan: `Pelunasan Invoice ${penjualan.noInvoice} - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+            tipe: "kredit",
+            noInvoice: penjualan.noInvoice,
+            jenisTransaksi: "pelunasan"
+          });
+        }
+      });
+      
+      // Create a map to track unique transactions in financial report
+      const laporanTransactions = new Map();
+      
+      laporanKeuangan.forEach(item => {
+        let itemKey;
+        
+        if (item.noInvoice && item.jenisTransaksi) {
+          itemKey = `${item.noInvoice}-${item.jenisTransaksi}-${item.akun}`;
+        } else {
+          itemKey = `existing-${item.tanggal}-${item.akun}-${item.nilai}-${item.tipe}-${item.keterangan}`;
+        }
+        
+        laporanTransactions.set(itemKey, item);
+      });
+      
+      // Check if all journal transactions exist in financial report
+      let isSynchronized = true;
+      
+      // Check if all journal transactions are in financial report
+      for (const [key, journalTrans] of journalTransactions) {
+        if (!laporanTransactions.has(key)) {
+          isSynchronized = false;
+          break;
+        }
+      }
+      
+      // Check if all financial report transactions are in journal
+      if (isSynchronized) {
+        for (const [key, laporanTrans] of laporanTransactions) {
+          if (!journalTransactions.has(key) && !key.startsWith('existing-')) {
+            isSynchronized = false;
+            break;
+          }
+        }
+      }
+      
+      // Show warning if not synchronized
+      const syncWarning = document.getElementById("syncWarning");
+      if (!isSynchronized) {
+        syncWarning.style.display = "flex";
+      } else {
+        syncWarning.style.display = "none";
+      }
+    }
+    
+    function sinkronkanData() {
+      try {
+        const jurnalData = JSON.parse(localStorage.getItem("dataJurnal")) || [];
+        const dataPenjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+        
+        // Create new financial report from journal and sales data
+        const laporanKeuanganBaru = [];
+        const transactionKeys = new Set();
+        
+        // Add from manual journal
+        jurnalData.forEach(entry => {
+          // Skip journal entries from sales
+          if (entry.fromPenjualan) return;
+          
+          const journalKey = `manual-${entry.tanggal}-${entry.akun}-${entry.debit || entry.kredit}-${entry.keterangan}`;
+          if (!transactionKeys.has(journalKey)) {
+            // Create debit entry
+            if (entry.debit) {
+              laporanKeuanganBaru.push({
+                tanggal: entry.tanggal,
+                akun: entry.akun,
+                nilai: entry.debit,
+                keterangan: entry.keterangan,
+                tipe: "debit",
+                fromJurnal: true
+              });
+            }
+            
+            // Create credit entry
+            if (entry.kredit) {
+              laporanKeuanganBaru.push({
+                tanggal: entry.tanggal,
+                akun: entry.akun,
+                nilai: entry.kredit,
+                keterangan: entry.keterangan,
+                tipe: "kredit",
+                fromJurnal: true
+              });
+            }
+            
+            transactionKeys.add(journalKey);
+          }
+        });
+        
+        // Add from sales data
+        dataPenjualan.forEach(penjualan => {
+          // Sales transaction - revenue
+          const revenueKey = `${penjualan.noInvoice}-penjualan-Pendapatan Jasa`;
+          if (!transactionKeys.has(revenueKey)) {
+            laporanKeuanganBaru.push({
+              tanggal: penjualan.tanggal,
+              akun: "Pendapatan Jasa",
+              nilai: penjualan.total,
+              keterangan: `Penjualan - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+              tipe: "kredit",
+              noInvoice: penjualan.noInvoice,
+              jenisTransaksi: "penjualan"
+            });
+            transactionKeys.add(revenueKey);
+          }
+          
+          // Sales transaction - cash/receivable
+          const assetKey = `${penjualan.noInvoice}-penjualan-${penjualan.metodePembayaran === "Tunai" ? "Kas" : "Piutang Usaha"}`;
+          if (!transactionKeys.has(assetKey)) {
+            laporanKeuanganBaru.push({
+              tanggal: penjualan.tanggal,
+              akun: penjualan.metodePembayaran === "Tunai" ? "Kas" : "Piutang Usaha",
+              nilai: penjualan.total,
+              keterangan: `Penjualan - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+              tipe: "debit",
+              noInvoice: penjualan.noInvoice,
+              jenisTransaksi: "penjualan"
+            });
+            transactionKeys.add(assetKey);
+          }
+          
+          // Payment transaction
+          if (penjualan.status === "Lunas" && penjualan.tanggalPelunasan) {
+            const paymentKeyKas = `${penjualan.noInvoice}-pelunasan-Kas`;
+            if (!transactionKeys.has(paymentKeyKas)) {
+              laporanKeuanganBaru.push({
+                tanggal: penjualan.tanggalPelunasan,
+                akun: "Kas",
+                nilai: penjualan.total,
+                keterangan: `Pelunasan Invoice ${penjualan.noInvoice} - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+                tipe: "debit",
+                noInvoice: penjualan.noInvoice,
+                jenisTransaksi: "pelunasan"
+              });
+              transactionKeys.add(paymentKeyKas);
+            }
+            
+            const paymentKeyPiutang = `${penjualan.noInvoice}-pelunasan-Piutang Usaha`;
+            if (!transactionKeys.has(paymentKeyPiutang)) {
+              laporanKeuanganBaru.push({
+                tanggal: penjualan.tanggalPelunasan,
+                akun: "Piutang Usaha",
+                nilai: penjualan.total,
+                keterangan: `Pelunasan Invoice ${penjualan.noInvoice} - ${penjualan.customer || penjualan.namaPelanggan || "Pelanggan"}`,
+                tipe: "kredit",
+                noInvoice: penjualan.noInvoice,
+                jenisTransaksi: "pelunasan"
+              });
+              transactionKeys.add(paymentKeyPiutang);
+            }
+          }
+        });
+        
+        // Save the new financial report
+        localStorage.setItem("laporanKeuangan", JSON.stringify(laporanKeuanganBaru));
+        
+        // Force refresh synchronization status
+        cekSinkronisasi();
+        
+        // Refresh display
+        loadLaporan();
+        
+        // Log activity
+        logActivity('sync', 'General Ledger', 'Synchronized general ledger data with journal');
+        
+        // Check if synchronization was successful
+        const syncWarning = document.getElementById("syncWarning");
+        if (syncWarning.style.display === "none") {
+          showNotification("Data berhasil disinkronkan");
+        } else {
+          showNotification("Sinkronisasi selesai, tetapi masih ada perbedaan data", "warning");
+        }
+        
+        resetIdleTimer();
+      } catch (error) {
+        console.error("Error synchronizing data:", error);
+        showNotification("Terjadi kesalahan saat menyinkronkan data: " + error.message, "error");
+      }
+    }
+    
+    // ============ INITIALIZATION ============
+    window.onload = function() {
+      try {
+        const user = getCurrentUser();
+        if (!user) {
+          showNotification("Silakan login terlebih dahulu", "error");
+          window.location.href = "index.html";
+          return;
+        }
+        
+        // Update user info with format consistent with dashboard
+        document.getElementById("userWelcome").textContent = `Login sebagai: ${user.username} (${user.role})`;
+        
+        if (user.role === "admin") {
+          document.getElementById("linkPengguna").style.display = "block";
+        }
+        
+        // Set default date filter (this month)
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        document.getElementById("filterTanggalMulai").value = firstDay.toISOString().split('T')[0];
+        document.getElementById("filterTanggalSelesai").value = today.toISOString().split('T')[0];
+        
+        // Clean duplicates from financial report before loading
+        cleanDuplicateLaporanEntries();
+        
+        // Check synchronization and automatically sync if needed
+        cekSinkronisasi();
+        
+        // Display report data
+        loadLaporan();
+        
+        // Log activity
+        logActivity('view', 'General Ledger', 'User accessed general ledger page');
+        
+        // Setup auto logout
+        startIdleTimer();
+        
+        // Add event listeners for user activity
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('mousedown', resetIdleTimer);
+        document.addEventListener('keypress', resetIdleTimer);
+        document.addEventListener('scroll', resetIdleTimer);
+        document.addEventListener('touchstart', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
+      } catch (error) {
+        console.error("Error initializing page:", error);
+        showNotification("Terjadi kesalahan saat memuat halaman: " + error.message, "error");
+      }
+    };
+  </script>
+</body>
+</html>

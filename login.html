@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - PACIFIC PRO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #1a365d;
+      --secondary-color: #8B0000;
+      --accent-color: #3182ce;
+      --light-color: #ebf8ff;
+      --border-color: #e2e8f0;
+      --text-color: #2d3748;
+      --text-light: #718096;
+      --success-color: #38a169;
+      --danger-color: #e53e3e;
+      --warning-color: #dd6b20;
+      --gold-color: #d4af37;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.5);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a1929 0%, #1a365d 40%, #8B0000 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+      color: var(--text-color);
+      overflow: hidden;
+    }
+    
+    /* Luxury Background Effects */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 30%);
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    /* Particle Effects */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+    
+    .particle {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particle-float 15s infinite linear;
+    }
+    
+    @keyframes particle-float {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.4;
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+    
+    /* Gold Accent Lights */
+    .gold-accent {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+      filter: blur(20px);
+      z-index: 0;
+    }
+    
+    .gold-accent-1 {
+      top: -150px;
+      right: -100px;
+      animation: float-gold 20s infinite ease-in-out;
+    }
+    
+    .gold-accent-2 {
+      bottom: -150px;
+      left: -100px;
+      animation: float-gold 25s infinite ease-in-out reverse;
+    }
+    
+    @keyframes float-gold {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+    
+    /* Geometric Shapes */
+    .geometric-shape {
+      position: absolute;
+      opacity: 0.1;
+      z-index: 0;
+    }
+    
+    .shape-1 {
+      top: 10%;
+      left: 5%;
+      width: 100px;
+      height: 100px;
+      border: 2px solid var(--gold-color);
+      transform: rotate(45deg);
+      animation: rotate 30s linear infinite;
+    }
+    
+    .shape-2 {
+      bottom: 15%;
+      right: 8%;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 2px solid var(--gold-color);
+      animation: rotate 40s linear infinite reverse;
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .login-container {
+      width: 100%;
+      max-width: 460px;
+      z-index: 1;
+      margin-bottom: 60px;
+    }
+    
+    .login-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .login-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.25), 0 15px 15px -5px rgba(0, 0, 0, 0.15), 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    
+    .card-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 30px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card-header::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: pulse 4s infinite alternate;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(1.2); opacity: 0.8; }
+    }
+    
+    .card-header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--gold-color), rgba(212, 175, 55, 0.5), var(--gold-color));
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    
+    .logo-container {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 15px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3), var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+      border: 3px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    .logo-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      opacity: 0.1;
+      border-radius: 50%;
+    }
+    
+    .logo {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .logo-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 900;
+      font-family: 'Playfair Display', serif;
+      color: var(--primary-color);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .app-title {
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    
+    .app-title::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: var(--gold-color);
+    }
+    
+    .card-body {
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .form-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 24px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .form-title::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-color), transparent);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 8px;
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      padding-left: 44px;
+      font-size: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: white;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1), 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    .form-control:focus + .input-icon {
+      color: var(--accent-color);
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+      color: var(--accent-color);
+    }
+    
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+    }
+    
+    .checkbox-group input {
+      margin-right: 8px;
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-color);
+    }
+    
+    .checkbox-group label {
+      cursor: pointer;
+      user-select: none;
+      color: var(--text-color);
+    }
+    
+    .forgot-link {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .forgot-link:hover {
+      color: var(--gold-color);
+      text-decoration: underline;
+    }
+    
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      box-shadow: var(--shadow-md), 0 0 15px rgba(212, 175, 55, 0.3);
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.7s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      background: linear-gradient(135deg, var(--secondary-color), #660000);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg), 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+    
+    .btn:active {
+      transform: translateY(-1px);
+    }
+    
+    .btn i {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+    
+    .form-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-light);
+    }
+    
+    .form-footer a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .form-footer a:hover {
+      color: var(--gold-color);
+      text-decoration: underline;
+    }
+    
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+      animation: slideDown 0.5s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .alert-error {
+      background-color: #fed7d7;
+      color: var(--danger-color);
+      border-left: 4px solid var(--danger-color);
+    }
+    
+    .alert-success {
+      background-color: #c6f6d5;
+      color: var(--success-color);
+      border-left: 4px solid var(--success-color);
+    }
+    
+    .developer-info {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      z-index: 1;
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      letter-spacing: 1px;
+    }
+    
+    .developer-info span {
+      color: var(--gold-color);
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: var(--gold-color);
+      text-underline-offset: 4px;
+    }
+    
+    /* Session Timeout Warning Styles */
+    .session-warning {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s, visibility 0.4s;
+      backdrop-filter: blur(5px);
+    }
+    
+    .session-warning.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .session-warning-content {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: var(--shadow-xl), 0 0 30px rgba(212, 175, 55, 0.3);
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.4s;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    .session-warning.active .session-warning-content {
+      transform: scale(1);
+    }
+    
+    .session-warning-icon {
+      font-size: 48px;
+      color: var(--warning-color);
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    .session-warning-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 15px;
+      font-family: 'Playfair Display', serif;
+    }
+    
+    .session-warning-message {
+      font-size: 16px;
+      color: var(--text-light);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+    
+    .session-warning-timer {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--warning-color);
+      margin-bottom: 25px;
+      font-family: 'Playfair Display', serif;
+      text-shadow: 0 0 10px rgba(221, 107, 32, 0.3);
+    }
+    
+    .session-warning-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .session-warning-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .session-warning-extend {
+      background: linear-gradient(135deg, var(--accent-color), #2c5aa0);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .session-warning-extend:hover {
+      background: linear-gradient(135deg, #2c5aa0, var(--accent-color));
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .session-warning-logout {
+      background: linear-gradient(135deg, var(--border-color), #cbd5e0);
+      color: var(--text-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .session-warning-logout:hover {
+      background: linear-gradient(135deg, #cbd5e0, var(--border-color));
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Tablet and Laptop Responsive Styles */
+    @media (max-width: 1024px) {
+      .login-container {
+        margin-bottom: 50px;
+      }
+      
+      .card-header {
+        padding: 25px 15px;
+      }
+      
+      .logo-container {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 12px;
+      }
+      
+      .logo-fallback {
+        font-size: 36px;
+      }
+      
+      .app-title {
+        font-size: 26px;
+      }
+      
+      .card-body {
+        padding: 25px 20px;
+      }
+      
+      .form-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+      
+      .form-group {
+        margin-bottom: 16px;
+      }
+      
+      .form-control {
+        padding: 10px 14px;
+        padding-left: 40px;
+        font-size: 14px;
+      }
+      
+      .input-icon {
+        left: 14px;
+        font-size: 14px;
+      }
+      
+      .password-toggle {
+        right: 14px;
+        font-size: 14px;
+      }
+      
+      .form-options {
+        margin-bottom: 20px;
+        font-size: 13px;
+      }
+      
+      .btn {
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+      
+      .form-footer {
+        margin-top: 16px;
+        font-size: 13px;
+      }
+      
+      .developer-info {
+        font-size: 13px;
+        bottom: 15px;
+      }
+    }
+    
+    /* Mobile Responsive Styles */
+    @media (max-width: 480px) {
+      .login-card {
+        border-radius: 16px;
+      }
+      
+      .card-header {
+        padding: 20px 15px;
+      }
+      
+      .logo-container {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+      }
+      
+      .logo-fallback {
+        font-size: 32px;
+      }
+      
+      .app-title {
+        font-size: 22px;
+      }
+      
+      .card-body {
+        padding: 20px 15px;
+      }
+      
+      .form-title {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+      
+      .form-group {
+        margin-bottom: 14px;
+      }
+      
+      .form-control {
+        padding: 10px 12px;
+        padding-left: 36px;
+        font-size: 14px;
+      }
+      
+      .input-icon {
+        left: 12px;
+        font-size: 14px;
+      }
+      
+      .password-toggle {
+        right: 12px;
+        font-size: 14px;
+      }
+      
+      .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      
+      .btn {
+        padding: 11px 14px;
+        font-size: 14px;
+      }
+      
+      .form-footer {
+        margin-top: 14px;
+        font-size: 12px;
+      }
+      
+      .developer-info {
+        font-size: 12px;
+        bottom: 10px;
+      }
+      
+      .session-warning-content {
+        padding: 20px 15px;
+      }
+      
+      .session-warning-title {
+        font-size: 20px;
+      }
+      
+      .session-warning-message {
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      
+      .session-warning-timer {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      
+      .session-warning-buttons {
+        flex-direction: column;
+      }
+      
+      .session-warning-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particle effects -->
+  <div class="particles" id="particles"></div>
+  
+  <!-- Gold accent lights -->
+  <div class="gold-accent gold-accent-1"></div>
+  <div class="gold-accent gold-accent-2"></div>
+  
+  <!-- Geometric shapes -->
+  <div class="geometric-shape shape-1"></div>
+  <div class="geometric-shape shape-2"></div>
+  
+  <div class="login-container">
+    <div class="login-card">
+      <div class="card-header">
+        <div class="logo-container">
+          <img src="tegline.png" alt="PACIFI PRO Logo" class="logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+          <div id="logoFallback" class="logo-fallback" style="display: none;">PP</div>
+        </div>
+        <h1 class="app-title">PACIFIC PRO</h1>
+      </div>
+      
+      <div class="card-body">
+        <h2 class="form-title">Masuk ke Akun Anda</h2>
+        
+        <div id="errorMessage" class="alert alert-error"></div>
+        <div id="successMessage" class="alert alert-success"></div>
+        
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <div class="input-group">
+              <input type="text" id="username" class="form-control" placeholder="Masukkan username" required>
+              <span class="input-icon"><i class="fas fa-user"></i></span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+              <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+              <span class="input-icon"><i class="fas fa-lock"></i></span>
+              <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                <i class="fas fa-eye" id="toggleIcon"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-options">
+            <div class="checkbox-group">
+              <input type="checkbox" id="rememberMe">
+              <label for="rememberMe">Ingat saya</label>
+            </div>
+            <a href="#" class="forgot-link">Lupa password?</a>
+          </div>
+          
+          <button type="submit" class="btn">
+            <i class="fas fa-sign-in-alt"></i> Masuk
+          </button>
+        </form>
+        
+        <div class="form-footer">
+          Belum punya akun? <a href="#">Hubungi Administrator</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="developer-info">
+    Developed by <span>Pacific Interteknologi</span> © 2023
+  </div>
+  
+  <!-- Session Timeout Warning Modal -->
+  <div id="sessionWarning" class="session-warning">
+    <div class="session-warning-content">
+      <div class="session-warning-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 class="session-warning-title">Sesi Akan Berakhir</h3>
+      <p class="session-warning-message">
+        Anda telah tidak aktif untuk beberapa waktu. Sesi Anda akan berakhir dalam:
+      </p>
+      <div class="session-warning-timer" id="sessionTimer">01:00</div>
+      <div class="session-warning-buttons">
+        <button id="extendSession" class="session-warning-btn session-warning-extend">
+          Perpanjang Sesi
+        </button>
+        <button id="logoutNow" class="session-warning-btn session-warning-logout">
+          Logout Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // =====================
+    // PARTICLE EFFECT GENERATION
+    // =====================
+    
+    /**
+     * Creates floating particles for visual enhancement
+     */
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 20; // Reduced for better performance
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random properties
+        const size = Math.random() * 4 + 1;
+        const posX = Math.random() * 100;
+        const delay = Math.random() * 15;
+        const duration = Math.random() * 10 + 20;
+        
+        // Apply styles
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.animationDelay = `${delay}s`;
+        particle.style.animationDuration = `${duration}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // =====================
+    // SESSION TIMEOUT MANAGEMENT
+    // =====================
+    
+    // Konfigurasi timeout sesi (dalam milidetik)
+    const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 menit
+    const WARNING_BEFORE_TIMEOUT = 1 * 60 * 1000; // Tampilkan peringatan 1 menit sebelum timeout
+    
+    let idleTimer;
+    let warningTimer;
+    let countdownTimer;
+    let timeLeft;
+    
+    /**
+     * Inisialisasi deteksi aktivitas untuk session timeout
+     */
+    function initSessionTimeout() {
+      // Event listener untuk aktivitas pengguna
+      const events = [
+        'mousedown', 'mousemove', 'keypress', 
+        'scroll', 'touchstart', 'click'
+      ];
+      
+      events.forEach(event => {
+        document.addEventListener(event, resetIdleTimer, true);
+      });
+      
+      // Mulai timer idle
+      resetIdleTimer();
+    }
+    
+    /**
+     * Reset timer idle
+     */
+    function resetIdleTimer() {
+      // Hapus timer yang ada
+      clearTimeout(idleTimer);
+      clearTimeout(warningTimer);
+      clearInterval(countdownTimer);
+      
+      // Sembunyikan modal peringatan jika sedang ditampilkan
+      const warningModal = document.getElementById('sessionWarning');
+      warningModal.classList.remove('active');
+      
+      // Set timer baru untuk peringatan
+      warningTimer = setTimeout(showSessionWarning, SESSION_TIMEOUT - WARNING_BEFORE_TIMEOUT);
+      
+      // Set timer baru untuk timeout
+      idleTimer = setTimeout(autoLogout, SESSION_TIMEOUT);
+    }
+    
+    /**
+     * Tampilkan modal peringatan session akan berakhir
+     */
+    function showSessionWarning() {
+      const warningModal = document.getElementById('sessionWarning');
+      warningModal.classList.add('active');
+      
+      // Set waktu tersisa (dalam detik)
+      timeLeft = Math.floor(WARNING_BEFORE_TIMEOUT / 1000);
+      updateCountdown();
+      
+      // Update countdown setiap detik
+      countdownTimer = setInterval(updateCountdown, 1000);
+      
+      // Event listener untuk tombol perpanjang sesi
+      document.getElementById('extendSession').onclick = function() {
+        resetIdleTimer();
+        showNotification('Sesi telah diperpanjang', 'success');
+      };
+      
+      // Event listener untuk tombol logout
+      document.getElementById('logoutNow').onclick = function() {
+        autoLogout();
+      };
+    }
+    
+    /**
+     * Update tampilan countdown timer
+     */
+    function updateCountdown() {
+      timeLeft--;
+      
+      // Format waktu ke MM:SS
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      document.getElementById('sessionTimer').textContent = formattedTime;
+      
+      // Jika waktu habis, logout otomatis
+      if (timeLeft <= 0) {
+        autoLogout();
+      }
+    }
+    
+    /**
+     * Logout otomatis karena session timeout
+     */
+    function autoLogout() {
+      // Hapus timer
+      clearTimeout(idleTimer);
+      clearTimeout(warningTimer);
+      clearInterval(countdownTimer);
+      
+      // Sembunyikan modal peringatan
+      const warningModal = document.getElementById('sessionWarning');
+      warningModal.classList.remove('active');
+      
+      // Logout user
+      logout();
+    }
+    
+    // =====================
+    // USER LOGIN & ROLE MANAGEMENT
+    // =====================
+    
+    /**
+     * Inisialisasi data pengguna default jika belum ada
+     */
+    function initializeUsersData() {
+      if (!localStorage.getItem("users")) {
+        const defaultUsers = [
+          { 
+            username: "admin", 
+            password: "admin123", 
+            role: "admin", 
+            fullName: "Administrator",
+            email: "admin@pacifipro.com",
+            status: "active"
+          },
+          { 
+            username: "staff", 
+            password: "staff123", 
+            role: "staff", 
+            fullName: "Staff",
+            email: "staff@pacifipro.com",
+            status: "active"
+          },
+          { 
+            username: "viewer", 
+            password: "viewer123", 
+            role: "viewer", 
+            fullName: "Viewer",
+            email: "viewer@pacifipro.com",
+            status: "active"
+          }
+        ];
+        
+        localStorage.setItem("users", JSON.stringify(defaultUsers));
+      }
+    }
+    
+    /**
+     * Login user dan simpan ke localStorage
+     * @param {string} username - Username user
+     * @param {string} password - Password user
+     * @returns {object|null} User object jika berhasil, null jika gagal
+     */
+    function loginUser(username, password) {
+      if (!username || !password) {
+        showNotification("Username dan password wajib diisi", "error");
+        return null;
+      }
+      
+      // Ambil data pengguna dari localStorage
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      
+      const user = users.find(u => u.username === username && u.password === password);
+      if (user) {
+        // Simpan user ke localStorage tanpa password untuk keamanan
+        const userWithoutPassword = { ...user };
+        delete userWithoutPassword.password;
+        localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword));
+        return userWithoutPassword;
+      } else {
+        showNotification("Username atau password salah", "error");
+        return null;
+      }
+    }
+    
+    /**
+     * Mendapatkan user yang sedang login
+     * @returns {object|null} User object jika ada, null jika belum login
+     */
+    function getCurrentUser() {
+      try {
+        const saved = localStorage.getItem("currentUser");
+        return saved ? JSON.parse(saved) : null;
+      } catch (error) {
+        console.error("Error getting current user:", error);
+        return null;
+      }
+    }
+    
+    /**
+     * Logout user dan redirect ke halaman index
+     */
+    function logout() {
+      const user = getCurrentUser();
+      localStorage.removeItem("currentUser");
+      showNotification("Anda telah berhasil logout", "success");
+      
+      // Log aktivitas logout
+      if (user) {
+        logActivity(`User ${user.username} (${user.role}) logout`);
+      }
+      
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1000);
+    }
+    
+    /**
+     * Cek apakah user memiliki otorisasi untuk mengakses halaman
+     * @param {string[]} allowedRoles - Daftar role yang diizinkan
+     * @returns {boolean} True jika diizinkan, false jika tidak
+     */
+    function isAuthorized(allowedRoles = []) {
+      const user = getCurrentUser();
+      return user && allowedRoles.includes(user.role);
+    }
+    
+    /**
+     * Tampilkan notifikasi kepada user
+     * @param {string} message - Pesan notifikasi
+     * @param {string} type - Tipe notifikasi (success, error, info, warning)
+     */
+    function showNotification(message, type = "info") {
+      // Cek apakah ada container notifikasi
+      let notificationContainer = document.getElementById("notificationContainer");
+      
+      if (!notificationContainer) {
+        // Buat container notifikasi jika belum ada
+        notificationContainer = document.createElement("div");
+        notificationContainer.id = "notificationContainer";
+        notificationContainer.style.position = "fixed";
+        notificationContainer.style.top = "20px";
+        notificationContainer.style.right = "20px";
+        notificationContainer.style.zIndex = "9999";
+        document.body.appendChild(notificationContainer);
+      }
+      
+      // Buat elemen notifikasi
+      const notification = document.createElement("div");
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+      
+      // Style untuk notifikasi
+      notification.style.padding = "12px 20px";
+      notification.style.marginBottom = "10px";
+      notification.style.borderRadius = "8px";
+      notification.style.color = "white";
+      notification.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
+      notification.style.transform = "translateX(120%)";
+      notification.style.transition = "transform 0.3s ease";
+      
+      // Warna berdasarkan tipe
+      const colors = {
+        success: "#4CAF50",
+        error: "#F44336",
+        info: "#2196F3",
+        warning: "#FF9800"
+      };
+      notification.style.backgroundColor = colors[type] || colors.info;
+      
+      // Tambahkan icon berdasarkan tipe
+      const icons = {
+        success: "✓",
+        error: "✗",
+        info: "ℹ",
+        warning: "⚠"
+      };
+      notification.innerHTML = `<span style="margin-right: 8px;">${icons[type] || icons.info}</span>${message}`;
+      
+      // Tambahkan ke container
+      notificationContainer.appendChild(notification);
+      
+      // Animasi muncul
+      setTimeout(() => {
+        notification.style.transform = "translateX(0)";
+      }, 10);
+      
+      // Hapus otomatis setelah 3 detik
+      setTimeout(() => {
+        notification.style.transform = "translateX(120%)";
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+    
+    // =====================
+    // ACTIVITY LOGGING
+    // =====================
+    
+    /**
+     * Log aktivitas user
+     * @param {string} activity - Deskripsi aktivitas
+     */
+    function logActivity(activity) {
+      const user = getCurrentUser();
+      if (!user) return;
+      
+      try {
+        const logs = JSON.parse(localStorage.getItem("activityLogs")) || [];
+        
+        logs.push({
+          timestamp: new Date().toISOString(),
+          user: user.username,
+          role: user.role,
+          activity: activity,
+          page: window.location.pathname.split('/').pop() || 'unknown'
+        });
+        
+        // Simpan maksimal 100 log terakhir
+        if (logs.length > 100) {
+          logs.shift();
+        }
+        
+        localStorage.setItem("activityLogs", JSON.stringify(logs));
+      } catch (error) {
+        console.error("Error logging activity:", error);
+      }
+    }
+    
+    // =====================
+    // INITIALIZATION & LOGIN HANDLING
+    // =====================
+    
+    // Inisialisasi data pengguna
+    initializeUsersData();
+    
+    // Cek apakah ada user yang tersimpan di remember me
+    window.onload = function() {
+      // Create particle effects
+      createParticles();
+      
+      const rememberedUser = localStorage.getItem("rememberedUser");
+      if (rememberedUser) {
+        const user = JSON.parse(rememberedUser);
+        document.getElementById('username').value = user.username;
+        document.getElementById('rememberMe').checked = true;
+      }
+      
+      // Inisialisasi session timeout
+      initSessionTimeout();
+    };
+    
+    // Fungsi untuk toggle visibility password
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggleIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+    
+    // Fungsi untuk menampilkan pesan error
+    function showError(message) {
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+      
+      // Sembunyikan pesan setelah 5 detik
+      setTimeout(() => {
+        errorElement.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Fungsi untuk menampilkan pesan sukses
+    function showSuccess(message) {
+      const successElement = document.getElementById('successMessage');
+      successElement.textContent = message;
+      successElement.style.display = 'block';
+      
+      // Sembunyikan pesan setelah 3 detik
+      setTimeout(() => {
+        successElement.style.display = 'none';
+      }, 3000);
+    }
+    
+    // Fungsi login
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const rememberMe = document.getElementById('rememberMe').checked;
+      
+      // Validasi input
+      if (!username) {
+        showError('Username tidak boleh kosong');
+        return;
+      }
+      
+      if (!password) {
+        showError('Password tidak boleh kosong');
+        return;
+      }
+      
+      // Ambil data user dari localStorage
+      const allUsers = JSON.parse(localStorage.getItem("users")) || [];
+      const foundUser = allUsers.find(u => u.username === username && u.password === password);
+      
+      if (foundUser) {
+        // Simpan user yang sedang login
+        localStorage.setItem("currentUser", JSON.stringify(foundUser));
+        
+        // Jika remember me dicentang, simpan username
+        if (rememberMe) {
+          localStorage.setItem("rememberedUser", JSON.stringify({ username: username }));
+        } else {
+          localStorage.removeItem("rememberedUser");
+        }
+        
+        // Log aktivitas login
+        logActivity(`User ${username} (${foundUser.role}) login berhasil`);
+        
+        showSuccess('Login berhasil! Mengalihkan ke dashboard...');
+        
+        // Redirect ke dashboard setelah 1.5 detik
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1500);
+      } else {
+        showError('Username atau password salah!');
+        
+        // Log aktivitas login gagal
+        logActivity(`Login gagal untuk username: ${username}`);
+      }
+    }
+    
+    // Event listener untuk form submit
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      login();
+    });
+    
+    // Event listener untuk Enter key
+    document.getElementById('password').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        login();
+      }
+    });
+    
+    // Handle unhandled errors
+    window.addEventListener('error', function(e) {
+      console.error('Unhandled error:', e.error);
+      
+      // Log error ke activity logs
+      logActivity(`Error: ${e.message} at ${e.filename}:${e.lineno}`);
+      
+      // Tampilkan notifikasi ke user
+      showError('Terjadi kesalahan pada aplikasi. Silakan refresh halaman.');
+    });
+  </script>
+</body>
+</html>

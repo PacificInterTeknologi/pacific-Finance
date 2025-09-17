@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <title>Invoice Pelunasan - Pacific Inter Teknologi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tambahkan library untuk PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --pelunasan-color: #10b981;
+            --pelunasan-light: #f0fdf4;
+            --pelunasan-border: #bbf7d0;
+            --dp-color: #3b82f6;
+            --dp-light: #f0f9ff;
+            --dp-border: #bfdbfe;
+            --regular-color: #8b5cf6;
+            --regular-light: #f5f3ff;
+            --regular-border: #ddd6fe;
+            
+            /* Variabel ukuran font sesuai permintaan - diperbesar untuk keterbacaan */
+            --font-company-header: 22px;
+            --font-invoice-title: 22px;
+            --font-info-detail: 13px;
+            --font-table-header: 12px;
+            --font-total: 16px;
+            --font-signature: 13px;
+            --font-body: 13px;
+            --font-11-5px: 11.5px; /* Tambahkan variabel font 11.5px */
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+            background-color: #f8fafc;
+            color: var(--gray-800);
+            line-height: 1.5;
+            padding: 20px;
+            min-height: 100vh;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: var(--font-11-5px); /* Ubah font body menjadi 11.5px */
+            letter-spacing: 0.5px;
+        }
+        /* Menu Dropdown */
+        .dropdown-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .dropdown-toggle {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: var(--font-11-5px); /* Ubah font dropdown toggle menjadi 11.5px */
+            font-weight: 700;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown-toggle:hover {
+            background-color: var(--secondary);
+        }
+        .dropdown-menu-items {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            z-index: 1001;
+            margin-top: 5px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        .dropdown-menu-items.show {
+            display: flex;
+        }
+        .dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--font-11-5px); /* Ubah font dropdown item menjadi 11.5px */
+            color: var(--gray-700);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .dropdown-item:hover {
+            background-color: var(--gray-100);
+        }
+        .dropdown-item.danger {
+            color: #ef4444;
+        }
+        .dropdown-item.success {
+            color: #10b981;
+        }
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+        }
+        /* Invoice Container */
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        /* Header */
+        .invoice-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--gray-200);
+            position: relative;
+            z-index: 1;
+        }
+        .invoice-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .company-info {
+            display: flex;
+            align-items: center;
+        }
+        .company-details h1 {
+            font-size: var(--font-company-header);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .company-details p {
+            color: var(--gray-600);
+            font-size: var(--font-11-5px); /* Ubah font company details p menjadi 11.5px */
+            margin: 3px 0;
+            line-height: 1.4;
+        }
+        .invoice-title {
+            font-size: var(--font-invoice-title);
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        /* Invoice Info */
+        .invoice-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .info-group {
+            padding: 15px;
+            border: 1px dashed var(--gray-300);
+            border-radius: 6px;
+            background-color: transparent;
+        }
+        .info-group h3 {
+            font-size: var(--font-table-header);
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .info-group p {
+            font-size: var(--font-11-5px); /* Ubah font info group p menjadi 11.5px */
+            color: var(--gray-700);
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        .info-group p strong {
+            color: var(--gray-900);
+            font-weight: 700;
+        }
+        /* Invoice Details */
+        .invoice-details {
+            padding: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Payment Info */
+        .payment-info {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .payment-box {
+            background-color: white;
+            border-radius: 4px;
+            padding: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        .payment-box label {
+            display: block;
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+            font-size: var(--font-11-5px); /* Ubah font payment box label menjadi 11.5px */
+        }
+        .payment-box input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: var(--font-11-5px); /* Ubah font payment box input menjadi 11.5px */
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+        }
+        .payment-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Invoice Selection Section */
+        .invoice-selection-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .invoice-selection-title {
+            font-size: var(--font-11-5px); /* Ubah font invoice selection title menjadi 11.5px */
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .invoice-selection-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: var(--font-11-5px); /* Ubah font invoice select menjadi 11.5px */
+            font-family: 'Courier Prime', 'Roboto Mono', monospace;
+        }
+        
+        .invoice-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .invoice-btn {
+            padding: 8px 12px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: var(--font-11-5px); /* Ubah font invoice btn menjadi 11.5px */
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+        
+        .invoice-btn:hover {
+            background-color: var(--primary);
+        }
+        
+        .invoice-info-display {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid var(--gray-300);
+            font-size: var(--font-11-5px); /* Ubah font invoice info display menjadi 11.5px */
+        }
+        
+        .invoice-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .invoice-info-label {
+            font-weight: 700;
+            color: var(--gray-600);
+        }
+        
+        .invoice-info-value {
+            color: var(--gray-800);
+        }
+        
+        /* Pelunasan Info Section */
+        .pelunasan-info-section {
+            margin: 20px 0;
+            padding: 0 0 15px 0;
+            border-bottom: 1px dashed var(--gray-300);
+        }
+        .pelunasan-info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .pelunasan-info-header i {
+            font-size: 22px;
+            color: var(--pelunasan-color);
+            margin-right: 10px;
+        }
+        .pelunasan-info-header h3 {
+            font-size: var(--font-11-5px); /* Ubah font pelunasan info header h3 menjadi 11.5px */
+            font-weight: 700;
+            color: var(--pelunasan-color);
+        }
+        .pelunasan-info-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .pelunasan-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .pelunasan-info-item label {
+            font-size: var(--font-11-5px); /* Ubah font pelunasan info item label menjadi 11.5px */
+            font-weight: 700;
+            color: var(--gray-600);
+            margin-bottom: 5px;
+        }
+        .pelunasan-info-item .pelunasan-value {
+            font-size: var(--font-11-5px); /* Ubah font pelunasan value menjadi 11.5px */
+            font-weight: 700;
+            color: var(--pelunasan-color);
+        }
+        /* Terbilang */
+        .terbilang {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--pelunasan-light);
+            border-radius: 4px;
+            border: 1px dashed var(--pelunasan-border);
+            font-style: italic;
+            color: var(--pelunasan-color);
+            font-size: var(--font-11-5px); /* Ubah font terbilang menjadi 11.5px */
+        }
+        
+        /* Signature */
+        .signature-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .signature-box {
+            text-align: center;
+            width: 200px;
+        }
+        .signature-box p {
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 40px;
+            font-size: var(--font-11-5px); /* Ubah font signature box p menjadi 11.5px */
+        }
+        .signature-space {
+            position: relative;
+        }
+        .signature-line {
+            width: 100%;
+            height: 1px;
+            background-color: var(--gray-400);
+            margin-bottom: 6px;
+        }
+        .signature-info {
+            margin-top: 5px;
+        }
+        .signature-info h4 {
+            font-weight: 700;
+            color: var(--gray-900);
+            font-size: var(--font-11-5px); /* Ubah font signature info h4 menjadi 11.5px */
+            margin-bottom: 2px;
+        }
+        .signature-title {
+            font-size: var(--font-11-5px); /* Ubah font signature title menjadi 11.5px */
+            color: var(--gray-600);
+            font-style: normal;
+            margin: 0;
+        }
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: #10b981;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            max-width: 300px;
+            font-size: var(--font-11-5px); /* Ubah font notification menjadi 11.5px */
+        }
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .notification.error {
+            background-color: #ef4444;
+        }
+        /* Print Styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: 11.5pt !important; /* Ubah font body saat print menjadi 11.5pt */
+                line-height: 1.4;
+            }
+            
+            .invoice-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            
+            .dropdown-menu, .notification, .loading-spinner {
+                display: none !important;
+            }
+            
+            .invoice-container, .invoice-container * {
+                visibility: visible !important;
+            }
+            
+            .invoice-container {
+                position: static !important;
+                left: auto !important;
+                top: auto !important;
+            }
+            
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            .invoice-header {
+                border-bottom: 1px solid var(--gray-300) !important;
+                padding: 20mm 10mm 10mm !important;
+            }
+            
+            .invoice-details {
+                padding: 10mm !important;
+            }
+            
+            .info-group, .payment-box {
+                box-shadow: none !important;
+                border: 1px dashed var(--gray-400) !important;
+                page-break-inside: avoid;
+            }
+            
+            /* Sembunyikan bagian pemilihan invoice saat cetak */
+            .invoice-selection-section {
+                display: none !important;
+            }
+            
+            .pelunasan-info-section {
+                border-bottom: 1px dashed var(--gray-400) !important;
+                margin: 10mm 0 !important;
+                padding: 0 0 8mm 0 !important;
+            }
+            
+            .pelunasan-info-header {
+                margin-bottom: 5mm !important;
+            }
+            
+            .pelunasan-info-content {
+                gap: 5mm !important;
+            }
+            
+            .terbilang {
+                margin-top: 5mm !important;
+                padding: 3mm !important;
+                font-size: 11.5pt !important; /* Ubah font terbilang saat print menjadi 11.5pt */
+                border: 1px dashed var(--gray-400) !important;
+                background-color: transparent !important;
+                color: var(--text-light) !important;
+            }
+            
+            .payment-info {
+                margin-top: 8mm !important;
+            }
+            
+            .signature-line {
+                border-color: var(--gray-800) !important;
+            }
+            
+            input {
+                border: none !important;
+                background: transparent !important;
+                color: black !important;
+                -webkit-appearance: none;
+                font-family: 'Courier Prime', 'Roboto Mono', monospace !important;
+                font-size: 11.5pt !important; /* Ubah font input saat print menjadi 11.5pt */
+            }
+            
+            .company-details h1 {
+                font-size: 16pt !important;
+            }
+            
+            .company-details p {
+                font-size: 11.5pt !important; /* Ubah font company details p saat print menjadi 11.5pt */
+            }
+            
+            .invoice-title {
+                font-size: 16pt !important;
+            }
+            
+            .signature-section {
+                margin-top: 20mm !important;
+            }
+            
+            .signature-box {
+                width: 180px !important;
+            }
+            
+            /* Prevent page breaks inside important elements */
+            .invoice-info, .payment-info, .pelunasan-info-section {
+                page-break-inside: avoid;
+            }
+            
+            /* Optimasi spacing untuk print */
+            .pelunasan-info-section {
+                margin: 8mm 0 !important;
+                padding: 0 0 8mm 0 !important;
+            }
+            
+            .terbilang {
+                margin-top: 5mm !important;
+                padding: 3mm !important;
+            }
+            
+            .payment-info {
+                margin-top: 8mm !important;
+            }
+            
+            .signature-box {
+                width: 180px !important;
+            }
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .invoice-header {
+                padding: 20px;
+            }
+            
+            .invoice-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .invoice-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .invoice-details {
+                padding: 20px;
+            }
+            
+            .payment-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .signature-section {
+                justify-content: center;
+            }
+            
+            .pelunasan-info-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .invoice-selection-controls {
+                flex-direction: column;
+            }
+        }
+        @media (max-width: 480px) {
+            .invoice-header {
+                padding: 15px;
+            }
+            
+            .company-details h1 {
+                font-size: 18px;
+            }
+            
+            .invoice-title {
+                font-size: 18px;
+            }
+            
+            .invoice-details {
+                padding: 15px;
+            }
+            
+            .signature-box {
+                width: 180px;
+            }
+            
+            .pelunasan-info-header h3 {
+                font-size: 11.5px; /* Ubah font pelunasan info header h3 saat mobile menjadi 11.5px */
+            }
+            
+            .pelunasan-info-item .pelunasan-value {
+                font-size: 11.5px; /* Ubah font pelunasan value saat mobile menjadi 11.5px */
+            }
+        }
+        
+        /* Auto Logout Warning */
+        .logout-warning {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #f59e0b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 300px;
+        }
+        
+        .logout-warning.show {
+            display: flex;
+        }
+        
+        .logout-warning-title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .logout-warning-timer {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .logout-warning-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .logout-warning-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        .logout-warning-cancel {
+            background-color: white;
+            color: #f59e0b;
+        }
+        
+        .logout-warning-logout {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.8);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        }
+
+        .loading-spinner.show {
+          display: flex;
+        }
+
+        .spinner {
+          width: 50px;
+          height: 50px;
+          border: 5px solid rgba(0, 0, 0, 0.1);
+          border-radius: 50%;
+          border-top-color: var(--pelunasan-color);
+          animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+          margin-top: 15px;
+          font-size: 16px;
+          color: var(--gray-700);
+        }
+    </style>
+</head>
+<body onload="loadInvoice()">
+    <!-- Check Login -->
+    <script>
+        // Check if user is logged in
+        const currentUser = localStorage.getItem("currentUser");
+        if (!currentUser) {
+            window.location.href = "index.html";
+        }
+    </script>
+    
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+      <div class="spinner"></div>
+      <div class="loading-text">Membuat PDF...</div>
+    </div>
+    
+    <!-- Auto Logout Warning -->
+    <div class="logout-warning" id="logoutWarning">
+        <div class="logout-warning-title">Sesi Anda Akan Berakhir</div>
+        <div class="logout-warning-timer" id="logoutTimer">60</div>
+        <div class="logout-warning-actions">
+            <button class="logout-warning-btn logout-warning-cancel" onclick="cancelLogout()">Tetap Masuk</button>
+            <button class="logout-warning-btn logout-warning-logout" onclick="doLogout()">Keluar Sekarang</button>
+        </div>
+    </div>
+    
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu">
+        <button class="dropdown-toggle" onclick="toggleDropdown()">
+            <i class="fas fa-bars"></i> Menu
+        </button>
+        <div class="dropdown-menu-items" id="dropdownMenuItems">
+            <button class="dropdown-item" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <button class="dropdown-item success" onclick="saveInvoice()">
+                <i class="fas fa-save"></i> Simpan
+            </button>
+            <button class="dropdown-item" onclick="prepareForPrint()">
+                <i class="fas fa-print"></i> Cetak
+            </button>
+            <button class="dropdown-item" onclick="exportToPDF()">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <button class="dropdown-item danger" onclick="doLogout()">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </button>
+        </div>
+    </div>
+    <div class="invoice-container" id="invoiceContent">
+        <div class="invoice-header">
+            <div class="invoice-top">
+                <div class="company-info">
+                    <div class="company-details">
+                        <h1>PACIFIC INTER TEKNOLOGI</h1>
+                        <p>Kirana Two Office Tower Lt.10 Unit A</p>
+                        <p>Jl. Boulevard Timur No.88, Jakarta Utara</p>
+                        <p>Telp: +62 81808283379</p>
+                    </div>
+                </div>
+                <div class="invoice-title">Invoice Pelunasan</div>
+            </div>
+            <div class="invoice-info">
+                <div class="info-group">
+                    <h3>Bill To</h3>
+                    <p><strong id="namaPelanggan">-</strong></p>
+                    <p id="alamatPelanggan">-</p>
+                    <p id="telpPelanggan">-</p>
+                </div>
+                <div class="info-group">
+                    <h3>Invoice Details</h3>
+                    <p><strong>No:</strong> <span id="noInvoice">-</span></p>
+                    <p><strong>Date:</strong> <span id="tanggalInvoice">-</span></p>
+                    <p><strong>Payment Terms:</strong> <span id="termOfPayment">-</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="invoice-details">
+            <!-- Invoice Selection Section untuk DP -->
+            <div class="invoice-selection-section">
+                <div class="invoice-selection-title">
+                    <i class="fas fa-hand-holding-usd"></i> Informasi Invoice DP
+                </div>
+                <div class="invoice-selection-controls">
+                    <select id="dpInvoiceSelect" class="invoice-select" onchange="loadRegularInvoices()">
+                        <option value="">-- Pilih Invoice DP --</option>
+                    </select>
+                    <button class="invoice-btn" onclick="selectDPInvoice()">
+                        <i class="fas fa-check"></i> Pilih
+                    </button>
+                </div>
+                <div id="dpInvoiceInfo" class="invoice-info-display" style="display: none;">
+                    <!-- Info DP akan ditampilkan di sini -->
+                </div>
+            </div>
+            
+            <!-- Invoice Selection Section untuk Regular -->
+            <div class="invoice-selection-section">
+                <div class="invoice-selection-title">
+                    <i class="fas fa-file-invoice-dollar"></i> Informasi Invoice Regular
+                </div>
+                <div class="invoice-selection-controls">
+                    <select id="regularInvoiceSelect" class="invoice-select" onchange="loadRegularInvoiceInfo()">
+                        <option value="">-- Pilih Invoice Regular --</option>
+                    </select>
+                    <button class="invoice-btn" onclick="selectRegularInvoice()">
+                        <i class="fas fa-check"></i> Pilih
+                    </button>
+                </div>
+                <div id="regularInvoiceInfo" class="invoice-info-display" style="display: none;">
+                    <!-- Info regular akan ditampilkan di sini -->
+                </div>
+            </div>
+            
+            <!-- Pelunasan Info Section -->
+            <div id="pelunasanInfoSection" class="pelunasan-info-section">
+                <div class="pelunasan-info-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Informasi Pelunasan</h3>
+                </div>
+                <div class="pelunasan-info-content">
+                    <div class="pelunasan-info-item">
+                        <label>Total Tagihan</label>
+                        <div class="pelunasan-value" id="totalTagihanPelunasan">Rp 0</div>
+                    </div>
+                    <div class="pelunasan-info-item">
+                        <label>DP Sebelumnya</label>
+                        <div class="pelunasan-value" id="dpSebelumnya">Rp 0</div>
+                    </div>
+                    <div class="pelunasan-info-item">
+                        <label>Nominal Pelunasan</label>
+                        <div class="pelunasan-value" id="nominalPelunasan">Rp 0</div>
+                    </div>
+                    <div class="pelunasan-info-item">
+                        <label>Status Pembayaran</label>
+                        <div class="pelunasan-value" id="statusPelunasan">LUNAS</div>
+                    </div>
+                </div>
+                <!-- Terbilang -->
+                <div class="terbilang" id="terbilangText">Terbilang: Nol Rupiah</div>
+            </div>
+            
+            <div class="payment-info">
+                <div class="payment-box">
+                    <label>Payment Account</label>
+                    <input type="text" id="rekeningTujuan" />
+                </div>
+            </div>
+            
+            <div class="signature-section">
+                <div class="signature-box">
+                    <p>Hormat Kami,</p>
+                    <div class="signature-space">
+                        <div class="signature-line"></div>
+                        <div class="signature-info">
+                            <h4>ALFIANTO</h4>
+                            <p class="signature-title">Direktur</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        // Auto Logout Variables
+        let idleTime = 0;
+        let idleInterval;
+        let warningInterval;
+        const idleTimeLimit = 180; // 3 menit dalam detik
+        const warningTime = 60; // 1 menit sebelum logout untuk menampilkan peringatan
+        
+        // Auto Logout Functions
+        function startIdleTimer() {
+            // Reset idle time
+            idleTime = 0;
+            
+            // Clear existing intervals
+            if (idleInterval) clearInterval(idleInterval);
+            if (warningInterval) clearInterval(warningInterval);
+            
+            // Hide warning if it's visible
+            document.getElementById("logoutWarning").classList.remove("show");
+            
+            // Start counting idle time
+            idleInterval = setInterval(timerIncrement, 1000); // 1 detik
+        }
+        
+        function timerIncrement() {
+            idleTime = idleTime + 1;
+            
+            // Tampilkan peringatan ketika sisa 1 menit
+            if (idleTime >= idleTimeLimit - warningTime) {
+                // Hanya tampilkan peringatan sekali
+                if (idleTime === idleTimeLimit - warningTime) {
+                    showLogoutWarning();
+                }
+                
+                // Update timer setiap detik
+                updateLogoutTimer();
+            }
+            
+            // Logout ketika melebihi batas waktu
+            if (idleTime >= idleTimeLimit) {
+                doLogout();
+            }
+        }
+        
+        function showLogoutWarning() {
+            const warning = document.getElementById("logoutWarning");
+            warning.classList.add("show");
+            
+            // Update timer setiap detik
+            warningInterval = setInterval(updateLogoutTimer, 1000);
+        }
+        
+        function updateLogoutTimer() {
+            const timerElement = document.getElementById("logoutTimer");
+            const timeLeft = idleTimeLimit - idleTime;
+            
+            if (timeLeft > 0) {
+                timerElement.textContent = timeLeft + " detik";
+            }
+        }
+        
+        function cancelLogout() {
+            startIdleTimer();
+        }
+        
+        function doLogout() {
+            // Clear intervals
+            if (idleInterval) clearInterval(idleInterval);
+            if (warningInterval) clearInterval(warningInterval);
+            
+            // Remove user from localStorage
+            localStorage.removeItem("currentUser");
+            
+            // Redirect to login page
+            window.location.href = "index.html";
+        }
+        
+        // Event listeners untuk mendeteksi aktivitas user
+        document.addEventListener('mousemove', function() {
+            startIdleTimer();
+        });
+        
+        document.addEventListener('keypress', function() {
+            startIdleTimer();
+        });
+        
+        document.addEventListener('click', function() {
+            startIdleTimer();
+        });
+        
+        document.addEventListener('scroll', function() {
+            startIdleTimer();
+        });
+        
+        document.addEventListener('touchstart', function() {
+            startIdleTimer();
+        });
+        
+        // Utility Functions
+        function showNotification(message, type = 'success') {
+            try {
+                const notification = document.getElementById("notification");
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add("show");
+                
+                setTimeout(() => {
+                    notification.classList.remove("show");
+                }, 3000);
+            } catch (error) {
+                console.error("Error showing notification:", error);
+            }
+        }
+        
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById("dropdownMenuItems");
+            dropdownMenu.classList.toggle("show");
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdownMenu = document.getElementById("dropdownMenuItems");
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.remove("show");
+            }
+        });
+        
+        // Navigation Functions
+        function goBack() {
+            try {
+                console.log("Kembali ke halaman sebelumnya...");
+                window.location.href = "jenis-invoice.html";
+            } catch (error) {
+                console.error("Error navigating back:", error);
+                showNotification("Terjadi kesalahan saat navigasi", "error");
+            }
+        }
+        
+        // Format tanggal dengan aman
+        function formatDateSafely(dateString) {
+            try {
+                if (!dateString) return "-";
+                
+                // Jika dateString sudah dalam format "DD Month YYYY", kembalikan langsung
+                if (dateString.includes(" ")) {
+                    const parts = dateString.split(" ");
+                    if (parts.length === 3 && !isNaN(parts[0]) && parts[1].length > 2 && !isNaN(parts[2])) {
+                        return dateString;
+                    }
+                }
+                
+                // Jika dateString dalam format ISO (YYYY-MM-DD), konversi ke format Indonesia
+                if (dateString.includes("-")) {
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return "-";
+                    
+                    return date.toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                }
+                
+                return dateString;
+            } catch (error) {
+                console.error("Error formatting date:", error);
+                return "-";
+            }
+        }
+        
+        // Invoice Selection Functions
+        function loadDPInvoices() {
+            try {
+                const selectedPelanggan = JSON.parse(localStorage.getItem("selectedPelanggan")) || {};
+                const dpInvoiceSelect = document.getElementById("dpInvoiceSelect");
+                
+                // Clear existing options
+                dpInvoiceSelect.innerHTML = '<option value="">-- Pilih Invoice DP --</option>';
+                
+                // Get all invoices from localStorage
+                const allInvoices = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                
+                // Filter DP invoices for the selected customer that are not fully paid
+                const dpInvoices = allInvoices.filter(inv => 
+                    inv.jenisInvoice === 'dp' && 
+                    inv.customer === selectedPelanggan.nama && 
+                    inv.status === 'Belum Lunas'
+                );
+                
+                // Add options to select
+                dpInvoices.forEach(invoice => {
+                    const option = document.createElement('option');
+                    option.value = invoice.noInvoice;
+                    option.textContent = `${invoice.noInvoice} - ${formatDateSafely(invoice.tanggal)} - Rp ${invoice.dp.toLocaleString('id-ID')}`;
+                    dpInvoiceSelect.appendChild(option);
+                });
+                
+                if (dpInvoices.length === 0) {
+                    showNotification("Tidak ada invoice DP yang tersedia untuk pelunasan", "error");
+                }
+            } catch (error) {
+                console.error("Error loading DP invoices:", error);
+                showNotification("Terjadi kesalahan saat memuat data invoice DP", "error");
+            }
+        }
+        
+        function loadRegularInvoices() {
+            try {
+                const selectedDPInvoice = document.getElementById("dpInvoiceSelect").value;
+                const regularInvoiceSelect = document.getElementById("regularInvoiceSelect");
+                
+                // Clear existing options
+                regularInvoiceSelect.innerHTML = '<option value="">-- Pilih Invoice Regular --</option>';
+                
+                if (!selectedDPInvoice) {
+                    return;
+                }
+                
+                const selectedPelanggan = JSON.parse(localStorage.getItem("selectedPelanggan")) || {};
+                
+                // Get all invoices from localStorage
+                const allInvoices = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                
+                // Filter regular invoices for the selected customer that are not fully paid
+                const regularInvoices = allInvoices.filter(inv => 
+                    inv.jenisInvoice === 'regular' && 
+                    inv.customer === selectedPelanggan.nama && 
+                    inv.status === 'Belum Lunas'
+                );
+                
+                // Add options to select
+                regularInvoices.forEach(invoice => {
+                    const option = document.createElement('option');
+                    option.value = invoice.noInvoice;
+                    option.textContent = `${invoice.noInvoice} - ${formatDateSafely(invoice.tanggal)} - Rp ${invoice.total.toLocaleString('id-ID')}`;
+                    regularInvoiceSelect.appendChild(option);
+                });
+                
+                if (regularInvoices.length === 0) {
+                    showNotification("Tidak ada invoice regular yang tersedia untuk pelunasan", "error");
+                }
+            } catch (error) {
+                console.error("Error loading regular invoices:", error);
+                showNotification("Terjadi kesalahan saat memuat data invoice regular", "error");
+            }
+        }
+        
+        // Memuat informasi invoice regular
+        function loadRegularInvoiceInfo() {
+            try {
+                const selectedRegularInvoice = document.getElementById("regularInvoiceSelect").value;
+                
+                if (!selectedRegularInvoice) {
+                    document.getElementById("regularInvoiceInfo").style.display = "none";
+                    // Panggil updatePelunasanCalculation() meskipun tidak ada invoice yang dipilih
+                    updatePelunasanCalculation();
+                    return;
+                }
+                
+                // Get all invoices from localStorage
+                const allInvoices = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                
+                // Find the selected regular invoice
+                const regularInvoice = allInvoices.find(inv => inv.noInvoice === selectedRegularInvoice);
+                
+                if (!regularInvoice) {
+                    showNotification("Invoice regular tidak ditemukan", "error");
+                    return;
+                }
+                
+                // Display regular invoice info
+                const regularInvoiceInfo = document.getElementById("regularInvoiceInfo");
+                regularInvoiceInfo.style.display = "block";
+                regularInvoiceInfo.innerHTML = `
+                    <div class="invoice-info-row">
+                        <span class="invoice-info-label">No. Invoice:</span>
+                        <span class="invoice-info-value">${regularInvoice.noInvoice}</span>
+                    </div>
+                    <div class="invoice-info-row">
+                        <span class="invoice-info-label">Tanggal:</span>
+                        <span class="invoice-info-value">${formatDateSafely(regularInvoice.tanggal)}</span>
+                    </div>
+                    <div class="invoice-info-row">
+                        <span class="invoice-info-label">Total Tagihan:</span>
+                        <span class="invoice-info-value">Rp ${regularInvoice.total.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+                
+                // Simpan invoice reguler yang dipilih ke localStorage
+                localStorage.setItem("selectedRegularInvoice", JSON.stringify(regularInvoice));
+                
+                // Panggil updatePelunasanCalculation() setelah menampilkan info
+                updatePelunasanCalculation();
+                
+            } catch (error) {
+                console.error("Error loading regular invoice info:", error);
+                showNotification("Terjadi kesalahan saat memuat informasi invoice regular", "error");
+            }
+        }
+        
+        function selectDPInvoice() {
+            try {
+                const selectedDPInvoice = document.getElementById("dpInvoiceSelect").value;
+                
+                if (!selectedDPInvoice) {
+                    showNotification("Silakan pilih invoice DP terlebih dahulu", "error");
+                    return;
+                }
+                
+                // Get all invoices from localStorage
+                const allInvoices = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                
+                // Find the selected DP invoice
+                const dpInvoice = allInvoices.find(inv => inv.noInvoice === selectedDPInvoice);
+                
+                if (!dpInvoice) {
+                    showNotification("Invoice DP tidak ditemukan", "error");
+                    return;
+                }
+                
+                // Debug log
+                console.log("DP Invoice Data:", dpInvoice);
+                
+                // Display DP invoice info
+                const dpInvoiceInfo = document.getElementById("dpInvoiceInfo");
+                dpInvoiceInfo.style.display = "block";
+                
+                // Ambil data DP dengan beberapa kemungkinan properti
+                const dpAmount = dpInvoice.dp || dpInvoice.total || dpInvoice.nominalDP || 0;
+                const dpTanggal = dpInvoice.tanggal || dpInvoice.tglInvoice || "-";
+                const dpNoInvoice = dpInvoice.noInvoice || dpInvoice.invoiceNumber || "-";
+                
+                dpInvoiceInfo.innerHTML = `
+                    <div class="invoice-info-row">
+                        <span class="invoice-info-label">No. Invoice DP:</span>
+                        <span class="invoice-info-value">${dpNoInvoice}</span>
+                    </div>
+                    <div class="invoice-info-row">
+                        <span class="invoice-info-label">Tanggal DP:</span>
+                        <span class="invoice-info-value">${formatDateSafely(dpTanggal)}</span>
+                    </div>
+                    <div class="invoice-info-row">
+                        <span class="invoice-info-label">Nominal DP:</span>
+                        <span class="invoice-info-value">Rp ${dpAmount.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+                
+                // Buat objek baru dengan data yang sudah diproses
+                const processedDpInvoice = {
+                    ...dpInvoice,
+                    dp: dpAmount,
+                    tanggal: dpTanggal,
+                    noInvoice: dpNoInvoice
+                };
+                
+                // Save selected DP invoice to localStorage
+                localStorage.setItem("selectedDPInvoice", JSON.stringify(processedDpInvoice));
+                
+                // Load regular invoices related to this DP
+                loadRegularInvoices();
+                
+                // Update pelunasan calculation
+                updatePelunasanCalculation();
+                
+                showNotification("Invoice DP berhasil dipilih", "success");
+            } catch (error) {
+                console.error("Error selecting DP invoice:", error);
+                showNotification("Terjadi kesalahan saat memilih invoice DP", "error");
+            }
+        }
+        
+        function selectRegularInvoice() {
+            try {
+                const selectedRegularInvoice = document.getElementById("regularInvoiceSelect").value;
+                
+                if (!selectedRegularInvoice) {
+                    // Panggil updatePelunasanCalculation() meskipun tidak ada invoice yang dipilih
+                    updatePelunasanCalculation();
+                    return;
+                }
+                
+                // Get all invoices from localStorage
+                const allInvoices = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                
+                // Find the selected regular invoice
+                const regularInvoice = allInvoices.find(inv => inv.noInvoice === selectedRegularInvoice);
+                
+                if (!regularInvoice) {
+                    showNotification("Invoice regular tidak ditemukan", "error");
+                    return;
+                }
+                
+                // Save selected regular invoice to localStorage
+                localStorage.setItem("selectedRegularInvoice", JSON.stringify(regularInvoice));
+                
+                // Update pelunasan calculation
+                updatePelunasanCalculation();
+                
+                showNotification("Invoice regular berhasil dipilih", "success");
+            } catch (error) {
+                console.error("Error selecting regular invoice:", error);
+                showNotification("Terjadi kesalahan saat memilih invoice regular", "error");
+            }
+        }
+        
+        function updatePelunasanCalculation() {
+            try {
+                // Get selected invoices
+                const dpInvoice = JSON.parse(localStorage.getItem("selectedDPInvoice")) || {};
+                const regularInvoice = JSON.parse(localStorage.getItem("selectedRegularInvoice")) || {};
+                
+                // Debug log
+                console.log("DP Invoice:", dpInvoice);
+                console.log("Regular Invoice:", regularInvoice);
+                
+                // Calculate values
+                const regularTotal = regularInvoice.total || 0;
+                const dpAmount = dpInvoice.dp || dpInvoice.total || dpInvoice.nominalDP || 0;
+                
+                // Debug log
+                console.log("Regular Total:", regularTotal);
+                console.log("DP Amount:", dpAmount);
+                
+                // For pelunasan invoice, total is regular total minus DP
+                const total = regularTotal - dpAmount;
+                
+                // Debug log
+                console.log("Total Pelunasan:", total);
+                
+                // Update pelunasan info section
+                const totalTagihanPelunasan = document.getElementById("totalTagihanPelunasan");
+                const nominalPelunasan = document.getElementById("nominalPelunasan");
+                const dpSebelumnya = document.getElementById("dpSebelumnya");
+                
+                if (totalTagihanPelunasan && nominalPelunasan && dpSebelumnya) {
+                    totalTagihanPelunasan.textContent = "Rp " + regularTotal.toLocaleString("id-ID");
+                    dpSebelumnya.textContent = "Rp " + dpAmount.toLocaleString("id-ID");
+                    nominalPelunasan.textContent = "Rp " + total.toLocaleString("id-ID");
+                }
+                
+                // Update terbilang
+                const terbilangText = document.getElementById("terbilangText");
+                if (terbilangText) {
+                    terbilangText.textContent = "Terbilang: " + terbilang(total) + " Rupiah";
+                }
+            } catch (error) {
+                console.error("Error updating pelunasan calculation:", error);
+            }
+        }
+        
+        // Invoice Data Functions
+        function loadInvoice() {
+            try {
+                console.log("Memulai loadInvoice...");
+                
+                // Check if user is logged in
+                const currentUser = localStorage.getItem("currentUser");
+                if (!currentUser) {
+                    console.log("User tidak login, redirect ke index.html");
+                    window.location.href = "index.html";
+                    return;
+                }
+                
+                console.log("User terdeteksi:", currentUser);
+                
+                // Get data from localStorage
+                let pelanggan = {};
+                let jenis = {};
+                
+                try {
+                    // Ambil data pelanggan dari berbagai kemungkinan kunci
+                    pelanggan = JSON.parse(localStorage.getItem("selectedInvoice")) || 
+                               JSON.parse(localStorage.getItem("selectedPelanggan")) || {};
+                    console.log("Data pelanggan:", pelanggan);
+                } catch (e) {
+                    console.error("Error parsing selectedInvoice:", e);
+                }
+                
+                try {
+                    jenis = JSON.parse(localStorage.getItem("jenisInvoiceTerpilih")) || {};
+                    console.log("Data jenis invoice:", jenis);
+                } catch (e) {
+                    console.error("Error parsing jenisInvoiceTerpilih:", e);
+                }
+                
+                // Update UI with customer data
+                document.getElementById("namaPelanggan").textContent = pelanggan.nama || "-";
+                document.getElementById("alamatPelanggan").textContent = pelanggan.alamat || "-";
+                document.getElementById("telpPelanggan").textContent = pelanggan.telp || "-";
+                
+                // Update UI with invoice data
+                document.getElementById("noInvoice").textContent = jenis.noInvoice || "-";
+                document.getElementById("termOfPayment").textContent = jenis.top || "-";
+                document.getElementById("rekeningTujuan").value = jenis.rekening || "";
+                
+                // Format and set date
+                const tanggal = pelanggan.tanggal || new Date().toISOString().split("T")[0];
+                document.getElementById("tanggalInvoice").textContent = formatDateSafely(tanggal);
+                
+                // Load DP invoices for selection
+                loadDPInvoices();
+                
+                // Check if there are previously selected invoices
+                const selectedDPInvoice = JSON.parse(localStorage.getItem("selectedDPInvoice")) || null;
+                const selectedRegularInvoice = JSON.parse(localStorage.getItem("selectedRegularInvoice")) || null;
+                
+                if (selectedDPInvoice) {
+                    document.getElementById("dpInvoiceSelect").value = selectedDPInvoice.noInvoice;
+                    selectDPInvoice();
+                }
+                
+                if (selectedRegularInvoice) {
+                    document.getElementById("regularInvoiceSelect").value = selectedRegularInvoice.noInvoice;
+                    // Panggil fungsi untuk menampilkan info invoice regular
+                    loadRegularInvoiceInfo();
+                }
+                
+                console.log("loadInvoice selesai");
+                
+                // Start idle timer after page loads
+                startIdleTimer();
+            } catch (error) {
+                console.error("Error loading invoice data:", error);
+                showNotification("Terjadi kesalahan saat memuat data invoice", "error");
+            }
+        }
+        
+        // Calculation Functions
+        function terbilang(nilai) {
+            try {
+                const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"];
+                const satuan = ["", "Ribu", "Juta", "Miliar", "Triliun"];
+                
+                if (nilai === 0) return "Nol";
+                
+                let hasil = "", i = 0;
+                while (nilai > 0) {
+                    let temp = nilai % 1000, str = "", r = Math.floor(temp/100), p = Math.floor((temp%100)/10), s = temp%10;
+                    
+                    if (r > 0) str += (r === 1 ? "Seratus " : angka[r] + " Ratus ");
+                    
+                    if (p === 1) str += s === 0 ? "Sepuluh " : s === 1 ? "Sebelas " : angka[s] + " Belas ";
+                    else {
+                        if (p > 0) str += angka[p] + " Puluh ";
+                        if (s > 0) str += angka[s] + " ";
+                    }
+                    
+                    hasil = str + satuan[i] + " " + hasil;
+                    nilai = Math.floor(nilai / 1000);
+                    i++;
+                }
+                
+                return hasil.trim();
+            } catch (error) {
+                console.error("Error converting to words:", error);
+                return "Nol";
+            }
+        }
+        
+        // Export to PDF Function
+        function exportToPDF() {
+          try {
+            console.log("Export ke PDF...");
+            
+            // Show loading spinner
+            const loadingSpinner = document.getElementById("loadingSpinner");
+            loadingSpinner.classList.add("show");
+            
+            // Hide dropdown menu
+            const dropdownMenu = document.getElementById("dropdownMenuItems");
+            dropdownMenu.classList.remove("show");
+            
+            // Get invoice number for filename
+            const invoiceNumber = document.getElementById("noInvoice").textContent;
+            const customerName = document.getElementById("namaPelanggan").textContent;
+            
+            // Small delay to ensure DOM updates
+            setTimeout(() => {
+              // Get the invoice content element
+              const element = document.getElementById('invoiceContent');
+              
+              // Create canvas from HTML element
+              html2canvas(element, {
+                scale: 2, // Higher resolution
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff'
+              }).then(canvas => {
+                // Calculate PDF dimensions
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                let position = 0;
+                
+                // Add image to PDF
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Add new page if content exceeds one page
+                while (heightLeft >= 0) {
+                  position = heightLeft - imgHeight;
+                  pdf.addPage();
+                  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                  heightLeft -= pageHeight;
+                }
+                
+                // Save PDF
+                const fileName = `Invoice_Pelunasan_${invoiceNumber}_${customerName.replace(/\s+/g, '_')}.pdf`;
+                pdf.save(fileName);
+                
+                // Hide loading spinner
+                loadingSpinner.classList.remove("show");
+                
+                // Show success notification
+                showNotification(`PDF invoice pelunasan berhasil dibuat: ${fileName}`);
+                
+                console.log("PDF export completed");
+              }).catch(error => {
+                console.error("Error generating PDF:", error);
+                loadingSpinner.classList.remove("show");
+                showNotification("Terjadi kesalahan saat membuat PDF", "error");
+              });
+            }, 500);
+          } catch (error) {
+            console.error("Error exporting to PDF:", error);
+            const loadingSpinner = document.getElementById("loadingSpinner");
+            loadingSpinner.classList.remove("show");
+            showNotification("Terjadi kesalahan saat export PDF", "error");
+          }
+        }
+        
+        // Save and Print Functions
+        function saveInvoice() {
+            try {
+                console.log("Menyimpan invoice...");
+                
+                // Validasi data pelanggan
+                const namaPelanggan = document.getElementById("namaPelanggan").textContent;
+                if (!namaPelanggan || namaPelanggan === "-") {
+                    showNotification("Data pelanggan tidak lengkap. Silakan pilih pelanggan terlebih dahulu.", "error");
+                    return;
+                }
+                
+                // Validasi pilihan invoice
+                const selectedDPInvoice = JSON.parse(localStorage.getItem("selectedDPInvoice")) || null;
+                const selectedRegularInvoice = JSON.parse(localStorage.getItem("selectedRegularInvoice")) || null;
+                
+                if (!selectedDPInvoice) {
+                    showNotification("Silakan pilih invoice DP terlebih dahulu", "error");
+                    return;
+                }
+                
+                if (!selectedRegularInvoice) {
+                    showNotification("Silakan pilih invoice regular terlebih dahulu", "error");
+                    return;
+                }
+                
+                // Get jenis invoice from localStorage
+                const jenis = JSON.parse(localStorage.getItem("jenisInvoiceTerpilih")) || {};
+                const jenisInvoice = jenis.jenisInvoice || "pelunasan";
+                
+                // Get values from UI
+                const totalTagihanPelunasanText = document.getElementById("totalTagihanPelunasan").textContent;
+                const regularTotal = parseInt(totalTagihanPelunasanText.replace(/[^\d]/g, '')) || 0;
+                
+                const dpSebelumnyaText = document.getElementById("dpSebelumnya").textContent;
+                const dpAmount = parseInt(dpSebelumnyaText.replace(/[^\d]/g, '')) || 0;
+                
+                const nominalPelunasanText = document.getElementById("nominalPelunasan").textContent;
+                const nominalPelunasan = parseInt(nominalPelunasanText.replace(/[^\d]/g, '')) || 0;
+                
+                const data = {
+                    id: Date.now().toString(),
+                    tanggal: document.getElementById("tanggalInvoice").textContent,
+                    noInvoice: document.getElementById("noInvoice").textContent,
+                    customer: document.getElementById("namaPelanggan").textContent,
+                    alamat: document.getElementById("alamatPelanggan").textContent,
+                    telp: document.getElementById("telpPelanggan").textContent,
+                    termOfPayment: document.getElementById("termOfPayment").textContent,
+                    jenisInvoice: jenisInvoice,
+                    rekeningTujuan: document.getElementById("rekeningTujuan").value,
+                    dpAmount: dpAmount,
+                    dpInvoice: selectedDPInvoice,
+                    regularTotal: regularTotal,
+                    regularInvoice: selectedRegularInvoice,
+                    total: nominalPelunasan,
+                    status: "Lunas",
+                    tanggalPelunasan: new Date().toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    }),
+                    metodePembayaran: document.getElementById("termOfPayment").textContent === "Cash" ? "Tunai" : "Kredit",
+                    createdAt: new Date().toISOString()
+                };
+                
+                console.log("Data invoice yang akan disimpan:", data);
+                
+                // Save to penjualan
+                const penjualan = JSON.parse(localStorage.getItem("dataPenjualan")) || [];
+                penjualan.push(data);
+                localStorage.setItem("dataPenjualan", JSON.stringify(penjualan));
+                
+                // Update status invoice DP menjadi Lunas
+                const updatedPenjualan = penjualan.map(inv => {
+                    if (inv.noInvoice === data.dpInvoice.noInvoice) {
+                        inv.status = "Lunas";
+                        inv.tanggalPelunasan = data.tanggalPelunasan;
+                    }
+                    return inv;
+                });
+                localStorage.setItem("dataPenjualan", JSON.stringify(updatedPenjualan));
+                
+                // Update status invoice regular menjadi Lunas
+                const updatedPenjualan2 = updatedPenjualan.map(inv => {
+                    if (inv.noInvoice === data.regularInvoice.noInvoice) {
+                        inv.status = "Lunas";
+                        inv.tanggalPelunasan = data.tanggalPelunasan;
+                    }
+                    return inv;
+                });
+                localStorage.setItem("dataPenjualan", JSON.stringify(updatedPenjualan2));
+                
+                // Save to laporan keuangan dengan alur akuntansi yang benar
+                const laporanKeuangan = JSON.parse(localStorage.getItem("laporanKeuangan")) || [];
+                
+                // Pencatatan untuk Invoice Reguler (jika ada)
+                if (data.regularInvoice) {
+                    // 1. Mencatat Pendapatan Penjualan penuh
+                    laporanKeuangan.push({
+                        id: Date.now().toString(),
+                        tanggal: data.regularInvoice.tanggal,
+                        akun: "Pendapatan Penjualan",
+                        nilai: data.regularTotal,
+                        keterangan: `Pendapatan Penjualan - ${data.customer}`,
+                        tipe: "kredit",
+                        noInvoice: data.regularInvoice.noInvoice,
+                        invoiceId: data.regularInvoice.id,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    // 2. Mencatat Piutang Usaha
+                    laporanKeuangan.push({
+                        id: Date.now().toString() + 1,
+                        tanggal: data.regularInvoice.tanggal,
+                        akun: "Piutang Usaha",
+                        nilai: data.regularTotal,
+                        keterangan: `Piutang Usaha - ${data.customer}`,
+                        tipe: "debit",
+                        noInvoice: data.regularInvoice.noInvoice,
+                        invoiceId: data.regularInvoice.id,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                // Pencatatan untuk Invoice DP (jika ada)
+                if (data.dpInvoice) {
+                    // 1. Mencatat Uang Muka Penjualan (ketika DP diterima)
+                    laporanKeuangan.push({
+                        id: Date.now().toString() + 2,
+                        tanggal: data.dpInvoice.tanggal,
+                        akun: "Kas",
+                        nilai: data.dpAmount,
+                        keterangan: `Penerimaan DP - ${data.customer}`,
+                        tipe: "debit",
+                        noInvoice: data.dpInvoice.noInvoice,
+                        invoiceId: data.dpInvoice.id,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    // 2. Mencatat Uang Muka Penjualan sebagai kewajiban
+                    laporanKeuangan.push({
+                        id: Date.now().toString() + 3,
+                        tanggal: data.dpInvoice.tanggal,
+                        akun: "Uang Muka Penjualan",
+                        nilai: data.dpAmount,
+                        keterangan: `Uang Muka Penjualan - ${data.customer}`,
+                        tipe: "kredit",
+                        noInvoice: data.dpInvoice.noInvoice,
+                        invoiceId: data.dpInvoice.id,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                // Pencatatan untuk Invoice Pelunasan
+                // 1. Mencatat penerimaan pelunasan (Kas masuk)
+                laporanKeuangan.push({
+                    id: Date.now().toString() + 4,
+                    tanggal: data.tanggal,
+                    akun: data.metodePembayaran === "Tunai" ? "Kas" : "Bank",
+                    nilai: data.total,
+                    keterangan: `Penerimaan Pelunasan - ${data.customer}`,
+                    tipe: "debit",
+                    noInvoice: data.noInvoice,
+                    invoiceId: data.id,
+                    createdAt: new Date().toISOString()
+                });
+                
+                // 2. Mengurangi Piutang Usaha
+                laporanKeuangan.push({
+                    id: Date.now().toString() + 5,
+                    tanggal: data.tanggal,
+                    akun: "Piutang Usaha",
+                    nilai: data.total,
+                    keterangan: `Penutupan Piutang - ${data.customer}`,
+                    tipe: "kredit",
+                    noInvoice: data.noInvoice,
+                    invoiceId: data.id,
+                    createdAt: new Date().toISOString()
+                });
+                
+                // 3. Memindahkan Uang Muka Penjualan ke Pendapatan (jika ada DP)
+                if (data.dpAmount > 0) {
+                    laporanKeuangan.push({
+                        id: Date.now().toString() + 6,
+                        tanggal: data.tanggal,
+                        akun: "Uang Muka Penjualan",
+                        nilai: data.dpAmount,
+                        keterangan: `Pemindahan Uang Muka ke Pendapatan - ${data.customer}`,
+                        tipe: "debit",
+                        noInvoice: data.noInvoice,
+                        invoiceId: data.id,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    laporanKeuangan.push({
+                        id: Date.now().toString() + 7,
+                        tanggal: data.tanggal,
+                        akun: "Pendapatan Penjualan",
+                        nilai: data.dpAmount,
+                        keterangan: `Pengakuan Pendapatan dari DP - ${data.customer}`,
+                        tipe: "kredit",
+                        noInvoice: data.noInvoice,
+                        invoiceId: data.id,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                localStorage.setItem("laporanKeuangan", JSON.stringify(laporanKeuangan));
+                
+                // Update dashboard data
+                const dashboardData = JSON.parse(localStorage.getItem("dashboardData")) || {};
+                dashboardData.penjualan = {
+                    total: (dashboardData.penjualan?.total || 0) + data.regularTotal,
+                    lastUpdated: new Date().toISOString(),
+                    invoiceCount: penjualan.length
+                };
+                localStorage.setItem("dashboardData", JSON.stringify(dashboardData));
+                
+                // Update data pelanggan dengan riwayat pembelian
+                if (data.dpInvoice && data.dpInvoice.pelangganId) {
+                    const dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+                    const pelangganIndex = dataPelanggan.findIndex(p => p.id === data.dpInvoice.pelangganId);
+                    if (pelangganIndex !== -1) {
+                        if (!dataPelanggan[pelangganIndex].riwayatPembelian) {
+                            dataPelanggan[pelangganIndex].riwayatPembelian = [];
+                        }
+                        // Update status invoice DP
+                        const dpIndex = dataPelanggan[pelangganIndex].riwayatPembelian.findIndex(
+                            r => r.invoiceId === data.dpInvoice.id
+                        );
+                        if (dpIndex !== -1) {
+                            dataPelanggan[pelangganIndex].riwayatPembelian[dpIndex].status = "Lunas";
+                            dataPelanggan[pelangganIndex].riwayatPembelian[dpIndex].tanggalPelunasan = data.tanggalPelunasan;
+                        }
+                        // Update status invoice regular
+                        const regularIndex = dataPelanggan[pelangganIndex].riwayatPembelian.findIndex(
+                            r => r.invoiceId === data.regularInvoice.id
+                        );
+                        if (regularIndex !== -1) {
+                            dataPelanggan[pelangganIndex].riwayatPembelian[regularIndex].status = "Lunas";
+                            dataPelanggan[pelangganIndex].riwayatPembelian[regularIndex].tanggalPelunasan = data.tanggalPelunasan;
+                        }
+                        // Tambahkan invoice pelunasan
+                        dataPelanggan[pelangganIndex].riwayatPembelian.push({
+                            invoiceId: data.id,
+                            noInvoice: data.noInvoice,
+                            tanggal: data.tanggal,
+                            total: data.total,
+                            status: data.status
+                        });
+                        localStorage.setItem("dataPelanggan", JSON.stringify(dataPelanggan));
+                    }
+                }
+                
+                // Clear selected invoices from localStorage
+                localStorage.removeItem("selectedDPInvoice");
+                localStorage.removeItem("selectedRegularInvoice");
+                
+                showNotification("✅ Invoice pelunasan berhasil disimpan dengan pencatatan akuntansi yang benar.");
+                console.log("Invoice pelunasan berhasil disimpan");
+            } catch (error) {
+                console.error("Error saving invoice:", error);
+                showNotification("Terjadi kesalahan saat menyimpan invoice", "error");
+            }
+        }
+        
+        function prepareForPrint() {
+            try {
+                console.log("Menyiapkan untuk cetak...");
+                window.print();
+            } catch (error) {
+                console.error("Error preparing for print:", error);
+                showNotification("Terjadi kesalahan saat menyiapkan cetakan", "error");
+            }
+        }
+    </script>
+</body>
+</html>

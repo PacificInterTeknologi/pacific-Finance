@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup & Restore Data - PACIFIC PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variabel CSS untuk tema konsisten */
+        :root {
+            --primary-color: #1B1F3B;
+            --secondary-color: #8B0000;
+            --accent-color: #4285f4;
+            --light-color: #f8f9fa;
+            --border-color: #e0e0e0;
+            --text-color: #333;
+            --success-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc05;
+            --shadow: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-hover: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Reset dan basis */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-name {
+            margin-right: 15px;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c5221f;
+            transform: translateY(-1px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            height: calc(100vh - 70px);
+            position: fixed;
+            left: 0;
+            top: 70px;
+            box-shadow: var(--shadow);
+            overflow-y: auto;
+            z-index: 90;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: calc(100vh - 70px);
+            transition: margin-left 0.3s ease;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .page-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Backup Container */
+        .backup-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        
+        .backup-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .backup-section:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .backup-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0d0e1f;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #2d8e47;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c5221f;
+            transform: translateY(-1px);
+        }
+        
+        /* File Input */
+        .file-input {
+            display: none;
+        }
+        
+        /* Info Box */
+        .backup-info {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        
+        .backup-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .backup-info ul {
+            margin-left: 20px;
+        }
+        
+        .backup-info li {
+            margin-bottom: 5px;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .progress-status {
+            font-weight: bold;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+        
+        /* Status Info */
+        .last-backup {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: var(--light-color);
+            border-radius: 4px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        /* Checkbox styling */
+        .checkbox-group {
+            margin: 15px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .checkbox-item:hover {
+            background-color: var(--light-color);
+        }
+        
+        .checkbox-item input {
+            margin-right: 10px;
+        }
+        
+        /* Progress Detail */
+        .progress-detail {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--light-color);
+            border-radius: 4px;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .progress-detail.show {
+            display: block;
+        }
+        
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .progress-item-name {
+            color: #666;
+        }
+        
+        .progress-item-status {
+            font-weight: bold;
+        }
+        
+        .progress-item-status.success {
+            color: var(--success-color);
+        }
+        
+        .progress-item-status.error {
+            color: var(--danger-color);
+        }
+        
+        .progress-item-status.pending {
+            color: var(--warning-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-container">
+            <div class="brand">PACIFIC PRO</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userWelcome">Loading...</div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="pelanggan.html"><i class="fas fa-users"></i> Data Pelanggan</a></li>
+            <li><a href="jenis-invoice.html"><i class="fas fa-file-alt"></i> Jenis Invoice</a></li>
+            <li><a href="invoice.html"><i class="fas fa-receipt"></i> Invoice</a></li>
+            <li><a href="laporan-penjualan.html"><i class="fas fa-chart-line"></i> Laporan Penjualan</a></li>
+            <li><a href="program_keuangan_akun.html"><i class="fas fa-coins"></i> Input Akun</a></li>
+            <li><a href="program_keuangan_jurnal.html"><i class="fas fa-book"></i> Jurnal</a></li>
+            <li><a href="program_keuangan_laporan.html"><i class="fas fa-chart-pie"></i> Laporan Keuangan</a></li>
+            <li><a href="neraca.html"><i class="fas fa-balance-scale"></i> Neraca</a></li>
+            <li><a href="laba_rugi.html"><i class="fas fa-chart-line"></i> Laba Rugi</a></li>
+            <li><a href="arus_kas.html"><i class="fas fa-money-bill-wave"></i> Arus Kas</a></li>
+            <li><a href="backup.html" class="active"><i class="fas fa-database"></i> Backup & Restore</a></li>
+            <li><a href="pengguna.html" id="linkPengguna" style="display: none;"><i class="fas fa-user-cog"></i> Manajemen Pengguna</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Backup & Restore Data</h1>
+            <p class="page-subtitle">Kelola backup data sistem untuk keamanan</p>
+        </div>
+        
+        <div class="backup-container">
+            <!-- Backup Section -->
+            <div class="backup-section">
+                <h3><i class="fas fa-download"></i> Backup Data</h3>
+                <p>Buat backup dari semua data sistem</p>
+                
+                <button class="btn btn-primary" onclick="createFullBackup()">
+                    <i class="fas fa-database"></i> Backup Semua Data
+                </button>
+                
+                <button class="btn btn-success" onclick="createSelectiveBackup()">
+                    <i class="fas fa-filter"></i> Backup Selektif
+                </button>
+                
+                <div class="last-backup" id="lastBackupInfo">
+                    Backup terakhir: Belum pernah
+                </div>
+                
+                <div class="progress-container" id="backupProgressContainer" style="display: none;">
+                    <div class="progress-bar" id="backupProgress">
+                        <div class="progress-fill" id="backupProgressFill"></div>
+                        <div class="progress-text" id="backupProgressText">0%</div>
+                    </div>
+                    <div class="progress-info">
+                        <span class="progress-status" id="backupStatus">Memulai...</span>
+                        <span id="backupTimeRemaining">Estimasi: --:--</span>
+                    </div>
+                </div>
+                
+                <div class="progress-detail" id="backupDetail">
+                    <div class="progress-item">
+                        <span class="progress-item-name">Mengumpulkan data</span>
+                        <span class="progress-item-status pending" id="backupStatus-collect">Menunggu</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-item-name">Memproses data</span>
+                        <span class="progress-item-status pending" id="backupStatus-process">Menunggu</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-item-name">Membuat file</span>
+                        <span class="progress-item-status pending" id="backupStatus-create">Menunggu</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-item-name">Menyimpan backup</span>
+                        <span class="progress-item-status pending" id="backupStatus-save">Menunggu</span>
+                    </div>
+                </div>
+                
+                <div class="backup-info">
+                    <h4>Data yang akan di-backup:</h4>
+                    <ul>
+                        <li>Data Pelanggan</li>
+                        <li>Data Invoice & Penjualan</li>
+                        <li>Data Jurnal & Transaksi</li>
+                        <li>Data Pengguna</li>
+                        <li>Data Laporan Keuangan</li>
+                        <li>Data Neraca, Laba Rugi & Arus Kas</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Restore Section -->
+            <div class="backup-section">
+                <h3><i class="fas fa-upload"></i> Restore Data</h3>
+                <p>Kembalikan data dari file backup</p>
+                
+                <input type="file" id="restoreFile" class="file-input" accept=".json" onchange="handleFileSelect(event)">
+                
+                <button class="btn btn-primary" onclick="document.getElementById('restoreFile').click()">
+                    <i class="fas fa-file-import"></i> Pilih File Backup
+                </button>
+                
+                <button class="btn btn-success" id="restoreBtn" onclick="restoreData()" style="display: none;">
+                    <i class="fas fa-undo"></i> Restore Data
+                </button>
+                
+                <div class="progress-container" id="restoreProgressContainer" style="display: none;">
+                    <div class="progress-bar" id="restoreProgress">
+                        <div class="progress-fill" id="restoreProgressFill"></div>
+                        <div class="progress-text" id="restoreProgressText">0%</div>
+                    </div>
+                    <div class="progress-info">
+                        <span class="progress-status" id="restoreStatus">Memulai...</span>
+                        <span id="restoreTimeRemaining">Estimasi: --:--</span>
+                    </div>
+                </div>
+                
+                <div class="progress-detail" id="restoreDetail">
+                    <div class="progress-item">
+                        <span class="progress-item-name">Membaca file</span>
+                        <span class="progress-item-status pending" id="restoreStatus-read">Menunggu</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-item-name">Validasi data</span>
+                        <span class="progress-item-status pending" id="restoreStatus-validate">Menunggu</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-item-name">Backup darurat</span>
+                        <span class="progress-item-status pending" id="restoreStatus-emergency">Menunggu</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-item-name">Restore data</span>
+                        <span class="progress-item-status pending" id="restoreStatus-restore">Menunggu</span>
+                    </div>
+                </div>
+                
+                <div class="backup-info">
+                    <h4>Perhatian:</h4>
+                    <ul>
+                        <li>Restore data akan menimpa data yang ada saat ini</li>
+                        <li>Pastikan file backup valid dan tidak rusak</li>
+                        <li>Disarankan untuk membuat backup sebelum melakukan restore</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Auto Backup Section -->
+            <div class="backup-section">
+                <h3><i class="fas fa-clock"></i> Backup Otomatis</h3>
+                <p>Atur jadwal backup otomatis</p>
+                
+                <button class="btn btn-primary" onclick="enableAutoBackup()">
+                    <i class="fas fa-play"></i> Aktifkan Backup Harian
+                </button>
+                
+                <button class="btn btn-danger" onclick="disableAutoBackup()">
+                    <i class="fas fa-stop"></i> Nonaktifkan Backup Otomatis
+                </button>
+                
+                <div class="last-backup" id="autoBackupStatus">
+                    Status: Backup otomatis tidak aktif
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+    
+    <!-- Modal untuk backup selektif -->
+    <div id="selectiveBackupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Pilih Data untuk Backup</div>
+                <button class="modal-close" onclick="closeModal('selectiveBackupModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="checkbox-group" id="backupOptions">
+                    <!-- Checkbox options akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeModal('selectiveBackupModal')">Batal</button>
+                <button class="btn btn-success" onclick="processSelectiveBackup()">Backup</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Konstanta untuk kunci localStorage
+        const STORAGE_KEYS = {
+            dataPelanggan: 'dataPelanggan',
+            dataPenjualan: 'dataPenjualan',
+            dataJenisInvoice: 'dataJenisInvoice',
+            dataJurnal: 'dataJurnal',
+            dataLaporan: 'dataLaporan',
+            laporanKeuangan: 'laporanKeuangan',
+            users: 'users',
+            neraca: 'neraca',
+            labaBersih: 'labaBersih',
+            arusKas: 'arusKas',
+            dashboardData: 'dashboardData',
+            currentUser: 'currentUser',
+            lastBackup: 'lastBackup',
+            autoBackup: 'autoBackup',
+            autoBackupTime: 'autoBackupTime',
+            autoBackupData: 'autoBackupData',
+            lastAutoBackup: 'lastAutoBackup',
+            emergencyBackup: 'emergencyBackup'
+        };
+        
+        // Definisikan auditTrail sederhana untuk mencegah error
+        window.auditTrail = {
+            log: function(activity) {
+                console.log("Audit Trail:", activity);
+            }
+        };
+        
+        // Parser JSON untuk keuangan.js
+        class KeuanganParser {
+            static parseData(data) {
+                try {
+                    if (typeof data === 'string') {
+                        return JSON.parse(data);
+                    }
+                    return data;
+                } catch (error) {
+                    console.error("Error parsing JSON data:", error);
+                    return null;
+                }
+            }
+            
+            static stringifyData(data) {
+                try {
+                    return JSON.stringify(data, null, 2);
+                } catch (error) {
+                    console.error("Error stringifying data:", error);
+                    return "{}";
+                }
+            }
+            
+            static validateData(data) {
+                if (!data || typeof data !== 'object') {
+                    return false;
+                }
+                
+                // Validasi struktur data keuangan
+                const requiredFields = ['timestamp', 'version', 'data'];
+                for (const field of requiredFields) {
+                    if (!(field in data)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            static extractFinancialData(data) {
+                const financialData = {
+                    jurnal: [],
+                    laporanKeuangan: [],
+                    neraca: null,
+                    labaRugi: null,
+                    arusKas: null
+                };
+                
+                try {
+                    // Ekstrak data jurnal
+                    if (data.data && data.data.dataJurnal) {
+                        financialData.jurnal = this.parseData(data.data.dataJurnal) || [];
+                    }
+                    
+                    // Ekstrak data laporan keuangan
+                    if (data.data && data.data.laporanKeuangan) {
+                        financialData.laporanKeuangan = this.parseData(data.data.laporanKeuangan) || [];
+                    }
+                    
+                    // Ekstrak data neraca
+                    if (data.data && data.data.neraca) {
+                        financialData.neraca = this.parseData(data.data.neraca);
+                    }
+                    
+                    // Ekstrak data laba rugi
+                    if (data.data && data.data.labaBersih) {
+                        financialData.labaRugi = this.parseData(data.data.labaBersih);
+                    }
+                    
+                    // Ekstrak data arus kas
+                    if (data.data && data.data.arusKas) {
+                        financialData.arusKas = this.parseData(data.data.arusKas);
+                    }
+                    
+                    return financialData;
+                } catch (error) {
+                    console.error("Error extracting financial data:", error);
+                    return financialData;
+                }
+            }
+        }
+        
+        // Progress Manager untuk mengelola progress bar
+        class ProgressManager {
+            constructor(type) {
+                this.type = type;
+                this.container = document.getElementById(`${type}ProgressContainer`);
+                this.progressBar = document.getElementById(`${type}Progress`);
+                this.progressFill = document.getElementById(`${type}ProgressFill`);
+                this.progressText = document.getElementById(`${type}ProgressText`);
+                this.status = document.getElementById(`${type}Status`);
+                this.timeRemaining = document.getElementById(`${type}TimeRemaining`);
+                this.detail = document.getElementById(`${type}Detail`);
+                this.startTime = null;
+                this.totalSteps = 0;
+                this.currentStep = 0;
+            }
+            
+            start(totalSteps = 4) {
+                this.totalSteps = totalSteps;
+                this.currentStep = 0;
+                this.startTime = Date.now();
+                this.container.style.display = 'block';
+                this.detail.classList.add('show');
+                this.updateProgress(0, 'Memulai...');
+            }
+            
+            updateProgress(percentage, status) {
+                this.progressFill.style.width = percentage + '%';
+                this.progressText.textContent = Math.round(percentage) + '%';
+                this.status.textContent = status;
+                
+                // Update estimasi waktu
+                if (this.startTime && percentage > 0) {
+                    const elapsed = Date.now() - this.startTime;
+                    const totalEstimated = (elapsed / percentage) * 100;
+                    const remaining = totalEstimated - elapsed;
+                    
+                    if (remaining > 0) {
+                        const minutes = Math.floor(remaining / 60000);
+                        const seconds = Math.floor((remaining % 60000) / 1000);
+                        this.timeRemaining.textContent = `Estimasi: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }
+            
+            updateStep(stepName, status) {
+                const stepElement = document.getElementById(`${this.type}Status-${stepName}`);
+                if (stepElement) {
+                    stepElement.className = `progress-item-status ${status}`;
+                    stepElement.textContent = status === 'success' ? 'Selesai' : 
+                                          status === 'error' ? 'Gagal' : 
+                                          status === 'processing' ? 'Memproses...' : 'Menunggu';
+                }
+            }
+            
+            complete() {
+                this.updateProgress(100, 'Selesai');
+                this.timeRemaining.textContent = 'Selesai';
+                
+                // Sembunyikan progress setelah 2 detik
+                setTimeout(() => {
+                    this.container.style.display = 'none';
+                    this.detail.classList.remove('show');
+                }, 2000);
+            }
+            
+            error(message) {
+                this.updateProgress(100, 'Error: ' + message);
+                this.timeRemaining.textContent = 'Gagal';
+            }
+        }
+        
+        // Inisialisasi saat halaman dimuat
+        window.onload = function() {
+            initializeApp();
+        };
+        
+        // Fungsi inisialisasi aplikasi
+        function initializeApp() {
+            console.log("[DEBUG] Initializing backup & restore application");
+            
+            // Cek login
+            const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+            if (!currentUser) {
+                console.log("[DEBUG] No current user found, redirecting to login");
+                window.location.href = "index.html";
+                return;
+            }
+            
+            // Tampilkan info user
+            try {
+                const user = JSON.parse(currentUser);
+                document.getElementById("userWelcome").textContent = `${user.fullName} (${user.role})`;
+                console.log("[DEBUG] User loaded:", user.fullName, user.role);
+                
+                // Tampilkan menu admin jika user adalah admin
+                if (user.role === "admin") {
+                    document.getElementById("linkPengguna").style.display = "block";
+                }
+            } catch (error) {
+                console.error("[DEBUG] Error parsing user data:", error);
+            }
+            
+            // Load info backup
+            loadLastBackupInfo();
+            checkAutoBackupStatus();
+            
+            console.log("[DEBUG] Application initialized successfully");
+        }
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type = 'success') {
+            console.log(`[DEBUG] Showing notification: ${message} (${type})`);
+            
+            const notification = document.getElementById("notification");
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add("show");
+            
+            // Sembunyikan notifikasi setelah 3 detik
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+            
+            // Log notifikasi sebagai aktivitas audit
+            logAuditActivity(type === 'error' ? 'error' : 'info', `Notification: ${message}`);
+        }
+        
+        // Fungsi untuk log aktivitas audit
+        function logAuditActivity(action, detail) {
+            try {
+                const user = JSON.parse(localStorage.getItem(STORAGE_KEYS.currentUser));
+                if (user) {
+                    auditTrail.log({
+                        action: action,
+                        module: 'Backup & Restore',
+                        detail: detail,
+                        user: user.fullName,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            } catch (e) {
+                console.error("Audit logging error:", e);
+            }
+        }
+        
+        // Fungsi logout
+        function logout() {
+            console.log("[DEBUG] Logging out user");
+            logAuditActivity('logout', 'User logout');
+            localStorage.removeItem(STORAGE_KEYS.currentUser);
+            window.location.href = "index.html";
+        }
+        
+        // Fungsi untuk membuat backup lengkap
+        async function createFullBackup() {
+            console.log("[DEBUG] Starting full backup process");
+            
+            const progress = new ProgressManager('backup');
+            progress.start(4);
+            
+            try {
+                showNotification("Memulai backup data...");
+                
+                // Step 1: Mengumpulkan data
+                progress.updateStep('collect', 'processing');
+                progress.updateProgress(10, 'Mengumpulkan data...');
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                console.log("[DEBUG] Collecting data for backup");
+                
+                // Kumpulkan semua data
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    version: "1.0",
+                    description: "Full backup of PACIFIC PRO data",
+                    data: {}
+                };
+                
+                // Ambil semua data dari localStorage
+                const dataKeys = Object.values(STORAGE_KEYS).filter(key => 
+                    key !== STORAGE_KEYS.currentUser && key !== STORAGE_KEYS.emergencyBackup
+                );
+                
+                let dataCount = 0;
+                for (const key of dataKeys) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        try {
+                            backupData.data[key] = KeuanganParser.parseData(data);
+                            dataCount++;
+                        } catch (error) {
+                            console.error(`[DEBUG] Error parsing data for ${key}:`, error);
+                            backupData.data[key] = data; // Simpan as-is jika parsing gagal
+                        }
+                    }
+                }
+                
+                progress.updateStep('collect', 'success');
+                progress.updateProgress(30, `Data terkumpul: ${dataCount} item`);
+                
+                // Step 2: Memproses data
+                progress.updateStep('process', 'processing');
+                progress.updateProgress(40, 'Memproses data...');
+                
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                console.log("[DEBUG] Processing collected data");
+                
+                // Validasi data
+                const totalSize = new Blob([KeuanganParser.stringifyData(backupData)]).size;
+                console.log("[DEBUG] Total backup size:", totalSize, "bytes");
+                
+                progress.updateStep('process', 'success');
+                progress.updateProgress(60, `Data diproses: ${(totalSize / 1024).toFixed(2)} KB`);
+                
+                // Step 3: Membuat file
+                progress.updateStep('create', 'processing');
+                progress.updateProgress(70, 'Membuat file backup...');
+                
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                console.log("[DEBUG] Creating backup file");
+                
+                // Convert ke blob dan download
+                const dataStr = KeuanganParser.stringifyData(backupData);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                progress.updateStep('create', 'success');
+                progress.updateProgress(85, 'File backup dibuat');
+                
+                // Step 4: Menyimpan backup
+                progress.updateStep('save', 'processing');
+                progress.updateProgress(90, 'Menyimpan backup...');
+                
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_pacific_pro_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                // Simpan info backup terakhir
+                localStorage.setItem(STORAGE_KEYS.lastBackup, new Date().toISOString());
+                loadLastBackupInfo();
+                
+                progress.updateStep('save', 'success');
+                progress.updateProgress(100, 'Backup selesai!');
+                
+                showNotification("Backup berhasil dibuat!");
+                logAuditActivity('backup', 'Full backup created');
+                
+                progress.complete();
+                
+                console.log("[DEBUG] Full backup completed successfully");
+            } catch (error) {
+                console.error("[DEBUG] Error creating backup:", error);
+                progress.error(error.message);
+                showNotification("Gagal membuat backup: " + error.message, "error");
+            }
+        }
+        
+        // Fungsi untuk membuat backup selektif
+        function createSelectiveBackup() {
+            console.log("[DEBUG] Starting selective backup process");
+            
+            try {
+                const dataTypes = [
+                    { key: STORAGE_KEYS.dataPelanggan, label: 'Data Pelanggan' },
+                    { key: STORAGE_KEYS.dataPenjualan, label: 'Data Penjualan' },
+                    { key: STORAGE_KEYS.dataJurnal, label: 'Data Jurnal' },
+                    { key: STORAGE_KEYS.laporanKeuangan, label: 'Laporan Keuangan' },
+                    { key: STORAGE_KEYS.users, label: 'Data Pengguna' },
+                    { key: STORAGE_KEYS.neraca, label: 'Data Neraca' },
+                    { key: STORAGE_KEYS.labaBersih, label: 'Data Laba Rugi' },
+                    { key: STORAGE_KEYS.arusKas, label: 'Data Arus Kas' }
+                ];
+                
+                // Tampilkan modal untuk memilih data
+                const modal = document.getElementById('selectiveBackupModal');
+                const optionsContainer = document.getElementById('backupOptions');
+                
+                // Kosongkan container
+                optionsContainer.innerHTML = '';
+                
+                // Tambahkan checkbox untuk setiap jenis data
+                dataTypes.forEach(type => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="chk-${type.key}" value="${type.key}" checked>
+                        <label for="chk-${type.key}">${type.label}</label>
+                    `;
+                    optionsContainer.appendChild(div);
+                });
+                
+                // Tampilkan modal
+                modal.style.display = 'flex';
+                
+            } catch (error) {
+                console.error("[DEBUG] Error creating selective backup:", error);
+                showNotification("Gagal membuat backup selektif: " + error.message, "error");
+            }
+        }
+        
+        // Fungsi untuk menutup modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Fungsi untuk memproses backup selektif
+        async function processSelectiveBackup() {
+            console.log("[DEBUG] Processing selective backup");
+            
+            const progress = new ProgressManager('backup');
+            progress.start(4);
+            
+            try {
+                const selectedData = {};
+                const checkboxes = document.querySelectorAll('#backupOptions input[type="checkbox"]:checked');
+                
+                progress.updateStep('collect', 'processing');
+                progress.updateProgress(10, 'Mengumpulkan data terpilih...');
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                checkboxes.forEach(cb => {
+                    const key = cb.value;
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        try {
+                            selectedData[key] = KeuanganParser.parseData(data);
+                        } catch (error) {
+                            console.error(`[DEBUG] Error parsing data for ${key}:`, error);
+                            selectedData[key] = data; // Simpan as-is jika parsing gagal
+                        }
+                    }
+                });
+                
+                if (Object.keys(selectedData).length === 0) {
+                    showNotification("Pilih minimal satu data untuk backup!", "warning");
+                    progress.complete();
+                    return;
+                }
+                
+                progress.updateStep('collect', 'success');
+                progress.updateProgress(30, `${Object.keys(selectedData).length} data terkumpul`);
+                
+                progress.updateStep('process', 'processing');
+                progress.updateProgress(40, 'Memproses data...');
+                
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    version: "1.0",
+                    description: "Selective backup of PACIFIC PRO data",
+                    data: selectedData
+                };
+                
+                progress.updateStep('process', 'success');
+                progress.updateProgress(60, 'Data diproses');
+                
+                progress.updateStep('create', 'processing');
+                progress.updateProgress(70, 'Membuat file backup...');
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const dataStr = KeuanganParser.stringifyData(backupData);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                progress.updateStep('create', 'success');
+                progress.updateProgress(85, 'File backup dibuat');
+                
+                progress.updateStep('save', 'processing');
+                progress.updateProgress(90, 'Mengunduh file...');
+                
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_selektif_pacific_pro_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                // Tutup modal
+                closeModal('selectiveBackupModal');
+                
+                progress.updateStep('save', 'success');
+                progress.updateProgress(100, 'Backup selektif selesai!');
+                
+                showNotification("Backup selektif berhasil dibuat!");
+                logAuditActivity('backup', 'Selective backup created');
+                
+                progress.complete();
+                
+                console.log("[DEBUG] Selective backup completed successfully");
+            } catch (error) {
+                console.error("[DEBUG] Error processing selective backup:", error);
+                progress.error(error.message);
+                showNotification("Gagal membuat backup selektif: " + error.message, "error");
+            }
+        }
+        
+        // Fungsi untuk menangani pemilihan file
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('restoreBtn').style.display = 'inline-flex';
+                showNotification(`File terpilih: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+                console.log("[DEBUG] File selected for restore:", file.name, file.size);
+            }
+        }
+        
+        // Fungsi untuk restore data
+        async function restoreData() {
+            console.log("[DEBUG] Starting restore process");
+            
+            const progress = new ProgressManager('restore');
+            progress.start(4);
+            
+            try {
+                const fileInput = document.getElementById('restoreFile');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    showNotification("Pilih file backup terlebih dahulu!", "error");
+                    progress.complete();
+                    return;
+                }
+                
+                if (!confirm("Apakah Anda yakin ingin restore data? Data saat ini akan ditimpa!")) {
+                    progress.complete();
+                    return;
+                }
+                
+                showNotification("Memulai restore data...");
+                
+                // Step 1: Membaca file
+                progress.updateStep('read', 'processing');
+                progress.updateProgress(10, 'Membaca file backup...');
+                
+                const reader = new FileReader();
+                
+                reader.onload = async function(e) {
+                    try {
+                        console.log("[DEBUG] File loaded, parsing content");
+                        
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        progress.updateStep('read', 'success');
+                        progress.updateProgress(25, 'File terbaca');
+                        
+                        // Step 2: Validasi data
+                        progress.updateStep('validate', 'processing');
+                        progress.updateProgress(30, 'Validasi data...');
+                        
+                        await new Promise(resolve => setTimeout(resolve, 600));
+                        
+                        const backupData = KeuanganParser.parseData(e.target.result);
+                        
+                        // Validasi file backup
+                        if (!KeuanganParser.validateData(backupData)) {
+                            throw new Error("Format file backup tidak valid!");
+                        }
+                        
+                        console.log("[DEBUG] Backup data validated, extracting financial data");
+                        
+                        // Ekstrak data keuangan untuk logging
+                        const financialData = KeuanganParser.extractFinancialData(backupData);
+                        console.log("[DEBUG] Financial data extracted:", financialData);
+                        
+                        progress.updateStep('validate', 'success');
+                        progress.updateProgress(50, 'Data valid');
+                        
+                        // Step 3: Backup darurat
+                        progress.updateStep('emergency', 'processing');
+                        progress.updateProgress(55, 'Membuat backup darurat...');
+                        
+                        await new Promise(resolve => setTimeout(resolve, 400));
+                        
+                        console.log("[DEBUG] Creating emergency backup");
+                        createEmergencyBackup(backupData.data);
+                        
+                        progress.updateStep('emergency', 'success');
+                        progress.updateProgress(65, 'Backup darurat dibuat');
+                        
+                        // Step 4: Restore data
+                        progress.updateStep('restore', 'processing');
+                        progress.updateProgress(70, 'Merestore data...');
+                        
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                        
+                        console.log("[DEBUG] Restoring data from backup");
+                        const restoreResult = restoreDataFromBackup(backupData.data);
+                        
+                        progress.updateStep('restore', 'success');
+                        progress.updateProgress(90, `${restoreResult.count} item di-restore`);
+                        
+                        // Reset form
+                        fileInput.value = '';
+                        document.getElementById('restoreBtn').style.display = 'none';
+                        
+                        progress.updateProgress(100, 'Restore selesai!');
+                        
+                        showNotification(`Data berhasil di-restore! ${restoreResult.count} item dipulihkan.`);
+                        logAuditActivity('restore', `Data restored from backup. ${restoreResult.count} items recovered.`);
+                        
+                        progress.complete();
+                        
+                        console.log("[DEBUG] Restore completed successfully");
+                        
+                    } catch (error) {
+                        console.error("[DEBUG] Error parsing backup file:", error);
+                        progress.error(error.message);
+                        showNotification("Gagal memproses file backup: " + error.message, "error");
+                    }
+                };
+                
+                reader.onerror = function() {
+                    console.error("[DEBUG] Error reading file");
+                    progress.error("Gagal membaca file");
+                    showNotification("Gagal membaca file backup!", "error");
+                };
+                
+                reader.readAsText(file);
+                
+            } catch (error) {
+                console.error("[DEBUG] Error restoring data:", error);
+                progress.error(error.message);
+                showNotification("Gagal restore data: " + error.message, "error");
+            }
+        }
+        
+        // Fungsi untuk membuat backup darurat
+        function createEmergencyBackup(backupKeys) {
+            console.log("[DEBUG] Creating emergency backup");
+            
+            const currentDataBackup = {};
+            
+            Object.keys(backupKeys).forEach(key => {
+                currentDataBackup[key] = localStorage.getItem(key);
+            });
+            
+            localStorage.setItem(STORAGE_KEYS.emergencyBackup, KeuanganParser.stringifyData({
+                timestamp: new Date().toISOString(),
+                data: currentDataBackup
+            }));
+        }
+        
+        // Fungsi untuk restore data dari backup
+        function restoreDataFromBackup(backupData) {
+            console.log("[DEBUG] Restoring data from backup");
+            
+            let restoreCount = 0;
+            const errors = [];
+            
+            Object.keys(backupData).forEach(key => {
+                if (backupData[key] !== null && backupData[key] !== undefined) {
+                    try {
+                        const value = typeof backupData[key] === 'object' 
+                            ? KeuanganParser.stringifyData(backupData[key])
+                            : backupData[key];
+                        
+                        localStorage.setItem(key, value);
+                        restoreCount++;
+                        console.log(`[DEBUG] Restored ${key} successfully`);
+                    } catch (err) {
+                        console.error(`[DEBUG] Failed to restore ${key}:`, err);
+                        errors.push(key);
+                    }
+                }
+            });
+            
+            if (errors.length > 0) {
+                console.warn(`[DEBUG] Some data failed to restore: ${errors.join(', ')}`);
+            }
+            
+            return { count: restoreCount, errors: errors };
+        }
+        
+        // Fungsi untuk mengaktifkan backup otomatis
+        function enableAutoBackup() {
+            console.log("[DEBUG] Enabling auto backup");
+            
+            localStorage.setItem(STORAGE_KEYS.autoBackup, 'true');
+            localStorage.setItem(STORAGE_KEYS.autoBackupTime, new Date().toISOString());
+            
+            // Set interval untuk backup harian
+            if (!window.backupInterval) {
+                window.backupInterval = setInterval(createAutoBackup, 24 * 60 * 60 * 1000); // 24 jam
+                console.log("[DEBUG] Auto backup interval set");
+            }
+            
+            checkAutoBackupStatus();
+            showNotification("Backup otomatis diaktifkan");
+            logAuditActivity('settings', 'Auto backup enabled');
+        }
+        
+        // Fungsi untuk menonaktifkan backup otomatis
+        function disableAutoBackup() {
+            console.log("[DEBUG] Disabling auto backup");
+            
+            localStorage.setItem(STORAGE_KEYS.autoBackup, 'false');
+            
+            if (window.backupInterval) {
+                clearInterval(window.backupInterval);
+                window.backupInterval = null;
+                console.log("[DEBUG] Auto backup interval cleared");
+            }
+            
+            checkAutoBackupStatus();
+            showNotification("Backup otomatis dinonaktifkan");
+            logAuditActivity('settings', 'Auto backup disabled');
+        }
+        
+        // Fungsi untuk membuat backup otomatis
+        function createAutoBackup() {
+            console.log("[DEBUG] Creating auto backup");
+            
+            try {
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    version: "1.0",
+                    auto: true,
+                    description: "Automatic backup of PACIFIC PRO data",
+                    data: {}
+                };
+                
+                // Ambil semua data kecuali data user
+                Object.values(STORAGE_KEYS).forEach(key => {
+                    if (key !== STORAGE_KEYS.currentUser && key !== STORAGE_KEYS.emergencyBackup) {
+                        const data = localStorage.getItem(key);
+                        if (data) {
+                            try {
+                                backupData.data[key] = KeuanganParser.parseData(data);
+                            } catch (error) {
+                                console.error(`[DEBUG] Error parsing data for ${key}:`, error);
+                                backupData.data[key] = data; // Simpan as-is jika parsing gagal
+                            }
+                        }
+                    }
+                });
+                
+                // Simpan backup ke localStorage
+                localStorage.setItem(STORAGE_KEYS.autoBackupData, KeuanganParser.stringifyData(backupData));
+                localStorage.setItem(STORAGE_KEYS.lastAutoBackup, new Date().toISOString());
+                
+                console.log("[DEBUG] Auto backup created at:", new Date());
+                
+            } catch (error) {
+                console.error("[DEBUG] Error creating auto backup:", error);
+            }
+        }
+        
+        // Fungsi untuk mengecek status backup otomatis
+        function checkAutoBackupStatus() {
+            console.log("[DEBUG] Checking auto backup status");
+            
+            const autoBackup = localStorage.getItem(STORAGE_KEYS.autoBackup) === 'true';
+            const statusElement = document.getElementById('autoBackupStatus');
+            
+            if (autoBackup) {
+                statusElement.textContent = "Status: Backup otomatis aktif";
+                statusElement.style.color = "var(--success-color)";
+                
+                // Cek apakah perlu menjalankan interval
+                if (!window.backupInterval) {
+                    window.backupInterval = setInterval(createAutoBackup, 24 * 60 * 60 * 1000);
+                    console.log("[DEBUG] Auto backup interval set");
+                }
+            } else {
+                statusElement.textContent = "Status: Backup otomatis tidak aktif";
+                statusElement.style.color = "var(--danger-color)";
+                
+                if (window.backupInterval) {
+                    clearInterval(window.backupInterval);
+                    window.backupInterval = null;
+                    console.log("[DEBUG] Auto backup interval cleared");
+                }
+            }
+        }
+        
+        // Fungsi untuk memuat info backup terakhir
+        function loadLastBackupInfo() {
+            console.log("[DEBUG] Loading last backup info");
+            
+            const lastBackup = localStorage.getItem(STORAGE_KEYS.lastBackup);
+            const infoElement = document.getElementById('lastBackupInfo');
+            
+            if (lastBackup) {
+                const date = new Date(lastBackup);
+                infoElement.textContent = `Backup terakhir: ${date.toLocaleString('id-ID')}`;
+            } else {
+                infoElement.textContent = "Backup terakhir: Belum pernah";
+            }
+        }
+    </script>
+</body>
+</html>
