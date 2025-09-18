@@ -338,11 +338,12 @@
             font-weight: 700;
             color: var(--gray-800);
             background: transparent;
-            width: 120px;
+            width: 200px; /* Diperbesar dari 160px menjadi 200px */
             text-align: right;
-            padding: 4px;
+            padding: 6px 8px;
             border: 1px dashed var(--gray-300);
             border-radius: 4px;
+            min-width: 200px; /* Minimum width diperbesar */
         }
         
         #diskonInput:focus {
@@ -361,6 +362,9 @@
             font-weight: 700;
             color: var(--gray-900);
             font-size: 12px;
+            min-width: 180px;
+            text-align: right;
+            padding-right: 5px;
         }
         
         .summary-row.total .summary-label {
@@ -371,6 +375,7 @@
         .summary-row.total .summary-value {
             font-size: var(--font-total);
             color: var(--primary);
+            min-width: 220px;
         }
         
         /* =====================
@@ -723,6 +728,11 @@
             color: #ef4444;
         }
         
+        .notification.success {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
         /* =====================
            LOADING SPINNER STYLES
            ===================== */
@@ -1018,6 +1028,20 @@
             .signature-section {
                 justify-content: center;
             }
+            
+            /* Adjust summary for mobile */
+            .summary-value {
+                min-width: 150px;
+            }
+            
+            .summary-row.total .summary-value {
+                min-width: 180px;
+            }
+            
+            #diskonInput {
+                width: 180px;
+                min-width: 180px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1051,6 +1075,23 @@
             
             .signature-box {
                 width: 180px;
+            }
+            
+            /* Further adjust for very small screens */
+            .summary-value {
+                min-width: 120px;
+                font-size: 11px;
+            }
+            
+            .summary-row.total .summary-value {
+                min-width: 150px;
+                font-size: 13px;
+            }
+            
+            #diskonInput {
+                width: 150px;
+                min-width: 150px;
+                padding: 4px 6px;
             }
         }
     </style>
@@ -1146,8 +1187,8 @@
                             <th style="width: 45%;">Item Description</th>
                             <th style="width: 10%;">Qty</th>
                             <th style="width: 10%;">Unit</th>
-                            <th style="width: 15%;">Unit Price</th>
-                            <th style="width: 20%;">Total</th>
+                            <th style="width: 15%;">Unit Price (IDR)</th>
+                            <th style="width: 20%;">Total (IDR)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1156,7 +1197,7 @@
                             <td><input type="number" value="1" min="1" oninput="updateTotal()"></td>
                             <td><input type="text" value="pcs" oninput="updateTotal()"></td>
                             <td><input type="number" value="0" min="0" oninput="updateTotal()"></td>
-                            <td class="line-total">Rp 0</td>
+                            <td class="line-total">0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1166,20 +1207,20 @@
             <div class="summary">
                 <div class="summary-row">
                     <div class="summary-label">Subtotal</div>
-                    <div class="summary-value" id="subtotalValue">Rp 0</div>
+                    <div class="summary-value" id="subtotalValue">IDR 0</div>
                 </div>
                 <div class="summary-row" id="diskonRow">
                     <div class="summary-label">Diskon</div>
-                    <div class="summary-value">
-                        <div style="display: flex; align-items: center;">
-                            <span style="margin-right: 4px;">Rp</span>
+                    <div class="summary-value" id="diskonValue">
+                        <div style="display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;">
+                            <span style="margin-right: 8px;">IDR</span>
                             <input type="number" id="diskonInput" min="0" value="0" oninput="updateTotal()">
                         </div>
                     </div>
                 </div>
                 <div class="summary-row total">
                     <div class="summary-label">Total</div>
-                    <div class="summary-value" id="grandTotal">Rp 0</div>
+                    <div class="summary-value" id="grandTotal">IDR 0</div>
                 </div>
             </div>
 
@@ -1410,7 +1451,7 @@
                                 <div class="invoice-date">${formatDateToID(invoice.tanggal)}</div>
                                 <div class="invoice-customer">${invoice.customer}</div>
                             </div>
-                            <div class="invoice-amount">Rp ${invoice.total.toLocaleString("id-ID")}</div>
+                            <div class="invoice-amount">IDR ${invoice.total.toLocaleString("id-ID")}</div>
                         </div>
                     `;
                     invoiceList.appendChild(invoiceItem);
@@ -1728,7 +1769,7 @@
                             <td><input type="number" value="${item.qty}" min="1" oninput="updateTotal()"></td>
                             <td><input type="text" value="${item.unit}" oninput="updateTotal()"></td>
                             <td><input type="number" value="${item.harga}" min="0" oninput="updateTotal()"></td>
-                            <td class="line-total">Rp ${item.total.toLocaleString("id-ID")}</td>
+                            <td class="line-total">${item.total.toLocaleString("id-ID")}</td>
                         `;
                         tbody.appendChild(row);
                     });
@@ -1764,7 +1805,7 @@
                     <td><input type="number" value="1" min="1" oninput="updateTotal()"></td>
                     <td><input type="text" value="pcs" oninput="updateTotal()"></td>
                     <td><input type="number" value="0" min="0" oninput="updateTotal()"></td>
-                    <td class="line-total">Rp 0</td>
+                    <td class="line-total">0</td>
                 `;
                 
                 document.querySelector("#itemTable tbody").appendChild(row);
@@ -1815,13 +1856,14 @@
                     const harga = parseFloat(row.cells[3].querySelector("input").value) || 0;
                     const sub = qty * harga;
                     
-                    row.cells[4].textContent = "Rp " + sub.toLocaleString("id-ID");
+                    // Format tanpa "Rp" karena akan ditambahkan oleh CSS
+                    row.cells[4].textContent = sub.toLocaleString("id-ID");
                     subtotal += sub;
                 });
                 
                 // Update tampilan subtotal
                 const subtotalElement = document.getElementById("subtotalValue");
-                subtotalElement.textContent = "Rp " + subtotal.toLocaleString("id-ID");
+                subtotalElement.textContent = "IDR " + subtotal.toLocaleString("id-ID");
                 
                 // Ambil nilai diskon dari input manual (dalam rupiah)
                 const diskonInput = document.getElementById("diskonInput");
@@ -1843,14 +1885,14 @@
                 
                 // Update total akhir
                 const grandTotalElement = document.getElementById("grandTotal");
-                grandTotalElement.textContent = "Rp " + total.toLocaleString("id-ID");
+                grandTotalElement.textContent = "IDR " + total.toLocaleString("id-ID");
                 
                 // Update terbilang
                 const terbilangText = document.getElementById("terbilangText");
                 terbilangText.textContent = "Terbilang: " + terbilang(total) + " Rupiah";
                 
                 console.log("Update total selesai - Subtotal: " + subtotal + 
-                           ", Diskon: Rp " + diskonAmount + ", Total: " + total);
+                           ", Diskon: IDR " + diskonAmount + ", Total: " + total);
             } catch (error) {
                 console.error("Error updating total:", error);
             }
@@ -2274,8 +2316,9 @@
         
         // Menutup modal jika pengguna mengklik di luar modal
         window.onclick = function(event) {
-            const modal = document.getElementById("printInvoiceModal");
-            if (event.target === modal) {
+            const printModal = document.getElementById("printInvoiceModal");
+            
+            if (event.target === printModal) {
                 closePrintInvoiceModal();
             }
         };
