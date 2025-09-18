@@ -38,13 +38,9 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0a1929 0%, #1a365d 40%, #8B0000 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             color: white;
-            text-align: center;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         
         /* ===== LUXURY BACKGROUND ===== */
@@ -164,10 +160,126 @@
             50% { transform: translateY(-20px); }
         }
         
-        /* ===== LUXURY CONTAINER ===== */
-        .container {
+        /* ===== HEADER/NAVIGATION ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-family: 'Playfair Display', serif;
+            border: 2px solid var(--gold-color);
+        }
+        
+        .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: clamp(15px, 3vw, 25px);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+        
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--gold-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+        }
+        
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 5% 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== LANDING PAGE ===== */
+        .landing-container {
             max-width: 600px;
-            padding: 50px;
+            padding: clamp(30px, 5vw, 50px);
             position: relative;
             z-index: 1;
             animation: fadeInUp 1s ease-out;
@@ -176,6 +288,8 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin: 0 auto;
         }
         
         @keyframes fadeInUp {
@@ -246,17 +360,17 @@
         
         /* ===== LOGO SECTION ===== */
         .logo-container {
-            margin-bottom: 40px;
+            margin-bottom: clamp(25px, 5vw, 40px);
             position: relative;
         }
         
         .logo {
-            max-width: 220px;
+            max-width: clamp(140px, 30vw, 220px);
             height: auto;
             border-radius: 50%;
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3);
             background-color: white;
-            padding: 25px;
+            padding: clamp(15px, 3vw, 25px);
             transition: transform 0.5s ease, box-shadow 0.5s ease;
             animation: pulse 3s infinite;
             border: 3px solid rgba(212, 175, 55, 0.3);
@@ -275,7 +389,7 @@
         
         .logo-fallback {
             display: none;
-            font-size: 60px;
+            font-size: clamp(40px, 8vw, 60px);
             font-weight: 900;
             font-family: 'Playfair Display', serif;
             color: white;
@@ -286,8 +400,8 @@
         
         /* ===== CONTENT SECTION ===== */
         h1 {
-            font-size: clamp(2.2rem, 5vw, 2.8rem);
-            margin-bottom: 25px;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            margin-bottom: clamp(15px, 3vw, 25px);
             font-weight: 700;
             font-family: 'Playfair Display', serif;
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.3), 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -308,8 +422,8 @@
         }
         
         .subtitle {
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-            margin-bottom: 50px;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            margin-bottom: clamp(30px, 5vw, 50px);
             opacity: 0.9;
             font-weight: 300;
             letter-spacing: 1px;
@@ -318,7 +432,7 @@
         
         /* ===== LUXURY BUTTON STYLES ===== */
         .btn-container {
-            margin-top: 40px;
+            margin-top: clamp(25px, 5vw, 40px);
             position: relative;
         }
         
@@ -326,11 +440,11 @@
             display: inline-block;
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
             color: white;
-            padding: 18px 50px;
+            padding: clamp(12px, 3vw, 18px) clamp(30px, 6vw, 50px);
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
             transition: all 0.4s ease;
             border: 2px solid rgba(212, 175, 55, 0.5);
             backdrop-filter: blur(10px);
@@ -339,6 +453,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             text-transform: uppercase;
             letter-spacing: 1px;
+            cursor: pointer;
         }
         
         .btn::before {
@@ -370,11 +485,323 @@
         .btn i {
             margin-right: 12px;
             transition: transform 0.3s ease;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
         }
         
         .btn:hover i {
             transform: translateX(5px);
+        }
+        
+        /* ===== FEATURES PAGE ===== */
+        .features-container {
+            width: 100%;
+            padding: clamp(25px, 4vw, 40px);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .features-header {
+            text-align: center;
+            margin-bottom: clamp(30px, 5vw, 50px);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+            gap: clamp(20px, 4vw, 30px);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: clamp(20px, 4vw, 30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--gold-color);
+            margin-bottom: clamp(15px, 3vw, 20px);
+        }
+        
+        .feature-title {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            margin-bottom: clamp(10px, 2vw, 15px);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .feature-description {
+            opacity: 0.8;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+        
+        /* ===== EXCHANGE RATES PAGE ===== */
+        .exchange-container {
+            width: 100%;
+            padding: clamp(25px, 4vw, 40px);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .exchange-header {
+            text-align: center;
+            margin-bottom: clamp(30px, 5vw, 40px);
+        }
+        
+        .exchange-content {
+            display: grid;
+            gap: clamp(20px, 4vw, 30px);
+        }
+        
+        .exchange-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: clamp(15px, 3vw, 25px);
+        }
+        
+        .currency-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: clamp(15px, 3vw, 25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .currency-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .currency-flag {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin-bottom: clamp(10px, 2vw, 15px);
+        }
+        
+        .currency-name {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .currency-code {
+            color: var(--gold-color);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            margin-bottom: clamp(10px, 2vw, 15px);
+        }
+        
+        .currency-rate {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .currency-change {
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .change-up {
+            color: var(--success-color);
+        }
+        
+        .change-down {
+            color: var(--danger-color);
+        }
+        
+        .last-updated {
+            text-align: center;
+            margin-top: clamp(20px, 4vw, 30px);
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            margin-top: clamp(20px, 4vw, 30px);
+            gap: 10px;
+        }
+        
+        /* ===== LOGIN PAGE ===== */
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: clamp(25px, 4vw, 40px);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: clamp(25px, 4vw, 30px);
+        }
+        
+        .login-form {
+            display: grid;
+            gap: clamp(15px, 3vw, 20px);
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(15px, 3vw, 20px);
+        }
+        
+        .form-label {
+            margin-bottom: clamp(5px, 1vw, 8px);
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+        
+        .form-input, .form-textarea {
+            padding: clamp(12px, 3vw, 15px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s ease, background 0.3s ease;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: clamp(8px, 2vw, 10px) 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--gold-color);
+        }
+        
+        .forgot-password {
+            color: var(--gold-color);
+            text-decoration: none;
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            transition: opacity 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: clamp(15px, 3vw, 20px) 0;
+            gap: 15px;
+        }
+        
+        .login-divider::before, .login-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: clamp(15px, 3vw, 20px);
+        }
+        
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: clamp(15px, 3vw, 20px);
+            opacity: 0.8;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+        
+        .signup-link a {
+            color: var(--gold-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+        
+        .signup-link a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
         
         /* ===== NOTIFICATION STYLES ===== */
@@ -394,6 +821,7 @@
             font-weight: 500;
             backdrop-filter: blur(10px);
             border-left: 4px solid var(--gold-color);
+            max-width: 90%;
         }
         
         .notification.show {
@@ -410,27 +838,24 @@
         }
         
         /* ===== LUXURY FOOTER ===== */
-        .developer-info {
+        .footer {
             position: absolute;
-            bottom: 30px;
+            bottom: 0;
             left: 0;
             right: 0;
+            padding: clamp(15px, 3vw, 20px);
             text-align: center;
             color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
+            font-size: clamp(14px, 3vw, 16px);
             z-index: 1;
             font-weight: 500;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 2s ease-out 0.5s both;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
             letter-spacing: 1px;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .developer-info span {
+        .footer span {
             color: var(--gold-color);
             font-weight: 600;
             text-decoration: underline;
@@ -438,10 +863,81 @@
             text-decoration-color: var(--gold-color);
         }
         
+        /* ===== LOADING SPINNER ===== */
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--gold-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* ===== RESPONSIVE DESIGN ===== */
-        @media (max-width: 768px) {
-            .container {
+        @media (min-width: 768px) {
+            .nav-menu {
+                position: static;
+                transform: none;
+                background: transparent;
+                flex-direction: row;
+                padding: 0;
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.9);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease;
+                z-index: 99;
+            }
+            
+            .nav-menu.active {
+                transform: translateY(0);
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .landing-container {
                 padding: 40px 25px;
+                margin: 0 20px;
+            }
+            
+            .features-container, .exchange-container, .login-container {
+                padding: 30px 20px;
                 margin: 0 20px;
             }
             
@@ -463,15 +959,20 @@
                 font-size: 1.1rem;
             }
             
-            .developer-info {
+            .footer {
                 font-size: 14px;
-                bottom: 20px;
+                padding: 15px;
             }
         }
         
         @media (max-width: 480px) {
-            .container {
+            .landing-container {
                 padding: 30px 20px;
+                margin: 0 15px;
+            }
+            
+            .features-container, .exchange-container, .login-container {
+                padding: 25px 15px;
                 margin: 0 15px;
             }
             
@@ -501,6 +1002,10 @@
             .decoration-bottom {
                 height: 1px;
             }
+            
+            .features-grid, .exchange-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         /* ===== ACCESSIBILITY IMPROVEMENTS ===== */
@@ -518,7 +1023,9 @@
         
         /* ===== FOCUS STYLES ===== */
         a:focus,
-        button:focus {
+        button:focus,
+        input:focus,
+        textarea:focus {
             outline: 3px solid var(--gold-color);
             outline-offset: 2px;
         }
@@ -548,39 +1055,285 @@
     <div class="geometric-shape shape-1"></div>
     <div class="geometric-shape shape-2"></div>
     
-    <!-- Main container -->
-    <div class="container" id="main-content">
-        <!-- Decorative elements -->
-        <div class="decoration decoration-top"></div>
-        <div class="decoration decoration-bottom"></div>
-        <div class="corner-decoration corner-tl"></div>
-        <div class="corner-decoration corner-tr"></div>
-        <div class="corner-decoration corner-bl"></div>
-        <div class="corner-decoration corner-br"></div>
-        
-        <!-- Logo section -->
-        <div class="logo-container">
-            <img src="tegline.png" alt="PACIFIC PRO Logo" class="logo" 
-                 onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
-            <div id="logoFallback" class="logo-fallback">PP</div>
+    <!-- Header/Navigation -->
+    <header class="header">
+        <div class="logo-nav">
+            <div class="brand-name">PACIFIC PRO</div>
+        </div>
+        <nav>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#" class="nav-link active" data-page="home">Beranda</a></li>
+                <li><a href="#" class="nav-link" data-page="features">Fitur</a></li>
+                <li><a href="#" class="nav-link" data-page="exchange">Kurs Mata Uang</a></li>
+                <li><a href="#" class="nav-link" data-page="login">Masuk</a></li>
+            </ul>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <!-- Loading Spinner -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
         </div>
         
-        <!-- Content section -->
-        <main>
-            <h1>SISTEM AKUNTANSI</h1>
-            <p class="subtitle">Developed by Pacific Inter Teknologi</p>
-            
-            <!-- Button container -->
-            <div class="btn-container">
-                <a href="login.html" class="btn" aria-label="Masuk ke sistem PACIFIC PRO">
-                    <i class="fas fa-sign-in-alt"></i> Masuk ke Sistem
-                </a>
+        <!-- Home Page -->
+        <div class="page active" id="home">
+            <div class="landing-container">
+                <!-- Decorative elements -->
+                <div class="decoration decoration-top"></div>
+                <div class="decoration decoration-bottom"></div>
+                <div class="corner-decoration corner-tl"></div>
+                <div class="corner-decoration corner-tr"></div>
+                <div class="corner-decoration corner-bl"></div>
+                <div class="corner-decoration corner-br"></div>
+                
+                <!-- Logo section -->
+                <div class="logo-container">
+                    <img src="tegline.png" alt="PACIFIC PRO Logo" class="logo" 
+                         onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+                    <div id="logoFallback" class="logo-fallback">PP</div>
+                </div>
+                
+                <!-- Content section -->
+                <div>
+                    <h1>SISTEM AKUNTANSI</h1>
+                    <p class="subtitle">Developed by Pacific Inter Teknologi</p>
+                    
+                    <!-- Button container -->
+                    <div class="btn-container">
+                        <button class="btn" onclick="spa.navigateTo('login')">
+                            <i class="fas fa-sign-in-alt"></i> Masuk ke Sistem
+                        </button>
+                    </div>
+                </div>
             </div>
-        </main>
-    </div>
+        </div>
+        
+        <!-- Features Page -->
+        <div class="page" id="features">
+            <div class="features-container">
+                <div class="features-header">
+                    <h1>Fitur Unggulan</h1>
+                    <p class="subtitle">Sistem akuntansi dengan berbagai fitur canggih</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature-title">Laporan Keuangan</h3>
+                        <p class="feature-description">Generate laporan keuangan secara real-time dengan visualisasi data yang mudah dipahami.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <h3 class="feature-title">Manajemen Invoice</h3>
+                        <p class="feature-description">Buat, kirim, dan lacak invoice dengan mudah. Otomatisasi pengingat pembayaran.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="feature-title">Manajemen Pelanggan</h3>
+                        <p class="feature-description">Kelola data pelanggan, riwayat transaksi, dan preferensi mereka secara terpusat.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Keamanan Terjamin</h3>
+                        <p class="feature-description">Enkripsi data end-to-end dan sistem keamanan berlapis untuk melindungi informasi keuangan Anda.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Akses Mobile</h3>
+                        <p class="feature-description">Akses sistem akuntansi Anda dari mana saja melalui perangkat mobile atau desktop.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <h3 class="feature-title">Cloud Storage</h3>
+                        <p class="feature-description">Simpan data Anda dengan aman di cloud dengan backup otomatis dan restore point.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Exchange Rates Page -->
+        <div class="page" id="exchange">
+            <div class="exchange-container">
+                <div class="exchange-header">
+                    <h1>Kurs Mata Uang Terkini</h1>
+                    <p class="subtitle">Informasi kurs mata uang update terkait dengan keuangan</p>
+                </div>
+                
+                <div class="exchange-content">
+                    <div class="exchange-grid">
+                        <div class="currency-card">
+                            <div class="currency-flag">🇺🇸</div>
+                            <h3 class="currency-name">Dolar AS</h3>
+                            <div class="currency-code">USD</div>
+                            <div class="currency-rate">Rp 15.234,50</div>
+                            <div class="currency-change change-up">
+                                <i class="fas fa-arrow-up"></i> +0.25%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇪🇺</div>
+                            <h3 class="currency-name">Euro</h3>
+                            <div class="currency-code">EUR</div>
+                            <div class="currency-rate">Rp 16.542,75</div>
+                            <div class="currency-change change-down">
+                                <i class="fas fa-arrow-down"></i> -0.15%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇬🇧</div>
+                            <h3 class="currency-name">Pound Sterling</h3>
+                            <div class="currency-code">GBP</div>
+                            <div class="currency-rate">Rp 19.231,40</div>
+                            <div class="currency-change change-up">
+                                <i class="fas fa-arrow-up"></i> +0.42%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇯🇵</div>
+                            <h3 class="currency-name">Yen Jepang</h3>
+                            <div class="currency-code">JPY</div>
+                            <div class="currency-rate">Rp 103,45</div>
+                            <div class="currency-change change-down">
+                                <i class="fas fa-arrow-down"></i> -0.08%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇸🇬</div>
+                            <h3 class="currency-name">Dolar Singapura</h3>
+                            <div class="currency-code">SGD</div>
+                            <div class="currency-rate">Rp 11.345,60</div>
+                            <div class="currency-change change-up">
+                                <i class="fas fa-arrow-up"></i> +0.12%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇦🇺</div>
+                            <h3 class="currency-name">Dolar Australia</h3>
+                            <div class="currency-code">AUD</div>
+                            <div class="currency-rate">Rp 10.012,30</div>
+                            <div class="currency-change change-down">
+                                <i class="fas fa-arrow-down"></i> -0.05%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇨🇳</div>
+                            <h3 class="currency-name">Yuan Tiongkok</h3>
+                            <div class="currency-code">CNY</div>
+                            <div class="currency-rate">Rp 2.145,80</div>
+                            <div class="currency-change change-up">
+                                <i class="fas fa-arrow-up"></i> +0.18%
+                            </div>
+                        </div>
+                        
+                        <div class="currency-card">
+                            <div class="currency-flag">🇲🇷</div>
+                            <h3 class="currency-name">Ringgit Malaysia</h3>
+                            <div class="currency-code">MYR</div>
+                            <div class="currency-rate">Rp 3.421,50</div>
+                            <div class="currency-change change-up">
+                                <i class="fas fa-arrow-up"></i> +0.09%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="last-updated">
+                        Terakhir diperbarui: <span id="lastUpdated"></span>
+                    </div>
+                    
+                    <div class="refresh-btn">
+                        <button class="btn" onclick="refreshExchangeRates()">
+                            <i class="fas fa-sync-alt"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Login Page -->
+        <div class="page" id="login">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1>Masuk ke Sistem</h1>
+                    <p class="subtitle">Silakan masuk untuk mengakses dashboard Anda</p>
+                </div>
+                
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" id="username" class="form-input" placeholder="Masukkan username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="Masukkan password" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Ingat saya</label>
+                        </div>
+                        <a href="#" class="forgot-password">Lupa password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        <i class="fas fa-sign-in-alt"></i> Masuk
+                    </button>
+                </form>
+                
+                <div class="login-divider">
+                    <span>Atau masuk dengan</span>
+                </div>
+                
+                <div class="social-login">
+                    <button class="social-btn" aria-label="Login with Google">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button class="social-btn" aria-label="Login with Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="social-btn" aria-label="Login with Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                </div>
+                
+                <div class="signup-link">
+                    <p>Belum punya akun? <a href="#" onclick="spa.showNotification('Fitur pendaftaran akan segera hadir!', 'info')">Daftar sekarang</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
     
     <!-- Footer -->
-    <footer class="developer-info">
+    <footer class="footer">
         Developed by <span>Pacific Inter Teknologi</span> © 2023
     </footer>
     
@@ -589,135 +1342,314 @@
     
     <!-- JavaScript -->
     <script>
-        // ===== PARTICLE EFFECT GENERATION =====
-        /**
-         * Creates floating particles for visual enhancement
-         */
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 30;
+        // ===== SINGLE PAGE APPLICATION (SPA) OBJECT =====
+        const spa = {
+            // Current active page
+            currentPage: 'home',
             
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
+            // Initialize the SPA
+            init() {
+                // Setup navigation event listeners
+                this.setupNavigation();
                 
-                // Random properties
-                const size = Math.random() * 5 + 1;
-                const posX = Math.random() * 100;
-                const delay = Math.random() * 15;
-                const duration = Math.random() * 10 + 15;
+                // Setup form submissions
+                this.setupForms();
                 
-                // Apply styles
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${posX}%`;
-                particle.style.animationDelay = `${delay}s`;
-                particle.style.animationDuration = `${duration}s`;
+                // Create particle effects
+                this.createParticles();
                 
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        // ===== AUDIT TRAIL INTEGRATION =====
-        // This function logs user activities for tracking purposes
-        function logActivity(action, module, detail) {
-            if (window.auditTrail) {
-                window.auditTrail.log({
-                    action: action,
-                    module: module,
-                    detail: detail
+                // Check for existing user session
+                this.checkExistingSession();
+                
+                // Initialize exchange rates
+                this.initExchangeRates();
+                
+                // Log page access
+                this.logActivity('view', 'Landing Page', 'User accessed landing page');
+            },
+            
+            // Setup navigation event listeners
+            setupNavigation() {
+                // Navigation links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = e.currentTarget.getAttribute('data-page');
+                        this.navigateTo(page);
+                    });
                 });
-            }
-        }
-        
-        // ===== NOTIFICATION SYSTEM =====
-        /**
-         * Shows a notification message to the user
-         * @param {string} message - The message to display
-         * @param {string} type - The type of notification (success, error, info)
-         */
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById("notification");
-            
-            // Set message and type
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            
-            // Show notification
-            notification.classList.add("show");
-            
-            // Log the notification as an audit activity
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (user) {
-                logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
-            }
-            
-            // Hide notification after 3 seconds
-            setTimeout(() => {
-                notification.classList.remove("show");
-            }, 3000);
-        }
-        
-        // ===== SESSION MANAGEMENT =====
-        /**
-         * Checks if user is already logged in and redirects to dashboard
-         */
-        function checkExistingSession() {
-            const currentUser = localStorage.getItem("currentUser");
-            
-            if (currentUser) {
-                const user = JSON.parse(currentUser);
-                showNotification(`Selamat datang kembali, ${user.fullName}! Mengarahkan ke dashboard...`, "success");
                 
-                // Redirect to dashboard after a short delay
+                // Mobile menu toggle
+                const menuToggle = document.getElementById('menuToggle');
+                const navMenu = document.getElementById('navMenu');
+                
+                menuToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                });
+                
+                // Close mobile menu when clicking on a link
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navMenu.classList.remove('active');
+                    });
+                });
+            },
+            
+            // Navigate to a specific page
+            navigateTo(pageId) {
+                // Don't navigate if already on the page
+                if (this.currentPage === pageId) return;
+                
+                // Show loading spinner
+                document.getElementById('loading').style.display = 'flex';
+                
+                // Hide all pages
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Update active navigation link
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-page') === pageId) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                // Simulate loading delay for better UX
                 setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 1500);
-            }
-        }
-        
-        // ===== INITIALIZATION =====
-        /**
-         * Initializes the page when DOM is fully loaded
-         */
-        document.addEventListener('DOMContentLoaded', function() {
-            // Create particle effects
-            createParticles();
+                    // Show the target page
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // Update current page
+                    this.currentPage = pageId;
+                    
+                    // Hide loading spinner
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    // Log navigation
+                    this.logActivity('navigate', 'Navigation', `User navigated to ${pageId} page`);
+                    
+                    // Special handling for login page
+                    if (pageId === 'login') {
+                        // Focus on username field
+                        setTimeout(() => {
+                            document.getElementById('username').focus();
+                        }, 100);
+                    }
+                    
+                    // Special handling for exchange rates page
+                    if (pageId === 'exchange') {
+                        // Refresh exchange rates when navigating to this page
+                        this.refreshExchangeRates();
+                    }
+                }, 300);
+            },
+            
+            // Setup form submissions
+            setupForms() {
+                // Login form
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleLoginForm();
+                    });
+                }
+            },
+            
+            // Handle login form submission
+            handleLoginForm() {
+                // Get form values
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const remember = document.getElementById('remember').checked;
+                
+                // Simulate login process
+                this.showNotification('Memproses login...', 'info');
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // For demo purposes, accept any username/password
+                    if (username && password) {
+                        // Create user object
+                        const user = {
+                            username: username,
+                            fullName: username === 'admin' ? 'Administrator' : 'User',
+                            role: username === 'admin' ? 'admin' : 'user',
+                            remember: remember
+                        };
+                        
+                        // Save user to localStorage
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        
+                        // Show success message
+                        this.showNotification(`Login berhasil! Selamat datang, ${user.fullName}!`, 'success');
+                        
+                        // Log activity
+                        this.logActivity('login', 'Authentication', `User logged in: ${username}`);
+                        
+                        // Redirect to dashboard after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        this.showNotification('Username atau password salah. Silakan coba lagi.', 'error');
+                        
+                        // Log activity
+                        this.logActivity('error', 'Authentication', 'Failed login attempt');
+                    }
+                }, 1000);
+            },
             
             // Check for existing user session
-            checkExistingSession();
+            checkExistingSession() {
+                const currentUser = localStorage.getItem('currentUser');
+                
+                if (currentUser) {
+                    const user = JSON.parse(currentUser);
+                    this.showNotification(`Selamat datang kembali, ${user.fullName}!`, 'success');
+                    
+                    // Log activity
+                    this.logActivity('view', 'Landing Page', `Returning user: ${user.username}`);
+                }
+            },
+            
+            // Create particle effects
+            createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const particleCount = window.innerWidth < 768 ? 15 : 30; // Reduce particles on mobile
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random properties
+                    const size = Math.random() * 5 + 1;
+                    const posX = Math.random() * 100;
+                    const delay = Math.random() * 15;
+                    const duration = Math.random() * 10 + 15;
+                    
+                    // Apply styles
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}%`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            },
+            
+            // Initialize exchange rates
+            initExchangeRates() {
+                // Set the last updated time
+                this.updateLastUpdatedTime();
+                
+                // Auto-refresh exchange rates every 5 minutes
+                setInterval(() => {
+                    if (this.currentPage === 'exchange') {
+                        this.refreshExchangeRates();
+                    }
+                }, 300000); // 5 minutes
+            },
+            
+            // Update the last updated time
+            updateLastUpdatedTime() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                document.getElementById('lastUpdated').textContent = now.toLocaleDateString('id-ID', options);
+            },
+            
+            // Refresh exchange rates
+            refreshExchangeRates() {
+                // Show notification
+                this.showNotification('Memperbarui data kurs mata uang...', 'info');
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // Update the last updated time
+                    this.updateLastUpdatedTime();
+                    
+                    // Show success message
+                    this.showNotification('Data kurs mata uang telah diperbarui', 'success');
+                    
+                    // Log activity
+                    this.logActivity('refresh', 'Exchange Rates', 'User refreshed exchange rates');
+                }, 1000);
+            },
+            
+            // Show notification
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                
+                // Set message and type
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                
+                // Show notification
+                notification.classList.add('show');
+                
+                // Log the notification as an audit activity
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                if (user) {
+                    this.logActivity(type === 'error' ? 'error' : 'info', 'System', `Notification: ${message}`);
+                }
+                
+                // Hide notification after 3 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            },
+            
+            // Log activity
+            logActivity(action, module, detail) {
+                if (window.auditTrail) {
+                    window.auditTrail.log({
+                        action: action,
+                        module: module,
+                        detail: detail,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            }
+        };
+        
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the SPA
+            spa.init();
             
             // Add keyboard navigation
             document.addEventListener('keydown', function(e) {
-                // Enter key on the main button
-                if (e.key === 'Enter' && document.activeElement === document.querySelector('.btn')) {
-                    window.location.href = "login.html";
+                // ESC key closes mobile menu
+                if (e.key === 'Escape') {
+                    document.getElementById('navMenu').classList.remove('active');
                 }
             });
             
-            // Log page access if audit trail is available
-            logActivity('view', 'Landing Page', 'User accessed landing page');
-        });
-        
-        // ===== ERROR HANDLING =====
-        /**
-         * Global error handler for uncaught errors
-         */
-        window.addEventListener('error', function(e) {
-            console.error('An error occurred:', e.error);
-            showNotification('Terjadi kesalahan. Silakan refresh halaman.', 'error');
-        });
-        
-        // ===== PERFORMANCE MONITORING =====
-        /**
-         * Logs page load performance metrics
-         */
-        window.addEventListener('load', function() {
-            if (window.performance) {
-                const perfData = window.performance.timing;
-                const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
-                console.log(`Page loaded in ${pageLoadTime}ms`);
-            }
+            // Global error handler
+            window.addEventListener('error', function(e) {
+                console.error('An error occurred:', e.error);
+                spa.showNotification('Terjadi kesalahan. Silakan refresh halaman.', 'error');
+            });
+            
+            // Performance monitoring
+            window.addEventListener('load', function() {
+                if (window.performance) {
+                    const perfData = window.performance.timing;
+                    const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                    console.log(`Page loaded in ${pageLoadTime}ms`);
+                }
+            });
         });
     </script>
 </body>
