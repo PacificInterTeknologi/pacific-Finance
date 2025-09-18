@@ -111,6 +111,14 @@
       background-color: #2d8e47;
     }
     
+    .btn-danger {
+      background-color: var(--danger-color);
+    }
+    
+    .btn-danger:hover {
+      background-color: #c5221f;
+    }
+    
     /* Tambahkan style untuk fitur pencarian */
     .search-container {
       background-color: var(--light-color);
@@ -315,7 +323,7 @@
         padding: 15mm;
       }
       
-      .action-buttons, .back-link, .search-container {
+      .action-buttons, .back-link, .search-container, .saved-invoices-section {
         display: none !important;
       }
       
@@ -366,6 +374,106 @@
         padding: 8px 5px;
       }
     }
+    
+    /* Tambahan style untuk tabel invoice */
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    .invoice-table th, .invoice-table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    
+    .invoice-table th {
+      background-color: #f2f2f2;
+    }
+    
+    .invoice-table tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    /* Style untuk tombol aksi di tabel */
+    .action-cell {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .btn-small {
+      padding: 5px 8px;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+    
+    .btn-view {
+      background-color: var(--accent-color);
+    }
+    
+    .btn-view:hover {
+      background-color: #3367d6;
+    }
+    
+    /* Style untuk single invoice view */
+    .single-invoice-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .invoice-link {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    .invoice-link:hover {
+      color: #3367d6;
+      text-decoration: underline;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    
+    .loading-spinner.show {
+      display: flex;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      margin-top: 15px;
+      font-size: 16px;
+      color: var(--primary-color);
+    }
   </style>
 </head>
 <body>
@@ -380,7 +488,25 @@
       <div class="invoice-title">INVOICE</div>
     </div>
     
-    <div class="action-buttons">
+    <!-- Tombol kembali ke daftar invoice (hanya terlihat dalam mode single invoice) -->
+    <div id="backToListBtn" class="action-buttons" style="display: none;">
+      <button class="btn" onclick="showInvoiceList()">
+        <i class="fas fa-arrow-left"></i> Kembali ke Daftar Invoice
+      </button>
+    </div>
+    
+    <!-- Tombol aksi untuk single invoice (hanya terlihat dalam mode single invoice) -->
+    <div id="singleInvoiceActions" class="single-invoice-actions" style="display: none;">
+      <button class="btn btn-success" onclick="printInvoice()">
+        <i class="fas fa-print"></i> Print Ulang
+      </button>
+      <button class="btn btn-danger" onclick="exportToPDF()">
+        <i class="fas fa-file-pdf"></i> Export PDF
+      </button>
+    </div>
+    
+    <!-- Tombol aksi default (terlihat dalam mode daftar invoice) -->
+    <div id="defaultActions" class="action-buttons">
       <button class="btn" onclick="window.print()">
         <i class="fas fa-print"></i> Cetak Invoice
       </button>
@@ -390,7 +516,7 @@
     </div>
     
     <!-- Tambahkan fitur pencarian invoice -->
-    <div class="search-container">
+    <div id="searchSection" class="search-container">
       <input type="text" id="searchInput" placeholder="Masukkan nomor invoice">
       <button id="searchButton">
         <i class="fas fa-search"></i> Cari Invoice
@@ -469,6 +595,33 @@
         <i class="fas fa-arrow-left"></i> Kembali ke Laporan
       </a>
     </div>
+    
+    <!-- Bagian untuk menampilkan daftar invoice yang tersimpan -->
+    <div id="savedInvoicesSection" class="saved-invoices-section">
+      <h3>Daftar Invoice Tersimpan</h3>
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nomor Invoice</th>
+            <th>Tanggal</th>
+            <th>Pelanggan</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="savedInvoicesBody">
+          <!-- Data invoice akan diisi oleh JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="loading-spinner">
+    <div class="spinner"></div>
+    <div class="loading-text">Memproses...</div>
   </div>
   
   <script>
@@ -676,6 +829,9 @@
       // Tampilkan terbilang
       const terbilangSection = document.getElementById("terbilangSection");
       terbilangSection.innerHTML = `<p><strong>Terbilang:</strong> ${terbilang(totalAkhir)} Rupiah</p>`;
+      
+      // Simpan invoice yang sedang ditampilkan untuk keperluan print dan export
+      localStorage.setItem("currentInvoice", JSON.stringify(invoice));
     }
     
     // Fungsi untuk mencari invoice berdasarkan nomor
@@ -700,6 +856,9 @@
         // Tampilkan invoice yang ditemukan
         displayInvoice(invoice);
         
+        // Tampilkan mode single invoice
+        showSingleInvoiceView();
+        
         // Log activity
         logActivity('view', 'Invoice', `Mencari invoice: ${searchValue}`);
       } else {
@@ -711,6 +870,205 @@
         document.getElementById("invoiceContent").style.display = "none";
         document.getElementById("notFound").style.display = "block";
       }
+    }
+    
+    // Fungsi untuk menampilkan daftar invoice yang tersimpan
+    function displaySavedInvoices() {
+      const allInvoices = getAllInvoices();
+      const tbody = document.getElementById("savedInvoicesBody");
+      
+      // Kosongkan tabel
+      tbody.innerHTML = "";
+      
+      if (allInvoices.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Tidak ada invoice tersimpan</td></tr>`;
+        return;
+      }
+      
+      // Urutkan invoice berdasarkan tanggal (terbaru dulu)
+      const sortedInvoices = [...allInvoices].sort((a, b) => {
+        return new Date(b.tanggal) - new Date(a.tanggal);
+      });
+      
+      // Tampilkan invoice dalam tabel
+      sortedInvoices.forEach((invoice, index) => {
+        const statusClass = invoice.status === "Lunas" ? "status-lunas" : "status-belum-lunas";
+        
+        const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td><a href="#" class="invoice-link" onclick="viewSingleInvoice('${invoice.noInvoice}')">${invoice.noInvoice}</a></td>
+            <td>${invoice.tanggal}</td>
+            <td>${invoice.customer}</td>
+            <td>${formatCurrency(invoice.total)}</td>
+            <td><span class="status-badge ${statusClass}">${invoice.status || "Belum Lunas"}</span></td>
+            <td class="action-cell">
+              <button class="btn btn-small btn-view" onclick="viewSingleInvoice('${invoice.noInvoice}')">
+                <i class="fas fa-eye"></i> Lihat
+              </button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+    
+    // Fungsi untuk melihat invoice tunggal berdasarkan nomor invoice
+    function viewSingleInvoice(noInvoice) {
+      // Cari invoice
+      const allInvoices = getAllInvoices();
+      const invoice = allInvoices.find(d => d.noInvoice === noInvoice);
+      
+      if (invoice) {
+        // Tampilkan invoice
+        displayInvoice(invoice);
+        
+        // Tampilkan mode single invoice
+        showSingleInvoiceView();
+        
+        // Scroll ke bagian detail invoice
+        document.getElementById("invoiceContent").scrollIntoView({ behavior: 'smooth' });
+        
+        // Log activity
+        logActivity('view', 'Invoice', `Melihat invoice: ${noInvoice}`);
+      } else {
+        // Tampilkan pesan error
+        const errorDiv = document.getElementById("searchError");
+        errorDiv.textContent = "Invoice tidak ditemukan!";
+        errorDiv.style.display = "block";
+        
+        // Sembunyikan konten invoice
+        document.getElementById("invoiceContent").style.display = "none";
+        document.getElementById("notFound").style.display = "block";
+      }
+    }
+    
+    // Fungsi untuk menampilkan mode single invoice
+    function showSingleInvoiceView() {
+      // Sembunyikan bagian pencarian dan daftar invoice
+      document.getElementById("searchSection").style.display = "none";
+      document.getElementById("savedInvoicesSection").style.display = "none";
+      
+      // Tampilkan tombol kembali ke daftar invoice dan aksi single invoice
+      document.getElementById("backToListBtn").style.display = "flex";
+      document.getElementById("singleInvoiceActions").style.display = "flex";
+      document.getElementById("defaultActions").style.display = "none";
+    }
+    
+    // Fungsi untuk menampilkan mode daftar invoice
+    function showInvoiceList() {
+      // Tampilkan bagian pencarian dan daftar invoice
+      document.getElementById("searchSection").style.display = "flex";
+      document.getElementById("savedInvoicesSection").style.display = "block";
+      
+      // Sembunyikan tombol kembali ke daftar invoice dan aksi single invoice
+      document.getElementById("backToListBtn").style.display = "none";
+      document.getElementById("singleInvoiceActions").style.display = "none";
+      document.getElementById("defaultActions").style.display = "flex";
+      
+      // Sembunyikan konten invoice
+      document.getElementById("invoiceContent").style.display = "none";
+    }
+    
+    // Fungsi untuk print invoice
+    function printInvoice() {
+      // Tampilkan loading spinner
+      const loadingSpinner = document.getElementById("loadingSpinner");
+      loadingSpinner.classList.add("show");
+      loadingSpinner.querySelector(".loading-text").textContent = "Menyiapkan cetakan...";
+      
+      // Berikan jeda singkat untuk memastikan perubahan diterapkan
+      setTimeout(() => {
+        window.print();
+        
+        // Sembunyikan loading spinner
+        setTimeout(() => {
+          loadingSpinner.classList.remove("show");
+        }, 1000);
+      }, 500);
+    }
+    
+    // Fungsi untuk export ke PDF
+    function exportToPDF() {
+      // Tampilkan loading spinner
+      const loadingSpinner = document.getElementById("loadingSpinner");
+      loadingSpinner.classList.add("show");
+      loadingSpinner.querySelector(".loading-text").textContent = "Membuat PDF...";
+      
+      // Ambil data invoice yang sedang ditampilkan
+      const currentInvoice = JSON.parse(localStorage.getItem("currentInvoice"));
+      
+      if (!currentInvoice) {
+        loadingSpinner.classList.remove("show");
+        alert("Tidak ada invoice yang dapat diekspor!");
+        return;
+      }
+      
+      // Import library jsPDF dan html2canvas
+      const script1 = document.createElement('script');
+      script1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      document.head.appendChild(script1);
+      
+      const script2 = document.createElement('script');
+      script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      document.head.appendChild(script2);
+      
+      // Tunggu library dimuat
+      script2.onload = function() {
+        // Small delay to ensure DOM updates
+        setTimeout(() => {
+          // Get the invoice content element
+          const element = document.getElementById('invoiceContent');
+          
+          // Create canvas from HTML element
+          html2canvas(element, {
+            scale: 2, // Higher resolution
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff'
+          }).then(canvas => {
+            // Calculate PDF dimensions
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 295; // A4 height in mm
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            
+            // Create PDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            let position = 0;
+            
+            // Add image to PDF
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            // Add new page if content exceeds one page
+            while (heightLeft >= 0) {
+              position = heightLeft - imgHeight;
+              pdf.addPage();
+              pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+            }
+            
+            // Save PDF
+            const fileName = `Invoice_${currentInvoice.noInvoice}_${currentInvoice.customer.replace(/\s+/g, '_')}.pdf`;
+            pdf.save(fileName);
+            
+            // Hide loading spinner
+            loadingSpinner.classList.remove("show");
+            
+            // Show success notification
+            showNotification(`PDF invoice berhasil dibuat: ${fileName}`);
+            
+            // Log activity
+            logActivity('export', 'Invoice', `Export PDF invoice: ${currentInvoice.noInvoice}`);
+          }).catch(error => {
+            console.error("Error generating PDF:", error);
+            loadingSpinner.classList.remove("show");
+            showNotification("Terjadi kesalahan saat membuat PDF", "error");
+          });
+        }, 500);
+      };
     }
     
     // Tambahkan event listener untuk tombol cari
@@ -732,6 +1090,7 @@
       
       if (invoice) {
         displayInvoice(invoice);
+        showSingleInvoiceView();
       } else {
         // Tampilkan pesan not found
         document.getElementById("invoiceContent").style.display = "none";
@@ -740,6 +1099,22 @@
     } else {
       // Jika tidak ada parameter URL, sembunyikan konten invoice
       document.getElementById("invoiceContent").style.display = "none";
+    }
+    
+    // Tampilkan daftar invoice yang tersimpan
+    displaySavedInvoices();
+    
+    // Cek apakah ada nomor invoice yang tersimpan di localStorage
+    const savedInvoiceNumber = localStorage.getItem("selectedInvoiceNumber");
+    if (savedInvoiceNumber) {
+      // Isi input pencarian dengan nomor invoice yang tersimpan
+      document.getElementById("searchInput").value = savedInvoiceNumber;
+      
+      // Cari dan tampilkan invoice
+      searchInvoice();
+      
+      // Hapus nomor invoice dari localStorage setelah ditampilkan
+      localStorage.removeItem("selectedInvoiceNumber");
     }
   </script>
 </body>
